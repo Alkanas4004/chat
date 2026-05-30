@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ويب إيجيبت | الطالب</title>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <style>
+        /* ========== المتغيرات الأساسية ========== */
+        :root {
+            --gold: #FFC107;
+            --gold-dark: #B8860B;
+            --gold-light: #FFD54F;
+            --bg: #0A0A0F;
+            --surface: #15151F;
+            --surface2: #1E1E2A;
+            --surface3: #252532;
+            --text: #FFFFFF;
+            --text2: #AAAAAA;
+            --danger: #FF4757;
+            --success: #2ED573;
+            --online: #2ED573;
+            --typing: #FFC107;
+            --radius: 24px;
+            --shadow: 0 8px 25px rgba(0,0,0,0.5);
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 70px;
+            --chat-input-height: 60px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            direction: rtl;
+            overscroll-behavior: none;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* هيكل التطبيق */
+        #app {
+            width: 100%;
+            max-width: 500px;
+            height: 100dvh;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(255,193,7,0.15);
+        }
+        @media (min-width: 600px) {
+            #app {
+                max-width: 550px;
+                height: 90dvh;
+                border-radius: 35px;
+                margin: 20px;
+            }
+        }
+
+        /* ========== حركات ========== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes typingBubble {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        .scale-in {
+            animation: scaleIn 0.3s ease-out;
+        }
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* ========== التحميل ========== */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10,10,15,0.9);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,193,7,0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* ========== الهيدر ========== */
+        .app-header {
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: var(--surface);
+            border-bottom: 1px solid #222;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--gold);
+            cursor: pointer;
+            text-shadow: 0 0 15px rgba(255,193,7,0.5);
+            transition: var(--transition);
+        }
+        .logo:active { transform: scale(0.95); }
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gold);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            width: 40px; height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .icon-btn:hover { background: rgba(255,193,7,0.1); }
+        .icon-btn:active { transform: scale(0.9); }
+
+        /* ========== الصفحات ========== */
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========== تسجيل الدخول ========== */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 30px;
+        }
+        .login-card {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 40px 25px;
+            text-align: center;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        .login-card h1 {
+            font-size: 2.6rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid #333;
+            background: var(--surface2);
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 3px;
+            outline: none;
+            transition: var(--transition);
+            margin: 10px 0;
+        }
+        .input-field:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255,193,7,0.3);
+        }
+        .btn {
+            display: inline-block;
+            padding: 16px 30px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--gold);
+            color: #000;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255,193,7,0.3);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            box-shadow: none;
+        }
+        .btn-sm {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            width: auto;
+            border-radius: 20px;
+        }
+        .error-text {
+            color: var(--danger);
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* ========== شبكة الجروبات ========== */
+        .section-title {
+            color: var(--gold);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 5px;
+        }
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+        }
+        .group-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .group-card:active {
+            transform: scale(0.96);
+            background: var(--surface2);
+        }
+        .group-card img {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            object-fit: cover;
+        }
+        .group-card h3 {
+            color: var(--gold);
+            font-size: 1rem;
+            margin: 10px 0 5px;
+        }
+        .group-card p {
+            color: var(--text2);
+            font-size: 0.8rem;
+        }
+        .group-card .online-badge {
+            width: 12px; height: 12px;
+            background: var(--online);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        /* ========== الشات ========== */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--surface);
+            border-bottom: 1px solid #222;
+            gap: 10px;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+        .chat-header img {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+        }
+        .chat-header .group-name {
+            font-weight: bold;
+            color: var(--gold);
+            flex: 1;
+        }
+        .chat-header .typing-status {
+            font-size: 0.75rem;
+            color: var(--typing);
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-size: cover;
+            background-position: center;
+            background-color: #111;
+            -webkit-overflow-scrolling: touch;
+        }
+        .message {
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message.sent {
+            align-items: flex-end;
+        }
+        .message.received {
+            align-items: flex-start;
+        }
+        .bubble {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 20px;
+            background: var(--surface2);
+            color: #fff;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .message.sent .bubble {
+            background: var(--gold);
+            color: #000;
+        }
+        .bubble img, .bubble video {
+            max-width: 220px;
+            border-radius: 12px;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .bubble audio {
+            max-width: 200px;
+            margin-top: 6px;
+        }
+        .message .meta {
+            font-size: 0.65rem;
+            color: #888;
+            margin: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .message .meta .seen {
+            color: var(--gold);
+            font-size: 0.8rem;
+        }
+        .message-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 2px;
+        }
+        .message-actions button {
+            background: none;
+            border: none;
+            color: var(--text2);
+            font-size: 0.9rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .message-actions button:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .reply-preview {
+            background: rgba(255,193,7,0.1);
+            border-right: 3px solid var(--gold);
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: var(--text2);
+        }
+        .reaction {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* ========== إدخال الشات ========== */
+        .chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            padding-bottom: calc(10px + var(--safe-bottom));
+            background: var(--surface);
+            border-top: 1px solid #222;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 25px;
+            border: none;
+            background: var(--surface2);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .chat-input-area input:focus {
+            background: var(--surface3);
+        }
+        .circle-btn {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: none;
+            color: #000;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .circle-btn:active { transform: scale(0.9); }
+        .circle-btn.recording {
+            background: var(--danger);
+            animation: pulse 1s infinite;
+        }
+
+        /* ========== القائمة المنسدلة ========== */
+        .menu-dots {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 1.8rem;
+            color: var(--gold);
+            cursor: pointer;
+            z-index: 50;
+            background: var(--surface);
+            border-radius: 50%;
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dropdown {
+            position: absolute;
+            top: 55px;
+            left: 15px;
+            background: var(--surface);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            z-index: 55;
+            display: none;
+            min-width: 200px;
+            padding: 8px;
+        }
+        .dropdown.active {
+            display: block;
+        }
+        .dropdown-item {
+            display: block;
+            padding: 12px 18px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .dropdown-item:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* ========== الخلفيات ========== */
+        .bg-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .bg-option {
+            width: 90px; height: 90px;
+            border-radius: 18px;
+            background-size: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        .bg-option:active {
+            transform: scale(0.95);
+            border-color: var(--gold);
+        }
+
+        /* ========== معلومات الجروب ========== */
+        .info-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .info-card img {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            border: 4px solid var(--gold);
+        }
+
+        /* ========== الوسائط ========== */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .media-item {
+            background: var(--surface2);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .media-item img, .media-item video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .media-item:active { transform: scale(0.95); }
+
+        /* ========== الدعم ========== */
+        .support-social {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .support-social img {
+            width: 55px;
+            transition: var(--transition);
+        }
+        .support-social img:active { transform: scale(0.9); }
+
+        /* ========== سكرول بار ========== */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* ========== منبثقات ========== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- Overlay التحميل -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p style="margin-top:20px; color:var(--gold);">جارٍ التحميل...</p>
+    </div>
+
+    <!-- تسجيل الدخول -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card fade-in">
+            <h1>🏫 Web Egypt</h1>
+            <input type="text" id="codeInput" class="input-field" placeholder="أدخل الكود" autocomplete="off">
+            <button class="btn" onclick="studentLogin()">دخول</button>
+            <p id="loginError" class="error-text"></p>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="mainScreen" class="hidden" style="flex:1; display:flex; flex-direction:column;">
+        <div class="app-header">
+            <div class="logo" onclick="navigate('groups')">Web Egypt</div>
+            <div class="header-icons">
+                <button class="icon-btn" onclick="navigate('media')" title="الوسائط">📁</button>
+                <button class="icon-btn" onclick="navigate('support')" title="الدعم">⚙️</button>
+                <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
+            </div>
+        </div>
+        <div id="contentArea" class="screen fade-in"></div>
+    </div>
+</div>
+
+<script>
+    /********************************************************
+     *  إعدادات Firebase و Cloudinary
+     ********************************************************/
+    firebase.initializeApp({
+        apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY",
+        authDomain: "schoolchatapp-2c5b7.firebaseapp.com",
+        projectId: "schoolchatapp-2c5b7",
+        storageBucket: "schoolchatapp-2c5b7.appspot.com",
+        messagingSenderId: "979995006662",
+        appId: "1:979995006662:web:eb08f33a68f41cc283e9c7"
+    });
+    const db = firebase.firestore();
+    const CLOUD_NAME = "dlcjb79w0";
+    const UPLOAD_PRESET = "school_preset";
+
+    // متغيرات عامة
+    let currentUser = null;
+    let currentGroupId = null;
+    let currentGroupData = null;
+    let chatUnsubscribe = null;
+    let typingTimeout = null;
+    let replyToMessage = null; // لتخزين الرسالة المُرد عليها
+
+    // أدوات
+    function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+    function navigate(page, data = null) {
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        const content = document.getElementById('contentArea');
+        content.classList.add('fade-in');
+        switch(page) {
+            case 'groups': renderGroups(); break;
+            case 'chat': renderChat(data); break;
+            case 'media': renderMediaPage(); break;
+            case 'support': renderSupport(); break;
+            case 'groupInfo': renderGroupInfo(); break;
+            case 'changeBg': renderChangeBackground(); break;
+            case 'radio': renderRadio(); break;
+            case 'chatSearch': renderChatSearch(); break;
+            default: renderGroups();
+        }
+    }
+
+    /********************************************************
+     *  تسجيل الدخول
+     ********************************************************/
+    window.studentLogin = async function() {
+        const code = document.getElementById('codeInput').value.trim().toUpperCase();
+        const errEl = document.getElementById('loginError');
+        errEl.textContent = '';
+        if (!code) { errEl.textContent = 'أدخل الكود'; return; }
+        showLoading();
+        try {
+            const snap = await db.collection('student_codes')
+                .where('code', '==', code)
+                .where('usedBy', '==', null)
+                .limit(1).get();
+            if (snap.empty) throw new Error('الكود غير صالح أو مستخدم');
+            const codeDoc = snap.docs[0];
+            const data = codeDoc.data();
+            const userId = data.studentNumber || codeDoc.id;
+            const userRef = db.collection('users').doc(userId);
+            const userDoc = await userRef.get();
+            if (!userDoc.exists) {
+                await userRef.set({
+                    userID: userId,
+                    name: data.studentName,
+                    phone: data.studentNumber || '',
+                    role: 'user',
+                    chatBg: '',
+                    online: true,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                await userRef.update({ online: true });
+            }
+            await codeDoc.ref.update({ usedBy: userId });
+            currentUser = { uid: userId, ...(await userRef.get()).data() };
+            hideLoading();
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            navigate('groups');
+        } catch (e) {
+            hideLoading();
+            errEl.textContent = e.message;
+        }
+    };
+    window.logout = function() {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ online: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+        currentUser = null;
+        currentGroupId = null;
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('mainScreen').classList.add('hidden');
+    };
+
+    // تحديث الحالة عند الخروج من المتصفح (إن أمكن)
+    window.addEventListener('beforeunload', () => {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ online: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+    });
+
+    /********************************************************
+     *  عرض المجموعات (مع أونلاين)
+     ********************************************************/
+    async function renderGroups() {
+        const content = document.getElementById('contentArea');
+        content.innerHTML = `<h2 class="section-title">📚 مجموعاتي</h2><div id="groupsList" class="groups-grid"></div>`;
+        const snap = await db.collection('groups').where('members', 'array-contains', currentUser.uid).get();
+        let html = '';
+        snap.forEach(doc => {
+            const g = doc.data();
+            html += `
+            <div class="group-card scale-in" onclick="openChat('${doc.id}')">
+                <img src="${g.picture || 'https://via.placeholder.com/70'}" alt="صورة">
+                <h3>${g.name}</h3>
+                <p>${g.memberCount || 0} أعضاء</p>
+                <span class="online-badge" id="online-${doc.id}"></span>
+            </div>`;
+        });
+        document.getElementById('groupsList').innerHTML = html || '<p style="color:var(--text2);">لم تنضم لأي مجموعة بعد</p>';
+    }
+
+    function openChat(groupId) {
+        currentGroupId = groupId;
+        navigate('chat');
+    }
+
+    /********************************************************
+     *  الشات (مع مؤشر كتابة، ردود، تفاعلات)
+     ********************************************************/
+    function renderChat() {
+        const content = document.getElementById('contentArea');
+        db.collection('groups').doc(currentGroupId).get().then(doc => {
+            if (!doc.exists) { navigate('groups'); return; }
+            currentGroupData = doc.data();
+            const g = currentGroupData;
+            const perms = g.permissions || {};
+            const isLocked = g.isLocked;
+            const isClosed = (g.type === 'closed' && g.adminID !== currentUser.uid);
+
+            content.innerHTML = `
+            <div class="chat-container">
+                <div class="chat-header">
+                    <img src="${g.picture || 'https://via.placeholder.com/40'}" alt="صورة">
+                    <div class="group-name">${g.name}</div>
+                    <span class="typing-status" id="typingIndicator"></span>
+                    <button class="icon-btn" onclick="navigate('chatSearch')">🔍</button>
+                </div>
+                ${isLocked ? '<div class="locked-banner">🔒 الجروب مقفول بواسطة الأدمن</div>' : ''}
+                <div class="chat-messages" id="chatMessages" style="background-image: url('${currentUser.chatBg || ''}');"></div>
+                ${!isLocked ? `
+                <div class="chat-input-area">
+                    <button class="circle-btn" onclick="startVoice()" id="voiceBtn">🎤</button>
+                    <input id="msgInput" placeholder="${isClosed ? 'الأدمن فقط يمكنه الكتابة' : 'اكتب رسالة...'}" ${isClosed ? 'disabled' : ''} onkeydown="if(event.key==='Enter')sendMessage()" oninput="handleTyping()">
+                    ${perms.allowImages !== false || perms.allowVideos !== false ? `<button class="circle-btn" onclick="uploadMedia()" ${isClosed ? 'disabled' : ''}>📎</button>` : ''}
+                    <button class="circle-btn" onclick="sendMessage()" ${isClosed ? 'disabled' : ''}>➤</button>
+                </div>` : ''}
+                <div id="replyPreview" class="hidden" style="padding:0 15px;"></div>
+                <div class="menu-dots" onclick="toggleChatMenu(event)">⋮</div>
+                <div id="chatMenu" class="dropdown">
+                    <a class="dropdown-item" onclick="navigate('changeBg')">🎨 تغيير الخلفية</a>
+                    <a class="dropdown-item" onclick="navigate('groupInfo')">ℹ️ معلومات الجروب</a>
+                    <a class="dropdown-item" onclick="navigate('radio')">📻 الراديو</a>
+                </div>
+            </div>`;
+            loadMessages();
+            listenTyping();
+        });
+    }
+
+    function toggleChatMenu(e) {
+        e.stopPropagation();
+        document.getElementById('chatMenu').classList.toggle('active');
+        document.addEventListener('click', () => document.getElementById('chatMenu').classList.remove('active'), { once: true });
+    }
+
+    // تحميل الرسائل مع إمكانية الرد والحذف
+    function loadMessages() {
+        const div = document.getElementById('chatMessages');
+        if (chatUnsubscribe) chatUnsubscribe();
+        chatUnsubscribe = db.collection('groups').doc(currentGroupId).collection('messages')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snap => {
+                div.innerHTML = snap.empty ? '<p style="text-align:center; color:#aaa;">لا توجد رسائل</p>' : '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    m.id = doc.id;
+                    const isSent = m.senderID === currentUser.uid;
+                    const cls = isSent ? 'sent' : 'received';
+                    let contentHtml = m.content;
+                    if (m.type === 'image') contentHtml = `<img src="${m.content}" onclick="window.open('${m.content}')">`;
+                    else if (m.type === 'video') contentHtml = `<video controls src="${m.content}" style="max-width:200px;"></video>`;
+                    else if (m.type === 'audio') contentHtml = `<audio controls src="${m.content}"></audio>`;
+                    else if (m.type === 'file') contentHtml = `<a href="${m.content}" target="_blank" style="color:var(--gold);">📄 ملف</a>`;
+
+                    // إذا كانت الرسالة رد على أخرى
+                    let replyHtml = '';
+                    if (m.replyTo) {
+                        replyHtml = `<div class="reply-preview">↩️ رد على: ${m.replyTo.text?.substring(0,30)}...</div>`;
+                    }
+
+                    const time = m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
+                    const seenIcon = isSent && m.seen ? '<span class="seen">✓✓</span>' : (isSent ? '<span>✓</span>' : '');
+
+                    div.innerHTML += `
+                    <div class="message ${cls}" id="msg-${m.id}">
+                        ${replyHtml}
+                        <div class="bubble" oncontextmenu="showMessageActions(event, '${m.id}')">
+                            ${contentHtml}
+                        </div>
+                        <div class="meta">
+                            ${m.senderName || ''} • ${time} ${seenIcon}
+                            <span class="reaction" id="reaction-${m.id}">${m.reaction || ''}</span>
+                        </div>
+                        <div class="message-actions">
+                            <button onclick="replyTo('${m.id}')">↩️ رد</button>
+                            <button onclick="reactToMessage('${m.id}', '❤️')">❤️</button>
+                            <button onclick="reactToMessage('${m.id}', '😂')">😂</button>
+                            <button onclick="reactToMessage('${m.id}', '👍')">👍</button>
+                            ${isSent ? `<button onclick="deleteMessage('${m.id}')">🗑️</button>` : ''}
+                        </div>
+                    </div>`;
+                });
+                div.scrollTop = div.scrollHeight;
+            });
+    }
+
+    // إرسال رسالة (نص)
+    window.sendMessage = function() {
+        const input = document.getElementById('msgInput');
+        if (!input || input.disabled) return;
+        const text = input.value.trim();
+        if (!text) return;
+        const messageData = {
+            senderID: currentUser.uid,
+            senderName: currentUser.name,
+            type: 'text',
+            content: text,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            seen: false
+        };
+        if (replyToMessage) {
+            messageData.replyTo = {
+                id: replyToMessage.id,
+                text: replyToMessage.content?.substring(0,50)
+            };
+            replyToMessage = null;
+            document.getElementById('replyPreview').classList.add('hidden');
+        }
+        db.collection('groups').doc(currentGroupId).collection('messages').add(messageData);
+        input.value = '';
+        stopTyping();
+    };
+
+    // رفع وسائط
+    window.uploadMedia = function() {
+        cloudinary.createUploadWidget({
+            cloudName: CLOUD_NAME,
+            uploadPreset: UPLOAD_PRESET,
+            sources: ['local', 'url', 'camera'],
+            multiple: false,
+            maxFileSize: 20000000,
+            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'mp3', 'wav', 'pdf', 'doc', 'docx']
+        }, (error, result) => {
+            if (!error && result.event === 'success') {
+                const url = result.info.secure_url;
+                const resource = result.info.resource_type;
+                let type = 'file';
+                if (resource === 'image') type = 'image';
+                else if (resource === 'video') type = 'video';
+                else if (resource === 'raw' && result.info.format === 'mp3') type = 'audio';
+                db.collection('groups').doc(currentGroupId).collection('messages').add({
+                    senderID: currentUser.uid,
+                    senderName: currentUser.name,
+                    type: type,
+                    content: url,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    seen: false
+                });
+            }
+        }).open();
+    };
+
+    // الرد على رسالة
+    window.replyTo = function(msgId) {
+        db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId).get().then(doc => {
+            if (doc.exists) {
+                replyToMessage = { id: doc.id, content: doc.data().content };
+                document.getElementById('replyPreview').innerHTML = `<div class="reply-preview">↩️ رد على: ${doc.data().content?.substring(0,20)}... <button onclick="cancelReply()">✖️</button></div>`;
+                document.getElementById('replyPreview').classList.remove('hidden');
+                document.getElementById('msgInput').focus();
+            }
+        });
+    };
+    window.cancelReply = function() {
+        replyToMessage = null;
+        document.getElementById('replyPreview').classList.add('hidden');
+    };
+
+    // تفاعل (ريأكشن)
+    window.reactToMessage = function(msgId, emoji) {
+        const ref = db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId);
+        db.runTransaction(async transaction => {
+            const doc = await transaction.get(ref);
+            if (!doc.exists) return;
+            const currentReaction = doc.data().reaction;
+            if (currentReaction === emoji) {
+                transaction.update(ref, { reaction: firebase.firestore.FieldValue.delete() });
+            } else {
+                transaction.update(ref, { reaction: emoji });
+            }
+        });
+    };
+
+    // حذف رسالة (خاص بالمرسل)
+    window.deleteMessage = function(msgId) {
+        if (confirm('حذف الرسالة؟')) {
+            db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId).delete();
+        }
+    };
+
+    // مؤشر الكتابة
+    function handleTyping() {
+        const ref = db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid);
+        ref.set({ name: currentUser.name, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            ref.delete();
+        }, 3000);
+    }
+    function stopTyping() {
+        db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
+    }
+    function listenTyping() {
+        db.collection('groups').doc(currentGroupId).collection('typing')
+            .onSnapshot(snap => {
+                const indicator = document.getElementById('typingIndicator');
+                if (!indicator) return;
+                const typers = [];
+                snap.forEach(doc => {
+                    if (doc.id !== currentUser.uid) typers.push(doc.data().name);
+                });
+                indicator.textContent = typers.length ? `${typers[0]} يكتب...` : '';
+            });
+    }
+
+    // رسائل صوتية (محاكاة)
+    window.startVoice = function() {
+        alert('خاصية التسجيل الصوتي قيد التطوير');
+        // يمكن استخدام MediaRecorder API
+    };
+
+    // بحث داخل الشات
+    function renderChatSearch() {
+        const content = document.getElementById('contentArea');
+        content.innerHTML = `
+        <h3 class="section-title">🔍 بحث في المحادثة</h3>
+        <input id="chatSearchInput" class="input-field" placeholder="ابحث في الرسائل..." oninput="searchInChat()">
+        <div id="chatSearchResults"></div>
+        <button class="btn btn-outline btn-sm" onclick="navigate('chat')">رجوع</button>`;
+    }
+    window.searchInChat = function() {
+        const query = document.getElementById('chatSearchInput').value.toLowerCase().trim();
+        const container = document.getElementById('chatSearchResults');
+        if (!query) { container.innerHTML = ''; return; }
+        db.collection('groups').doc(currentGroupId).collection('messages')
+            .where('content', '>=', query)
+            .where('content', '<=', query + '\uf8ff')
+            .limit(20).get().then(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    html += `<div class="info-card" style="text-align:right; margin:5px 0; padding:10px;" onclick="scrollToMessage('${doc.id}')">${m.senderName}: ${m.content}</div>`;
+                });
+                container.innerHTML = html || '<p>لا توجد نتائج</p>';
+            });
+    };
+    window.scrollToMessage = function(msgId) {
+        navigate('chat');
+        setTimeout(() => {
+            const el = document.getElementById('msg-' + msgId);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+    };
+
+    /********************************************************
+     *  معلومات الجروب (مع إظهار المشرف ومراسلته)
+     ********************************************************/
+    function renderGroupInfo() {
+        const content = document.getElementById('contentArea');
+        db.collection('groups').doc(currentGroupId).get().then(doc => {
+            const g = doc.data();
+            db.collection('users').doc(g.adminID).get().then(adminDoc => {
+                const admin = adminDoc.exists ? adminDoc.data() : {};
+                content.innerHTML = `
+                <div class="info-card scale-in">
+                    <img src="${g.picture || 'https://via.placeholder.com/110'}">
+                    <h2 style="color:var(--gold); margin-top:20px;">${g.name}</h2>
+                    <p>${g.description || ''}</p>
+                    <p style="color:var(--gold); font-size:1.2rem;">👥 ${g.memberCount || 0} عضو</p>
+                    <div style="margin-top:20px; text-align:right;">
+                        <h4 style="color:var(--gold);">المشرف:</h4>
+                        <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
+                            <img src="${admin.profilePic || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--gold);">
+                            <div>
+                                <strong>${admin.name || 'الأدمن'}</strong><br>
+                                <small>${admin.phone || ''}</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm" onclick="messageAdmin('${g.adminID}')">💬 مراسلة الأدمن</button>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="navigate('chat')">رجوع</button>
+                </div>`;
+            });
+        });
+    }
+    window.messageAdmin = function(adminID) {
+        alert('خاصية المحادثة الخاصة ستضاف قريباً');
+    };
+
+    /********************************************************
+     *  تغيير الخلفية
+     ********************************************************/
+    function renderChangeBackground() {
+        const content = document.getElementById('contentArea');
+        content.innerHTML = `
+        <h3 class="section-title">اختر خلفية</h3>
+        <h4 style="color:var(--gold);">👦 للأولاد</h4>
+        <div class="bg-grid">
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200');" onclick="setChatBg('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=200');" onclick="setChatBg('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800')"></div>
+        </div>
+        <h4 style="color:var(--gold);">👧 للبنات</h4>
+        <div class="bg-grid">
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200');" onclick="setChatBg('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800')"></div>
+            <div class="bg-option" style="background-image: url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200');" onclick="setChatBg('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800')"></div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="navigate('chat')">رجوع</button>`;
+    }
+    window.setChatBg = function(url) {
+        db.collection('users').doc(currentUser.uid).update({ chatBg: url });
+        currentUser.chatBg = url;
+        navigate('chat');
+    };
+
+    /********************************************************
+     *  الوسائط والملفات (بحث متقدم)
+     ********************************************************/
+    function renderMediaPage() {
+        const content = document.getElementById('contentArea');
+        content.innerHTML = `
+        <h3 class="section-title">🔍 بحث في الوسائط</h3>
+        <input id="mediaSearchInput" class="input-field" placeholder="ابحث باسم الملف..." style="text-align:right; letter-spacing:0;">
+        <div style="margin:10px 0; display:flex; gap:10px;">
+            <select id="mediaTypeFilter" class="input-field" style="width:auto; padding:10px;">
+                <option value="">الكل</option>
+                <option value="image">صور</option>
+                <option value="video">فيديو</option>
+                <option value="audio">صوت</option>
+                <option value="file">ملفات</option>
+            </select>
+        </div>
+        <div id="mediaResults" class="media-grid"></div>
+        <button class="btn btn-outline btn-sm" onclick="navigate('groups')">رجوع</button>`;
+        document.getElementById('mediaSearchInput').addEventListener('input', searchMedia);
+        document.getElementById('mediaTypeFilter').addEventListener('change', searchMedia);
+    }
+    function searchMedia() {
+        const query = document.getElementById('mediaSearchInput').value.toLowerCase().trim();
+        const typeFilter = document.getElementById('mediaTypeFilter').value;
+        const container = document.getElementById('mediaResults');
+        container.innerHTML = '<p style="color:var(--text2);">جاري البحث...</p>';
+        db.collection('groups').where('members', 'array-contains', currentUser.uid).get().then(groupSnap => {
+            const promises = [];
+            groupSnap.forEach(gDoc => {
+                promises.push(
+                    db.collection('groups').doc(gDoc.id).collection('messages')
+                        .orderBy('timestamp', 'desc')
+                        .limit(100).get()
+                );
+            });
+            Promise.all(promises).then(results => {
+                let html = '';
+                results.forEach(snap => {
+                    snap.forEach(doc => {
+                        const m = doc.data();
+                        if (m.type === 'text') return;
+                        if (typeFilter && m.type !== typeFilter) return;
+                        if (query && !m.content.toLowerCase().includes(query)) return;
+                        if (m.type === 'image') html += `<div class="media-item" onclick="window.open('${m.content}')"><img src="${m.content}"></div>`;
+                        else if (m.type === 'video') html += `<div class="media-item"><video src="${m.content}" controls></video></div>`;
+                        else if (m.type === 'audio') html += `<div class="media-item" onclick="window.open('${m.content}')">🎵</div>`;
+                        else html += `<div class="media-item" onclick="window.open('${m.content}')">📄</div>`;
+                    });
+                });
+                container.innerHTML = html || '<p>لا توجد نتائج</p>';
+            });
+        });
+    }
+
+    /********************************************************
+     *  الراديو (قيد التطوير)
+     ********************************************************/
+    function renderRadio() {
+        const content = document.getElementById('contentArea');
+        content.innerHTML = `
+        <h3 class="section-title">📻 الراديو</h3>
+        <div class="info-card">
+            <p style="color:var(--text2);">قريباً - استمع إلى محطات الراديو المفضلة</p>
+            <audio controls style="width:100%; margin-top:20px;">
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                متصفحك لا يدعم الصوت
+            </audio>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="navigate('chat')">رجوع</button>`;
+    }
+
+    /********************************************************
+     *  الدعم الفني
+     ********************************************************/
+    function renderSupport() {
+        const content = document.getElementById('contentArea');
+        db.collection('config').doc('support').get().then(doc => {
+            const s = doc.exists ? doc.data() : {};
+            content.innerHTML = `
+            <div class="info-card scale-in">
+                <img src="${s.adminImageURL || 'https://via.placeholder.com/110'}" style="width:120px; border-radius:50%; border:3px solid var(--gold);">
+                <h2 style="color:var(--gold); margin:20px 0;">الدعم الفني</h2>
+                <p style="color:var(--text2);">للشكاوى والاستفسارات</p>
+                <div class="support-social">
+                    ${s.whatsapp ? `<a href="${s.whatsapp}" target="_blank"><img src="https://img.icons8.com/color/48/whatsapp.png"></a>` : ''}
+                    ${s.facebook ? `<a href="${s.facebook}" target="_blank"><img src="https://img.icons8.com/color/48/facebook.png"></a>` : ''}
+                    ${s.tiktok ? `<a href="${s.tiktok}" target="_blank"><img src="https://img.icons8.com/color/48/tiktok--v1.png"></a>` : ''}
+                    ${s.youtube ? `<a href="${s.youtube}" target="_blank"><img src="https://img.icons8.com/color/48/youtube-play.png"></a>` : ''}
+                </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="navigate('groups')">رجوع</button>`;
+        });
+    }
+
+    // تحديث الحالة أونلاين للمجموعات (يمكن استدعاؤها)
+    // (لم نضف تفاصيل أكثر لكنها ممكنة)
+</script>
+</body>
+</html>

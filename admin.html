@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>لوحة الأدمن | Web Egypt</title>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <style>
+        /* ========== متغيرات وأساسيات ========== */
+        :root {
+            --gold: #FFC107;
+            --gold-dark: #B8860B;
+            --gold-light: #FFD54F;
+            --bg: #0A0A0F;
+            --surface: #15151F;
+            --surface2: #1E1E2A;
+            --surface3: #252532;
+            --text: #FFFFFF;
+            --text2: #AAAAAA;
+            --danger: #FF4757;
+            --success: #2ED573;
+            --online: #2ED573;
+            --sidebar-width: 270px;
+            --header-height: 70px;
+            --radius: 20px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            direction: rtl;
+            overscroll-behavior: none;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #app {
+            width: 100%;
+            max-width: 100%;
+            height: 100dvh;
+            background: var(--bg);
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 1024px) {
+            #app {
+                max-width: 1200px;
+                height: 95dvh;
+                border-radius: 30px;
+                margin: 20px;
+                box-shadow: 0 0 40px rgba(255,193,7,0.15);
+            }
+        }
+        /* حركات */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeInUp 0.4s ease-out; }
+        .scale-in { animation: scaleIn 0.3s ease-out; }
+
+        /* شاشة تسجيل الدخول */
+        .login-screen {
+            position: absolute; inset: 0; background: var(--bg);
+            display: flex; align-items: center; justify-content: center; z-index: 2000; flex-direction: column;
+        }
+        .login-box {
+            background: var(--surface); border-radius: 30px; padding: 40px 30px;
+            width: 400px; max-width: 90%; text-align: center;
+            box-shadow: 0 0 40px rgba(255,193,7,0.2);
+        }
+        .login-box h2 { color: var(--gold); font-size: 2.4rem; margin-bottom: 30px; }
+        .input-field {
+            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #333;
+            background: var(--surface2); color: #fff; font-size: 1rem; margin: 10px 0; outline: none;
+            transition: var(--transition);
+        }
+        .input-field:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,193,7,0.3); }
+        .btn {
+            display: inline-block; padding: 14px 28px; border-radius: 30px; border: none;
+            font-weight: bold; cursor: pointer; transition: var(--transition);
+            background: var(--gold); color: #000; margin: 5px; font-size: 0.9rem;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+        .btn-sm { padding: 8px 18px; font-size: 0.8rem; }
+        .error-text { color: var(--danger); margin-top: 15px; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,193,7,0.2); border-top-color: var(--gold);
+            border-radius: 50%; animation: spin 0.8s linear infinite; margin: 15px auto; display: none;
+        }
+
+        /* الهيكل الرئيسي */
+        .app-layout { display: flex; width: 100%; height: 100%; }
+        .sidebar {
+            width: var(--sidebar-width); background: var(--surface); height: 100%;
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            z-index: 100; flex-shrink: 0; border-left: 1px solid #222;
+        }
+        .sidebar .logo-area { text-align: center; padding: 25px 20px; border-bottom: 1px solid #222; }
+        .sidebar .logo-area h2 { color: var(--gold); font-size: 1.9rem; }
+        .sidebar .logo-area p { color: var(--text2); font-size: 0.8rem; }
+        .nav-links { flex: 1; overflow-y: auto; padding: 15px 0; }
+        .nav-item {
+            display: flex; align-items: center; padding: 13px 25px; color: var(--text2);
+            text-decoration: none; cursor: pointer; margin: 3px 10px; border-radius: 12px;
+            transition: var(--transition); font-size: 0.95rem;
+        }
+        .nav-item .icon { margin-left: 12px; font-size: 1.3rem; }
+        .nav-item:hover, .nav-item.active { background: var(--gold); color: #000; font-weight: bold; transform: translateX(-5px); }
+        .user-panel { padding: 15px; border-top: 1px solid #222; text-align: center; }
+        .user-avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 5px; }
+        .logout-btn {
+            background: none; border: 1px solid var(--danger); color: var(--danger);
+            padding: 8px 18px; border-radius: 20px; cursor: pointer; transition: var(--transition); margin-top: 10px;
+        }
+        .logout-btn:hover { background: var(--danger); color: #fff; }
+
+        .main-content { flex: 1; overflow-y: auto; padding: 25px; animation: fadeIn 0.4s; }
+        .page-header { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .page-header h1 { color: var(--gold); font-size: 2rem; }
+
+        .card {
+            background: var(--surface); border-radius: var(--radius); padding: 20px;
+            margin-bottom: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+        }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .stat-value { font-size: 2.5rem; font-weight: bold; color: var(--gold); }
+        .stat-label { color: var(--text2); }
+
+        .table-responsive { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #2a2a35; }
+        .data-table th { background: #1a1a26; color: var(--gold); }
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; }
+        .badge-admin { background: var(--gold); color: #000; }
+        .badge-user { background: #3a3a4a; color: #fff; }
+        .badge-open { background: var(--success); }
+        .badge-locked { background: var(--danger); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--gold); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; background: var(--surface2);
+            border: 1px solid #333; border-radius: 12px; color: #fff;
+        }
+        .toggle-switch { display: flex; align-items: center; gap: 10px; }
+
+        /* الشات داخل الأدمن */
+        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 150px); background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+        .chat-header { padding: 15px; background: var(--surface2); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #333; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #111; }
+        .message { margin-bottom: 12px; }
+        .bubble { display: inline-block; max-width: 75%; padding: 10px 15px; border-radius: 18px; background: var(--surface2); color: #fff; word-break: break-word; }
+        .sent .bubble { background: var(--gold); color: #000; margin-right: auto; }
+        .chat-input-area { display: flex; padding: 12px; background: var(--surface2); gap: 10px; border-top: 1px solid #333; }
+        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; background: var(--surface3); color: #fff; }
+        .circle-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--gold); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        .menu-toggle { display: none; position: absolute; top: 20px; right: 20px; z-index: 150; background: var(--gold); border: none; font-size: 1.8rem; padding: 8px 15px; border-radius: 10px; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; top: 0; right: 0; bottom: 0; transform: translateX(100%); width: 80%; z-index: 200; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; padding: 20px; }
+            .menu-toggle { display: block; }
+            .chat-container { height: calc(100vh - 120px); }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- شاشة الدخول -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>🔐 دخول الأدمن</h2>
+            <input type="email" id="adminEmail" class="input-field" placeholder="البريد الإلكتروني" dir="ltr" autocomplete="email">
+            <input type="password" id="adminPassword" class="input-field" placeholder="كلمة المرور" dir="ltr" autocomplete="current-password">
+            <button class="btn" onclick="adminLogin()" style="width:100%; margin-top:15px;">تسجيل الدخول</button>
+            <div id="loginSpinner" class="spinner"></div>
+            <p id="loginError" class="error-text"></p>
+        </div>
+    </div>
+
+    <!-- التطبيق الأساسي -->
+    <div id="appLayout" class="app-layout" style="display:none;">
+        <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="sidebar" id="sidebar">
+            <div class="logo-area">
+                <h2>Web Egypt</h2>
+                <p>لوحة التحكم</p>
+            </div>
+            <div class="nav-links">
+                <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">📊</span> الإحصائيات</div>
+                <div class="nav-item" onclick="switchPage('users')"><span class="icon">👥</span> المستخدمين</div>
+                <div class="nav-item" onclick="switchPage('groups')"><span class="icon">📋</span> جروباتي</div>
+                <div class="nav-item" onclick="switchPage('create-group')"><span class="icon">➕</span> إنشاء جروب</div>
+                <div class="nav-item" onclick="switchPage('codes')"><span class="icon">🔑</span> أكواد الطلاب</div>
+                <div class="nav-item" onclick="switchPage('media')"><span class="icon">📁</span> الوسائط</div>
+                <div class="nav-item" onclick="switchPage('settings')"><span class="icon">⚙️</span> الإعدادات</div>
+            </div>
+            <div class="user-panel">
+                <img src="https://via.placeholder.com/55" class="user-avatar" id="adminAvatar">
+                <div id="adminNameDisplay" style="color:var(--gold); font-weight:bold;"></div>
+                <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent"></div>
+    </div>
+</div>
+
+<script>
+    /********************************************************
+     *  إعدادات Firebase
+     ********************************************************/
+    firebase.initializeApp({
+        apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY",
+        authDomain: "schoolchatapp-2c5b7.firebaseapp.com",
+        projectId: "schoolchatapp-2c5b7",
+        storageBucket: "schoolchatapp-2c5b7.appspot.com",
+        messagingSenderId: "979995006662",
+        appId: "1:979995006662:web:eb08f33a68f41cc283e9c7"
+    });
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const CLOUD_NAME = "dlcjb79w0";
+    const UPLOAD_PRESET = "school_preset";
+
+    let currentAdmin = null;
+    let currentPage = 'dashboard';
+    let chatUnsub = null;
+    let currentChatGroupId = null;
+    let membersUnsub = null;
+
+    // ========== دوال عامة ==========
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+    function switchPage(page, data = null) {
+        if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+        if (membersUnsub) { membersUnsub(); membersUnsub = null; }
+        currentPage = page;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        const activeLink = [...document.querySelectorAll('.nav-item')].find(el => el.textContent.includes(getPageTitle(page)));
+        if (activeLink) activeLink.classList.add('active');
+        closeSidebar();
+        const main = document.getElementById('mainContent');
+        main.innerHTML = '<div class="spinner" style="display:block; margin:50px auto;"></div>';
+        switch(page) {
+            case 'dashboard': renderDashboard(); break;
+            case 'users': renderUsers(); break;
+            case 'groups': renderGroups(); break;
+            case 'create-group': renderCreateGroup(); break;
+            case 'edit-group': renderEditGroup(data); break;
+            case 'codes': renderCodes(); break;
+            case 'media': renderMediaPage(); break;
+            case 'settings': renderSettings(); break;
+            case 'chat': renderChat(data); break;
+            case 'members': renderMembers(data); break;
+        }
+    }
+    function getPageTitle(page) {
+        const map = { 'dashboard': 'الإحصائيات', 'users': 'المستخدمين', 'groups': 'جروباتي', 'create-group': 'إنشاء جروب', 'codes': 'أكواد الطلاب', 'media': 'الوسائط', 'settings': 'الإعدادات' };
+        return map[page] || '';
+    }
+
+    // ========== تسجيل الدخول ==========
+    window.adminLogin = function() {
+        const email = document.getElementById('adminEmail').value.trim();
+        const pass = document.getElementById('adminPassword').value.trim();
+        const errEl = document.getElementById('loginError');
+        const spinner = document.getElementById('loginSpinner');
+        errEl.textContent = '';
+        if (!email || !pass) { errEl.textContent = 'املأ جميع الحقول'; return; }
+        spinner.style.display = 'block';
+        auth.signInWithEmailAndPassword(email, pass)
+            .then(cred => db.collection('users').doc(cred.user.uid).get().then(doc => {
+                if (!doc.exists) {
+                    return db.collection('users').doc(cred.user.uid).set({
+                        userID: cred.user.uid, name: email.split('@')[0], email: email,
+                        role: 'admin', phone: '', profilePic: '', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => ({ role: 'admin', uid: cred.user.uid, name: email.split('@')[0] }));
+                } else {
+                    if (doc.data().role !== 'admin') throw new Error('غير مصرح');
+                    return { uid: cred.user.uid, ...doc.data() };
+                }
+            }))
+            .then(data => {
+                spinner.style.display = 'none';
+                currentAdmin = { uid: auth.currentUser.uid, ...data };
+                document.getElementById('adminNameDisplay').textContent = currentAdmin.name || 'أدمن';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appLayout').style.display = 'flex';
+                switchPage('dashboard');
+            })
+            .catch(err => { spinner.style.display = 'none'; errEl.textContent = 'خطأ: ' + err.message; });
+    };
+
+    window.logout = () => {
+        auth.signOut().then(() => {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appLayout').style.display = 'none';
+            currentAdmin = null;
+        });
+    };
+
+    // استعادة الجلسة
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (doc.exists && doc.data().role === 'admin') {
+                currentAdmin = { uid: user.uid, ...doc.data() };
+                document.getElementById('adminNameDisplay').textContent = currentAdmin.name || 'أدمن';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appLayout').style.display = 'flex';
+                switchPage('dashboard');
+            } else {
+                auth.signOut();
+            }
+        }
+    });
+
+    // ========== الصفحات ==========
+    // --- الإحصائيات ---
+    async function renderDashboard() {
+        const [usersSnap, groupsSnap, codesSnap] = await Promise.all([
+            db.collection('users').get(),
+            db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
+            db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get()
+        ]);
+        document.getElementById('mainContent').innerHTML = `
+            <div class="page-header"><h1>📊 الإحصائيات</h1></div>
+            <div class="grid-3">
+                <div class="card"><div class="stat-value">${usersSnap.size}</div><div class="stat-label">مستخدم</div></div>
+                <div class="card"><div class="stat-value">${groupsSnap.size}</div><div class="stat-label">جروب</div></div>
+                <div class="card"><div class="stat-value">${codesSnap.size}</div><div class="stat-label">كود</div></div>
+            </div>
+            <div class="card"><canvas id="statsChart"></canvas></div>
+            <button class="btn btn-outline" onclick="broadcastMessage()">📢 إرسال للكل</button>
+            <button class="btn btn-outline" onclick="exportData()">📤 تصدير البيانات</button>`;
+        const ctx = document.getElementById('statsChart')?.getContext('2d');
+        if (ctx) new Chart(ctx, { type: 'bar', data: { labels: ['مستخدمين','جروبات','أكواد'], datasets: [{ data: [usersSnap.size, groupsSnap.size, codesSnap.size], backgroundColor: ['#FFC107','#B8860B','#FFD54F'] }] } });
+    }
+    window.broadcastMessage = () => {
+        const msg = prompt('أدخل الرسالة للبث إلى جميع المجموعات:');
+        if (!msg) return;
+        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(snap => {
+            const batch = db.batch();
+            snap.forEach(doc => {
+                const ref = db.collection('groups').doc(doc.id).collection('messages').doc();
+                batch.set(ref, {
+                    senderID: currentAdmin.uid, senderName: currentAdmin.name,
+                    type: 'text', content: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+            return batch.commit();
+        }).then(() => alert('تم البث'));
+    };
+    window.exportData = () => {
+        // تصدير بسيط لعدد المستخدمين والمجموعات (يمكن توسيعه)
+        alert('خاصية التصدير قيد التطوير');
+    };
+
+    // --- المستخدمين ---
+    function renderUsers() {
+        db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snap => {
+            let rows = '';
+            snap.forEach(doc => {
+                const u = doc.data();
+                rows += `<tr>
+                    <td>${u.name || ''}</td>
+                    <td>${u.phone || '-'}</td>
+                    <td><span class="badge ${u.role==='admin'?'badge-admin':'badge-user'}">${u.role}</span></td>
+                    <td>${u.online ? '<span style="color:var(--online);">●</span>' : '○'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="toggleRole('${doc.id}','${u.role}')">تغيير</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${doc.id}')">حذف</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('mainContent').innerHTML = `
+                <div class="page-header"><h1>👥 المستخدمين</h1></div>
+                <input class="input-field" id="userSearch" placeholder="بحث..." oninput="filterTable('userSearch','userTable')">
+                <div class="table-responsive"><table class="data-table" id="userTable">${rows}</table></div>`;
+        });
+    }
+    window.toggleRole = (uid, currentRole) => {
+        db.collection('users').doc(uid).update({ role: currentRole === 'admin' ? 'user' : 'admin' });
+    };
+    window.deleteUser = uid => { if (confirm('حذف المستخدم؟')) db.collection('users').doc(uid).delete(); };
+
+    // --- الجروبات ---
+    function renderGroups() {
+        db.collection('groups').where('adminID', '==', currentAdmin.uid).onSnapshot(snap => {
+            let html = '';
+            snap.forEach(doc => {
+                const g = doc.data();
+                html += `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h3 style="color:var(--gold);">${g.name}</h3>
+                        <p>👥 ${g.memberCount || 0} | ${g.isLocked ? '🔒 مقفول' : '🟢 مفتوح'}</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm" onclick="openAdminChat('${doc.id}')">💬 شات</button>
+                        <button class="btn btn-sm" onclick="switchPage('members', '${doc.id}')">👤 الأعضاء</button>
+                        <button class="btn btn-sm" onclick="toggleLock('${doc.id}', ${!g.isLocked})">${g.isLocked ? 'فتح' : 'قفل'}</button>
+                        <button class="btn btn-sm" onclick="switchPage('edit-group', '${doc.id}')">تعديل</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteGroup('${doc.id}')">حذف</button>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('mainContent').innerHTML = `
+                <div class="page-header"><h1>📋 جروباتي</h1></div>
+                ${html || '<p style="color:var(--text2);">لا توجد جروبات</p>'}`;
+        });
+    }
+    window.openAdminChat = groupId => { currentChatGroupId = groupId; switchPage('chat'); };
+    window.toggleLock = (gid, lock) => db.collection('groups').doc(gid).update({ isLocked: lock });
+    window.deleteGroup = gid => { if (confirm('حذف الجروب نهائياً؟')) db.collection('groups').doc(gid).delete(); };
+
+    // صفحة الأعضاء
+    function renderMembers(groupId) {
+        document.getElementById('mainContent').innerHTML = `
+            <div class="page-header"><h1>👤 أعضاء الجروب</h1></div>
+            <div id="membersList"></div>
+            <button class="btn btn-outline" onclick="switchPage('groups')">رجوع</button>`;
+        membersUnsub = db.collection('groups').doc(groupId).onSnapshot(doc => {
+            const members = doc.data().members || [];
+            const container = document.getElementById('membersList');
+            if (!container) return;
+            let html = '<ul style="list-style:none; padding:0;">';
+            members.forEach(uid => {
+                html += `<li style="display:flex; justify-content:space-between; padding:5px; background:var(--surface2); margin:5px 0; border-radius:8px;">
+                    <span>${uid}</span>
+                    <button class="btn btn-sm btn-danger" onclick="removeMember('${groupId}','${uid}')">إزالة</button>
+                </li>`;
+            });
+            html += '</ul>';
+            html += `<div style="display:flex; gap:10px; margin-top:10px;">
+                <input class="input-field" id="newMemberId" placeholder="معرف المستخدم">
+                <button class="btn btn-sm" onclick="addMember('${groupId}')">إضافة</button>
+            </div>`;
+            container.innerHTML = html;
+        });
+    }
+    window.removeMember = (gid, uid) => {
+        db.collection('groups').doc(gid).update({
+            members: firebase.firestore.FieldValue.arrayRemove(uid),
+            memberCount: firebase.firestore.FieldValue.increment(-1)
+        });
+    };
+    window.addMember = gid => {
+        const newId = document.getElementById('newMemberId').value.trim();
+        if (!newId) return;
+        db.collection('groups').doc(gid).update({
+            members: firebase.firestore.FieldValue.arrayUnion(newId),
+            memberCount: firebase.firestore.FieldValue.increment(1)
+        });
+    };
+
+    // إنشاء جروب
+    function renderCreateGroup() {
+        document.getElementById('mainContent').innerHTML = `
+            <div class="page-header"><h1>➕ إنشاء جروب</h1></div>
+            <div class="card">
+                <div class="form-group"><label>اسم الجروب</label><input id="gName" class="input-field"></div>
+                <div class="form-group"><label>النوع</label><select id="gType" class="input-field"><option value="open">مفتوح</option><option value="closed">مقفول</option></select></div>
+                <div class="form-group"><label>رابط الصورة</label><input id="gPic" class="input-field" value="https://via.placeholder.com/150"></div>
+                <div class="form-group"><label>الوصف</label><textarea id="gDesc" class="input-field"></textarea></div>
+                <div class="toggle-switch"><label>📝 كتابة</label><input type="checkbox" id="gText" checked></div>
+                <div class="toggle-switch"><label>🖼️ صور</label><input type="checkbox" id="gImg" checked></div>
+                <div class="toggle-switch"><label>🎥 فيديو</label><input type="checkbox" id="gVid" checked></div>
+                <button class="btn" onclick="createGroup()" style="margin-top:15px;">إنشاء</button>
+            </div>`;
+    }
+    window.createGroup = () => {
+        const data = {
+            name: document.getElementById('gName').value,
+            type: document.getElementById('gType').value,
+            picture: document.getElementById('gPic').value,
+            description: document.getElementById('gDesc').value,
+            adminID: currentAdmin.uid,
+            members: [currentAdmin.uid],
+            memberCount: 1,
+            permissions: {
+                allowText: document.getElementById('gText').checked,
+                allowImages: document.getElementById('gImg').checked,
+                allowVideos: document.getElementById('gVid').checked
+            },
+            isLocked: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        db.collection('groups').add(data).then(() => switchPage('groups'));
+    };
+
+    // تعديل جروب
+    function renderEditGroup(groupId) {
+        db.collection('groups').doc(groupId).get().then(doc => {
+            const g = doc.data();
+            document.getElementById('mainContent').innerHTML = `
+                <div class="page-header"><h1>تعديل ${g.name}</h1></div>
+                <div class="card">
+                    <div class="form-group"><label>الاسم</label><input id="eName" class="input-field" value="${g.name}"></div>
+                    <div class="form-group"><label>النوع</label><select id="eType" class="input-field"><option value="open" ${g.type==='open'?'selected':''}>مفتوح</option><option value="closed" ${g.type==='closed'?'selected':''}>مقفول</option></select></div>
+                    <div class="form-group"><label>الصورة</label><input id="ePic" class="input-field" value="${g.picture || ''}"></div>
+                    <div class="form-group"><label>الوصف</label><textarea id="eDesc" class="input-field">${g.description || ''}</textarea></div>
+                    <button class="btn" onclick="saveEdit('${groupId}')">حفظ</button>
+                </div>`;
+        });
+    }
+    window.saveEdit = groupId => {
+        db.collection('groups').doc(groupId).update({
+            name: document.getElementById('eName').value,
+            type: document.getElementById('eType').value,
+            picture: document.getElementById('ePic').value,
+            description: document.getElementById('eDesc').value
+        }).then(() => switchPage('groups'));
+    };
+
+    // --- الأكواد ---
+    function renderCodes() {
+        db.collection('student_codes').where('adminID', '==', currentAdmin.uid).onSnapshot(snap => {
+            let rows = '';
+            snap.forEach(doc => {
+                const c = doc.data();
+                rows += `<tr><td>${c.studentName}</td><td>${c.code}</td><td>${c.usedBy ? 'مستخدم' : 'متاح'}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleteCode('${doc.id}')">حذف</button></td></tr>`;
+            });
+            document.getElementById('mainContent').innerHTML = `
+                <div class="page-header"><h1>🔑 أكواد الطلاب</h1></div>
+                <div class="card">
+                    <input id="stuName" class="input-field" placeholder="اسم الطالب">
+                    <input id="stuNumber" class="input-field" placeholder="الرقم">
+                    <input id="stuClass" class="input-field" placeholder="الصف">
+                    <select id="stuType" class="input-field"><option>طالب</option><option>طالبة</option></select>
+                    <button class="btn" onclick="generateCode()">توليد كود</button>
+                    <div id="newCode" style="font-size:1.5rem; color:var(--gold); margin:15px 0;"></div>
+                </div>
+                <div class="table-responsive"><table class="data-table">${rows}</table></div>`;
+        });
+    }
+    window.generateCode = () => {
+        const code = Math.random().toString(36).substring(2,8).toUpperCase();
+        db.collection('student_codes').add({
+            adminID: currentAdmin.uid, code,
+            studentName: document.getElementById('stuName').value,
+            studentNumber: document.getElementById('stuNumber').value,
+            studentClass: document.getElementById('stuClass').value,
+            type: document.getElementById('stuType').value,
+            usedBy: null, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => document.getElementById('newCode').textContent = 'الكود: ' + code);
+    };
+    window.deleteCode = id => { if (confirm('حذف الكود؟')) db.collection('student_codes').doc(id).delete(); };
+
+    // --- الوسائط ---
+    function renderMediaPage() {
+        document.getElementById('mainContent').innerHTML = `
+            <div class="page-header"><h1>📁 الوسائط</h1></div>
+            <select id="mediaGroupSelect" class="input-field"><option value="">اختر جروب</option></select>
+            <div id="mediaGrid" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;"></div>`;
+        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(snap => {
+            let opts = '';
+            snap.forEach(doc => opts += `<option value="${doc.id}">${doc.data().name}</option>`);
+            document.getElementById('mediaGroupSelect').innerHTML += opts;
+        });
+        document.getElementById('mediaGroupSelect').addEventListener('change', function() {
+            if (this.value) loadMedia(this.value);
+        });
+    }
+    function loadMedia(groupId) {
+        db.collection('groups').doc(groupId).collection('messages')
+            .where('type', 'in', ['image', 'video', 'file'])
+            .orderBy('timestamp', 'desc').limit(50).get().then(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    if (m.type === 'image') html += `<div style="width:100px; height:100px; overflow:hidden;"><img src="${m.content}" style="width:100%; height:100%; object-fit:cover;" onclick="window.open('${m.content}')"></div>`;
+                    else if (m.type === 'video') html += `<div style="width:100px;"><video src="${m.content}" controls style="width:100%;"></video></div>`;
+                    else html += `<div style="width:100px; background:var(--surface2); display:flex; align-items:center; justify-content:center;" onclick="window.open('${m.content}')">📄</div>`;
+                });
+                document.getElementById('mediaGrid').innerHTML = html || '<p>لا وسائط</p>';
+            });
+    }
+
+    // --- الإعدادات ---
+    function renderSettings() {
+        db.collection('config').doc('support').get().then(doc => {
+            const s = doc.exists ? doc.data() : {};
+            document.getElementById('mainContent').innerHTML = `
+                <div class="page-header"><h1>⚙️ الإعدادات</h1></div>
+                <div class="card">
+                    <h3 style="color:var(--gold);">بيانات الدعم الفني</h3>
+                    <div class="form-group"><label>صورة الأدمن</label><input id="supImg" class="input-field" value="${s.adminImageURL || ''}"></div>
+                    <div class="form-group"><label>واتساب</label><input id="supWa" class="input-field" value="${s.whatsapp || ''}"></div>
+                    <div class="form-group"><label>فيسبوك</label><input id="supFb" class="input-field" value="${s.facebook || ''}"></div>
+                    <div class="form-group"><label>تيك توك</label><input id="supTt" class="input-field" value="${s.tiktok || ''}"></div>
+                    <div class="form-group"><label>يوتيوب</label><input id="supYt" class="input-field" value="${s.youtube || ''}"></div>
+                    <button class="btn" onclick="saveSupport()">حفظ</button>
+                </div>
+                <div class="card">
+                    <h3 style="color:var(--gold);">تغيير كلمة المرور</h3>
+                    <div class="form-group"><label>كلمة المرور الجديدة</label><input id="newPass" type="password" class="input-field"></div>
+                    <button class="btn" onclick="changePassword()">تحديث</button>
+                </div>`;
+        });
+    }
+    window.saveSupport = () => {
+        db.collection('config').doc('support').set({
+            adminImageURL: document.getElementById('supImg').value,
+            whatsapp: document.getElementById('supWa').value,
+            facebook: document.getElementById('supFb').value,
+            tiktok: document.getElementById('supTt').value,
+            youtube: document.getElementById('supYt').value
+        }).then(() => alert('تم الحفظ'));
+    };
+    window.changePassword = () => {
+        const newPass = document.getElementById('newPass').value;
+        if (newPass) auth.currentUser.updatePassword(newPass).then(() => alert('تم')).catch(e => alert(e.message));
+    };
+
+    // --- الشات المدمج ---
+    function renderChat(groupId) {
+        currentChatGroupId = groupId;
+        db.collection('groups').doc(groupId).get().then(doc => {
+            const g = doc.data();
+            document.getElementById('mainContent').innerHTML = `
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <img src="${g.picture || 'https://via.placeholder.com/40'}" width="40" height="40" style="border-radius:50%;">
+                        <strong style="color:var(--gold);">${g.name}</strong>
+                        <button class="btn btn-outline btn-sm" onclick="switchPage('groups')" style="margin-right:auto;">رجوع</button>
+                    </div>
+                    <div class="chat-messages" id="adminChatMessages"></div>
+                    <div class="chat-input-area">
+                        <input id="adminMsgInput" class="input-field" placeholder="اكتب رسالة...">
+                        <button class="circle-btn" onclick="uploadAdminMedia()">📎</button>
+                        <button class="circle-btn" onclick="sendAdminMsg()">➤</button>
+                    </div>
+                </div>`;
+            loadAdminMessages(groupId);
+        });
+    }
+    function loadAdminMessages(groupId) {
+        const container = document.getElementById('adminChatMessages');
+        if (chatUnsub) chatUnsub();
+        chatUnsub = db.collection('groups').doc(groupId).collection('messages')
+            .orderBy('timestamp', 'asc').onSnapshot(snap => {
+                container.innerHTML = '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const isSent = m.senderID === currentAdmin.uid;
+                    container.innerHTML += `
+                    <div class="message ${isSent ? 'sent' : ''}">
+                        <div class="bubble">${m.content}</div>
+                        <div style="font-size:0.7rem; color:#888;">${m.senderName || ''}</div>
+                    </div>`;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+    }
+    window.sendAdminMsg = () => {
+        const input = document.getElementById('adminMsgInput');
+        if (!input.value.trim()) return;
+        db.collection('groups').doc(currentChatGroupId).collection('messages').add({
+            senderID: currentAdmin.uid, senderName: currentAdmin.name,
+            type: 'text', content: input.value.trim(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        input.value = '';
+    };
+    window.uploadAdminMedia = () => {
+        cloudinary.createUploadWidget({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET }, (err, result) => {
+            if (!err && result.event === 'success') {
+                const url = result.info.secure_url;
+                const type = result.info.resource_type === 'image' ? 'image' : (result.info.resource_type === 'video' ? 'video' : 'file');
+                db.collection('groups').doc(currentChatGroupId).collection('messages').add({
+                    senderID: currentAdmin.uid, senderName: currentAdmin.name,
+                    type, content: url, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        }).open();
+    };
+
+    // بحث بسيط
+    window.filterTable = (inputId, tableId) => {
+        const filter = document.getElementById(inputId).value.toUpperCase();
+        const table = document.getElementById(tableId);
+        const rows = table.getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            const td = rows[i].getElementsByTagName('td')[0];
+            if (td) {
+                const txt = td.textContent || td.innerText;
+                rows[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
+            }
+        }
+    };
+</script>
+</body>
+</html>
