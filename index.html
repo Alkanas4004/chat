@@ -223,6 +223,26 @@
         @media (max-width: 380px) {
             .groups-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
             .msg-bubble { max-width: 88%; }
+            .chat-messages-area {
+    flex: 1;
+    padding: 10px 12px;
+    overflow-y: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    background-color: #0d0d14;
+    background-size: cover;
+    background-position: center;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    /* أضف دول: */
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    height: auto;
+    scroll-behavior: smooth;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: scroll-position;
+}
         }
     </style>
 </head>
