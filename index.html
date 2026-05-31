@@ -750,100 +750,119 @@
         });
     }
 
-    function loadMessages() {
-        const div = document.getElementById('chatMessages');
-        if (!div) return;
+        function loadMessages() {
+        var div = document.getElementById('chatMessages'); 
+        if (!div) return; 
         if (chatUnsubscribe) chatUnsubscribe();
         
-        let lastDate = null;
-        let shouldAutoScroll = true;
+        var lastDate = null;
+        var shouldAutoScroll = true;
+        var userScrolled = false;
+        var scrollTimeout = null;
         
-        div.addEventListener('scroll', () => {
-            const bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
-            shouldAutoScroll = bottom < 80;
+        // رصد تمرير المستخدم
+        div.addEventListener('scroll', function() {
+            var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+            shouldAutoScroll = bottom < 60;
+            userScrolled = bottom > 120;
+            
+            clearTimeout(scrollTimeout);
+            if (userScrolled) {
+                scrollTimeout = setTimeout(function() {
+                    userScrolled = false;
+                }, 3000);
+            }
         }, { passive: true });
         
-        const unsub = db.collection('groups').doc(currentGroupId).collection('messages')
+        div.addEventListener('touchstart', function() {
+            userScrolled = true;
+        }, { passive: true });
+        
+        div.addEventListener('touchend', function() {
+            setTimeout(function() {
+                var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+                if (bottom < 60) {
+                    userScrolled = false;
+                    shouldAutoScroll = true;
+                }
+            }, 2000);
+        }, { passive: true });
+        
+        var unsub = db.collection('groups').doc(currentGroupId).collection('messages')
             .orderBy('timestamp', 'asc')
-            .onSnapshot(snap => {
-                div.innerHTML = '';
+            .onSnapshot(function(snap) {
+                var wasAtBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 80;
+                
+                div.innerHTML = ''; 
                 lastDate = null;
                 
-                if (snap.empty) {
-                    div.innerHTML = '<div style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل<br><span style="font-size:0.8rem;">كن أول من يرسل رسالة!</span></div>';
-                    return;
+                if (snap.empty) { 
+                    div.innerHTML = '<div style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل<br><span style="font-size:0.8rem;">كن أول من يرسل رسالة!</span></div>'; 
+                    return; 
                 }
                 
-                snap.forEach(doc => {
-                    const m = doc.data();
+                snap.forEach(function(doc) {
+                    var m = doc.data(); 
                     m.id = doc.id;
                     
-                    if (m.deleted) {
-                        div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;background:rgba(0,0,0,0.3);">🗑️ تم حذف الرسالة</div></div>';
-                        return;
+                    if (m.deleted) { 
+                        div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;background:rgba(0,0,0,0.3);">🗑️ تم حذف الرسالة</div></div>'; 
+                        return; 
                     }
                     
-                    let msgTime = '';
-                    if (m.timestamp) {
-                        try {
-                            const d = m.timestamp.toDate();
-                            const dateStr = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-                            if (dateStr !== lastDate) {
-                                div.innerHTML += `<div class="date-divider"><span>${dateStr}</span></div>`;
-                                lastDate = dateStr;
+                    var msgTime = '';
+                    if (m.timestamp) { 
+                        try { 
+                            var d = m.timestamp.toDate();
+                            var dateStr = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }); 
+                            if (dateStr !== lastDate) { 
+                                div.innerHTML += '<div class="date-divider"><span>' + dateStr + '</span></div>'; 
+                                lastDate = dateStr; 
                             }
                             msgTime = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-                        } catch(e) {}
+                        } catch(e) {} 
                     }
                     
-                    const isSent = m.senderID === currentUser.uid;
-                    const cls = isSent ? 'sent' : 'received';
-                    let contentHtml = '';
+                    var isSent = m.senderID === currentUser.uid;
+                    var cls = isSent ? 'sent' : 'received';
+                    var contentHtml = '';
                     
                     if (m.type === 'image') {
-                        contentHtml = `<img src="${m.content}" onclick="viewImage('${m.content}')" loading="lazy" style="max-width:220px; border-radius:10px; cursor:pointer;" onerror="this.style.display='none'">`;
-                        if (m.fileName) contentHtml += `<small style="font-size:0.65rem; color:#888; display:block;">📷 ${m.fileName}</small>`;
+                        contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:220px; border-radius:10px; cursor:pointer;" onerror="this.style.display=\'none\'">';
+                        if (m.fileName) contentHtml += '<small style="font-size:0.65rem; color:#888; display:block;">📷 ' + m.fileName + '</small>';
                     } else if (m.type === 'video') {
-                        contentHtml = `<video controls src="${m.content}" style="max-width:220px; border-radius:10px;" preload="metadata" playsinline></video>`;
-                        if (m.fileName) contentHtml += `<small style="font-size:0.65rem; color:#888; display:block;">🎥 ${m.fileName}</small>`;
+                        contentHtml = '<video controls src="' + m.content + '" style="max-width:220px; border-radius:10px;" preload="metadata" playsinline></video>';
+                        if (m.fileName) contentHtml += '<small style="font-size:0.65rem; color:#888; display:block;">🎥 ' + m.fileName + '</small>';
                     } else if (m.type === 'audio') {
-                        contentHtml = `<audio controls src="${m.content}" style="max-width:200px; border-radius:20px;" preload="metadata"></audio>`;
+                        contentHtml = '<audio controls src="' + m.content + '" style="max-width:200px; border-radius:20px;" preload="metadata"></audio>';
                     } else if (m.type === 'file') {
-                        contentHtml = `
-                        <div class="file-attachment" onclick="window.open('${m.content}')">
-                            <span style="font-size:1.5rem;">📄</span>
-                            <div>
-                                <strong>${m.fileName || 'ملف مرفق'}</strong>
-                                <br><small style="color:var(--text2);">اضغط للتحميل</small>
-                            </div>
-                        </div>`;
+                        contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.5rem;">📄</span><div><strong>' + (m.fileName || 'ملف مرفق') + '</strong><br><small style="color:var(--text2);">اضغط للتحميل</small></div></div>';
                     } else if (m.type === 'broadcast') {
-                        contentHtml = `<strong style="color:var(--gold);">📢 ${(m.content || '').replace(/\n/g, '<br>')}</strong>`;
+                        contentHtml = '<strong style="color:var(--gold);">📢 ' + (m.content || '').replace(/\n/g, '<br>') + '</strong>';
                     } else {
                         contentHtml = (m.content || '').replace(/\n/g, '<br>');
                     }
                     
-                    div.innerHTML += `
-                    <div class="msg-wrapper ${cls}">
-                        <div class="msg-bubble">${contentHtml}</div>
-                        <div class="msg-meta-info">
-                            ${!isSent ? `<strong>${m.senderName || 'مستخدم'}</strong> • ` : ''}
-                            ${msgTime}
-                            ${isSent ? `<span class="seen-check">${m.seen ? '✓✓' : '✓'}</span>` : ''}
-                            ${isSent ? `<button class="delete-msg-btn" onclick="deleteMyMessage('${m.id}')" title="حذف">🗑️</button>` : ''}
-                            ${!isSent ? `<button class="report-btn" onclick="reportMessage('${m.id}','${m.senderID}','${m.senderName || ''}')" title="تبليغ">🚩</button>` : ''}
-                        </div>
-                    </div>`;
+                    div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + (isSent ? ' <button class="delete-msg-btn" onclick="deleteMyMessage(\'' + m.id + '\')" title="حذف">🗑️</button>' : '') + (!isSent ? ' <button class="report-btn" onclick="reportMessage(\'' + m.id + '\',\'' + m.senderID + '\',\'' + (m.senderName || '') + '\')" title="تبليغ">🚩</button>' : '') + '</div></div>';
                 });
                 
-                if (shouldAutoScroll) {
-                    requestAnimationFrame(() => {
+                // تحسين التمرير - 3 محاولات للوصول لآخر رسالة
+                if (!userScrolled || wasAtBottom || shouldAutoScroll) {
+                    requestAnimationFrame(function() {
                         div.scrollTop = div.scrollHeight;
                     });
+                    
+                    setTimeout(function() {
+                        div.scrollTop = div.scrollHeight;
+                    }, 100);
+                    
+                    setTimeout(function() {
+                        div.scrollTop = div.scrollHeight;
+                    }, 300);
                 }
             });
         
-        allListeners.push(unsub);
+        allListeners.push(unsub); 
         chatUnsubscribe = unsub;
     }
 
@@ -1600,6 +1619,16 @@
     console.log('✅ New: Delete messages, report, stories with links');
     console.log('✅ New: Leaderboard, notes, profile name change');
     console.log('✅ New: Pull to refresh, improved animations');
+    // ضيف الكود ده في آخر الصفحة قبل </script>
+setInterval(function() {
+    var chatDiv = document.getElementById('chatMessages');
+    if (chatDiv) {
+        var isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 150;
+        if (isNearBottom) {
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+    }
+}, 500);
 </script>
 </body>
 </html>
