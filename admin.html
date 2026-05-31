@@ -3,58 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>لوحة الأدمن المتطورة | Web Egypt</title>
-    <!-- Firebase -->
+    <title>Web Egypt | الطالب</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Cloudinary Upload Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-    <!-- SheetJS for Excel Export -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* ========== متغيرات وأساسيات ========== */
         :root {
             --gold: #FFC107;
             --gold-dark: #B8860B;
             --gold-light: #FFD54F;
-            --gold-gradient: linear-gradient(135deg, #FFC107, #B8860B, #FFD54F);
             --bg: #0A0A0F;
             --surface: #15151F;
             --surface2: #1E1E2A;
             --surface3: #252532;
-            --surface4: #2A2A3A;
             --text: #FFFFFF;
             --text2: #AAAAAA;
-            --text3: #777777;
             --danger: #FF4757;
-            --danger-light: #FF6B81;
             --success: #2ED573;
-            --success-light: #7BED9F;
-            --info: #1E90FF;
-            --info-light: #70A1FF;
-            --warning: #FFA502;
-            --warning-light: #FFBE76;
             --online: #2ED573;
-            --offline: #FF4757;
-            --sidebar-width: 280px;
-            --header-height: 70px;
-            --radius: 20px;
-            --radius-sm: 12px;
-            --radius-lg: 30px;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-            --shadow: 0 6px 18px rgba(0,0,0,0.4);
-            --shadow-lg: 0 12px 30px rgba(0,0,0,0.5);
-            --shadow-gold: 0 0 30px rgba(255,193,7,0.3);
+            --radius: 24px;
+            --shadow: 0 8px 25px rgba(0,0,0,0.5);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            background: var(--bg);
+            background: #000;
             color: var(--text);
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
             direction: rtl;
@@ -64,1740 +42,1579 @@
             justify-content: center;
             align-items: center;
             -webkit-tap-highlight-color: transparent;
-            background-image: 
-                radial-gradient(ellipse at 20% 50%, rgba(255,193,7,0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(255,193,7,0.03) 0%, transparent 50%);
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.08) 0%, transparent 60%);
         }
         #app {
             width: 100%;
-            max-width: 100%;
+            max-width: 520px;
             height: 100dvh;
             background: var(--bg);
             display: flex;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 60px rgba(255,193,7,0.2);
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 600px) {
             #app {
-                max-width: 1300px;
-                height: 95dvh;
-                border-radius: 30px;
+                max-width: 550px;
+                height: 92dvh;
+                border-radius: 35px;
                 margin: 20px;
-                box-shadow: 0 0 60px rgba(255,193,7,0.15), 0 0 120px rgba(255,193,7,0.05);
             }
         }
-        /* ========== حركات متطورة ========== */
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes fadeInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes scaleOut { from { transform: scale(1.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes glow { 0% { box-shadow: 0 0 5px rgba(255,193,7,0.3); } 50% { box-shadow: 0 0 25px rgba(255,193,7,0.6); } 100% { box-shadow: 0 0 5px rgba(255,193,7,0.3); } }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
-        @keyframes typing { 0% { width: 0; } 100% { width: 100%; } }
-        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* ========== نظام الحركات المتكامل ========== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255,193,7,0.3); }
+            50% { box-shadow: 0 0 25px rgba(255,193,7,0.7); }
+            100% { box-shadow: 0 0 5px rgba(255,193,7,0.3); }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes rippleEffect {
+            to { transform: scale(4); opacity: 0; }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.08); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        @keyframes bellRing {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(15deg); }
+            20% { transform: rotate(-15deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(5deg); }
+            60% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
         
         .fade-in { animation: fadeInUp 0.5s ease-out; }
         .fade-in-down { animation: fadeInDown 0.5s ease-out; }
-        .fade-in-left { animation: fadeInLeft 0.5s ease-out; }
-        .fade-in-right { animation: fadeInRight 0.5s ease-out; }
         .scale-in { animation: scaleIn 0.4s ease-out; }
-        .slide-up { animation: slideUp 0.5s ease-out; }
+        .bounce-in { animation: bounceIn 0.6s ease-out; }
         .float-animation { animation: float 3s ease-in-out infinite; }
         .pulse-animation { animation: pulse 2s ease-in-out infinite; }
         .glow-animation { animation: glow 2s ease-in-out infinite; }
-        .gradient-animation { background-size: 200% 200%; animation: gradientShift 3s ease infinite; }
+        .shake-animation { animation: shake 0.5s ease-in-out; }
+        .bell-ring { animation: bellRing 0.8s ease-in-out; }
+        .pop-in { animation: popIn 0.4s ease-out; }
 
-        /* شريط تقدم متحرك */
-        .progress-bar {
-            height: 4px;
-            background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold-light));
-            background-size: 200% 100%;
+        /* ========== شاشة التحميل ========== */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,193,7,0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loading-text {
+            color: var(--text);
+            margin-top: 15px;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold-dark));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             animation: shimmer 2s linear infinite;
-            border-radius: 2px;
+            font-size: 1.1rem;
         }
 
-        /* ========== شاشة تسجيل الدخول ========== */
-        .login-screen {
-            position: absolute; inset: 0; background: var(--bg);
-            display: flex; align-items: center; justify-content: center; z-index: 2000; flex-direction: column;
-            background-image: 
-                radial-gradient(ellipse at center, rgba(255,193,7,0.08) 0%, transparent 70%),
-                radial-gradient(ellipse at 30% 20%, rgba(255,193,7,0.04) 0%, transparent 50%);
+        /* ========== الهيدر ========== */
+        .app-header {
+            height: 65px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 18px;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
+            border-bottom: 1px solid #222;
+            z-index: 10;
+            flex-shrink: 0;
         }
-        .login-box {
-            background: var(--surface); border-radius: var(--radius-lg); padding: 50px 40px;
-            width: 450px; max-width: 90%; text-align: center;
-            box-shadow: var(--shadow-gold), var(--shadow-lg);
-            border: 1px solid rgba(255,193,7,0.1);
+        .logo {
+            font-size: 1.7rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            animation: gradientShift 3s ease infinite;
+        }
+        .logo:active {
+            transform: scale(0.95);
+        }
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--gold);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: rgba(255,193,7,0.15);
+        }
+        .icon-btn:active {
+            transform: scale(0.9);
+        }
+        .badge-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--surface);
+        }
+
+        /* ========== الشاشات ========== */
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========== تسجيل الدخول ========== */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 30px;
+        }
+        .login-card {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 40px 25px;
+            text-align: center;
+            width: 100%;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,193,7,0.2);
             position: relative;
             overflow: hidden;
         }
-        .login-box::before {
+        .login-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, rgba(255,193,7,0.1), transparent, rgba(255,193,7,0.1), transparent);
-            animation: spin 10s linear infinite;
-            z-index: 0;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background: conic-gradient(transparent, rgba(255,193,7,0.08), transparent, rgba(255,193,7,0.08), transparent);
+            animation: spin 12s linear infinite;
         }
-        .login-box > * { position: relative; z-index: 1; }
-        .login-box h2 { 
-            color: var(--gold); font-size: 2.8rem; margin-bottom: 10px;
-            background: var(--gold-gradient);
+        .login-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .login-card .app-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .login-card h1 {
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .login-subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 30px; }
+        .login-card .subtitle {
+            color: var(--text2);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
         .input-field {
-            width: 100%; padding: 16px 20px; border-radius: 15px; border: 1px solid #333;
-            background: var(--surface2); color: #fff; font-size: 1rem; margin: 12px 0; outline: none;
-            transition: var(--transition); position: relative; z-index: 1;
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid #333;
+            background: var(--surface2);
+            color: #fff;
+            font-size: 1.3rem;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            transition: var(--transition);
+            margin: 10px 0;
+            font-weight: bold;
         }
-        .input-field:focus { 
-            border-color: var(--gold); 
-            box-shadow: 0 0 20px rgba(255,193,7,0.3);
+        .input-field:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(255,193,7,0.4);
             transform: translateY(-2px);
         }
-        .input-icon { position: relative; }
-        .input-icon .icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text3); z-index: 2; }
         .btn {
-            display: inline-block; padding: 16px 32px; border-radius: 30px; border: none;
-            font-weight: bold; cursor: pointer; transition: var(--transition);
-            background: var(--gold-gradient); color: #000; margin: 8px; font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(255,193,7,0.3);
-            position: relative; overflow: hidden;
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
             background-size: 200% 200%;
+            color: #000;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(255,193,7,0.3);
+            position: relative;
+            overflow: hidden;
             animation: gradientShift 3s ease infinite;
         }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,193,7,0.4); }
-        .btn:active { transform: scale(0.96); }
-        .btn-danger { background: linear-gradient(135deg, #FF4757, #FF6B81); color: #fff; }
-        .btn-success { background: linear-gradient(135deg, #2ED573, #7BED9F); color: #000; }
-        .btn-info { background: linear-gradient(135deg, #1E90FF, #70A1FF); color: #fff; }
-        .btn-warning { background: linear-gradient(135deg, #FFA502, #FFBE76); color: #000; }
-        .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); box-shadow: none; }
-        .btn-sm { padding: 10px 22px; font-size: 0.85rem; }
-        .btn-xs { padding: 6px 14px; font-size: 0.75rem; }
-        .btn-icon { width: 40px; height: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .error-text { color: var(--danger); margin-top: 15px; font-weight: bold; }
-        .success-text { color: var(--success); margin-top: 15px; font-weight: bold; }
-        .spinner {
-            width: 45px; height: 45px;
-            border: 4px solid rgba(255,193,7,0.2); border-top-color: var(--gold);
-            border-radius: 50%; animation: spin 0.8s linear infinite; margin: 15px auto; display: none;
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            box-shadow: none;
+            animation: none;
+        }
+        .btn-sm {
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            width: auto;
+            border-radius: 25px;
+        }
+        .btn-xs {
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            width: auto;
+            border-radius: 20px;
+        }
+        .error-text {
+            color: var(--danger);
+            margin-top: 12px;
+            font-weight: bold;
+            min-height: 24px;
         }
 
-        /* ========== الهيكل الرئيسي ========== */
-        .app-layout { display: flex; width: 100%; height: 100%; }
-        .sidebar {
-            width: var(--sidebar-width); background: var(--surface); height: 100%;
-            display: flex; flex-direction: column; transition: transform 0.3s ease;
-            z-index: 100; flex-shrink: 0; border-left: 1px solid #222;
-            background-image: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
+        /* ========== المجموعات ========== */
+        .section-title {
+            color: var(--gold);
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,193,7,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .sidebar-header { text-align: center; padding: 30px 20px; border-bottom: 1px solid #222; }
-        .sidebar-header .admin-avatar {
-            width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold);
-            margin-bottom: 12px; object-fit: cover; box-shadow: 0 0 20px rgba(255,193,7,0.3);
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
         }
-        .sidebar-header h2 { color: var(--gold); font-size: 1.6rem; }
-        .sidebar-header .role-badge {
-            display: inline-block; padding: 4px 14px; border-radius: 20px;
-            background: rgba(255,193,7,0.2); color: var(--gold); font-size: 0.75rem; margin-top: 5px;
-        }
-        .sidebar-header .status-dot {
-            width: 12px; height: 12px; border-radius: 50%; background: var(--online);
-            display: inline-block; margin-left: 5px; box-shadow: 0 0 10px var(--online);
-        }
-        .sidebar-divider { height: 1px; background: #222; margin: 10px 20px; }
-        .nav-section-title { color: var(--text3); font-size: 0.7rem; text-transform: uppercase; padding: 15px 25px 5px; letter-spacing: 2px; }
-        .nav-links { flex: 1; overflow-y: auto; padding: 10px 0; }
-        .nav-item {
-            display: flex; align-items: center; padding: 14px 25px; color: var(--text2);
-            text-decoration: none; cursor: pointer; margin: 3px 12px; border-radius: 14px;
-            transition: var(--transition); font-size: 0.95rem; gap: 12px;
-            position: relative; overflow: hidden;
-        }
-        .nav-item::before {
-            content: ''; position: absolute; inset: 0; background: var(--gold);
-            opacity: 0; transition: var(--transition); border-radius: 14px; z-index: 0;
-        }
-        .nav-item:hover::before, .nav-item.active::before { opacity: 1; }
-        .nav-item:hover, .nav-item.active { color: #000; font-weight: bold; transform: translateX(-5px); }
-        .nav-item .icon { font-size: 1.4rem; z-index: 1; position: relative; }
-        .nav-item .label { z-index: 1; position: relative; }
-        .nav-item .badge-count {
-            background: var(--danger); color: #fff; border-radius: 12px; padding: 2px 10px;
-            font-size: 0.7rem; z-index: 1; margin-right: auto;
-        }
-        .sidebar-footer { padding: 15px 20px; border-top: 1px solid #222; text-align: center; }
-        .sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .sidebar-footer .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold); }
-        .logout-btn {
-            background: rgba(255,71,87,0.1); border: 1px solid var(--danger); color: var(--danger);
-            padding: 10px 24px; border-radius: 25px; cursor: pointer; transition: var(--transition);
-            width: 100%; font-weight: bold;
-        }
-        .logout-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(255,71,87,0.4); }
-
-        .main-content { flex: 1; overflow-y: auto; padding: 30px; animation: fadeIn 0.5s; }
-        .page-header { 
-            margin-bottom: 30px; border-bottom: 2px solid #222; padding-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-        }
-        .page-header h1 { color: var(--gold); font-size: 2.2rem; }
-        .page-header .breadcrumb { color: var(--text2); font-size: 0.9rem; }
-        .page-header .breadcrumb span { color: var(--gold); }
-
-        /* ========== البطاقات ========== */
-        .card {
-            background: var(--surface); border-radius: var(--radius); padding: 24px;
-            margin-bottom: 20px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.05);
-            transition: var(--transition); position: relative; overflow: hidden;
-        }
-        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-header h3 { color: var(--gold); font-size: 1.3rem; }
-        .card-glow { box-shadow: 0 0 30px rgba(255,193,7,0.2); border-color: rgba(255,193,7,0.2); }
-        .stat-card {
-            text-align: center; padding: 30px 20px;
+        .group-card {
             background: linear-gradient(135deg, var(--surface), var(--surface2));
+            border-radius: 20px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
         }
-        .stat-card .icon-stat { font-size: 3rem; margin-bottom: 10px; }
-        .stat-value { font-size: 3rem; font-weight: bold; color: var(--gold); }
-        .stat-label { color: var(--text2); font-size: 0.9rem; margin-top: 5px; }
-        .stat-change { font-size: 0.8rem; margin-top: 5px; }
-        .stat-change.positive { color: var(--success); }
-        .stat-change.negative { color: var(--danger); }
-
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-
-        /* ========== الجداول ========== */
-        .table-responsive { overflow-x: auto; border-radius: var(--radius); }
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 14px 18px; text-align: right; border-bottom: 1px solid #2a2a35; }
-        .data-table th { 
-            background: var(--surface3); color: var(--gold); font-weight: bold;
-            position: sticky; top: 0; z-index: 1;
+        .group-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255,193,7,0.2);
         }
-        .data-table tr { transition: var(--transition); }
-        .data-table tbody tr:hover { background: rgba(255,193,7,0.05); }
-        .badge { 
-            display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 0.78rem; font-weight: bold;
-            letter-spacing: 0.5px;
+        .group-card:active {
+            transform: scale(0.95);
         }
-        .badge-admin { background: linear-gradient(135deg, #FFC107, #B8860B); color: #000; }
-        .badge-moderator { background: linear-gradient(135deg, #1E90FF, #4169E1); color: #fff; }
-        .badge-user { background: #3a3a4a; color: #fff; }
-        .badge-open { background: var(--success); color: #000; }
-        .badge-locked { background: var(--danger); color: #fff; }
-        .badge-pending { background: var(--warning); color: #000; }
-
-        /* ========== النماذج ========== */
-        .form-group { margin-bottom: 24px; }
-        .form-group label { display: block; margin-bottom: 8px; color: var(--gold); font-weight: bold; font-size: 0.9rem; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 14px 18px; background: var(--surface2);
-            border: 1px solid #333; border-radius: 14px; color: #fff; font-size: 0.95rem;
+        .group-card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            object-fit: cover;
             transition: var(--transition);
         }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: var(--gold); box-shadow: 0 0 15px rgba(255,193,7,0.2); outline: none;
+        .group-card:hover img {
+            transform: rotate(5deg) scale(1.05);
         }
-        .form-group textarea { min-height: 120px; resize: vertical; }
-        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
-        .form-row > * { flex: 1; min-width: 200px; }
-        .toggle-switch { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
-        .toggle-switch input[type="checkbox"] { 
-            width: 50px; height: 26px; appearance: none; background: #333;
-            border-radius: 13px; position: relative; cursor: pointer; transition: var(--transition);
+        .group-card h3 {
+            color: var(--gold);
+            font-size: 0.95rem;
+            margin: 10px 0 5px;
         }
-        .toggle-switch input[type="checkbox"]:checked { background: var(--gold); }
-        .toggle-switch input[type="checkbox"]::before {
-            content: ''; width: 22px; height: 22px; border-radius: 50%; background: #fff;
-            position: absolute; top: 2px; left: 2px; transition: var(--transition);
+        .group-card p {
+            color: var(--text2);
+            font-size: 0.75rem;
         }
-        .toggle-switch input[type="checkbox"]:checked::before { left: 26px; }
+        .group-card .member-count {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: var(--gold);
+        }
+        .group-card .locked-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1rem;
+        }
 
         /* ========== الشات ========== */
-        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 200px); background: var(--surface); border-radius: var(--radius); overflow: hidden; }
-        .chat-header { padding: 18px; background: var(--surface2); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #333; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #111; }
-        .message { margin-bottom: 14px; }
-        .bubble { display: inline-block; max-width: 75%; padding: 12px 18px; border-radius: 20px; background: var(--surface2); color: #fff; word-break: break-word; }
-        .sent { text-align: right; }
-        .sent .bubble { background: var(--gold-gradient); color: #000; }
-        .chat-input-area { display: flex; padding: 14px; background: var(--surface2); gap: 12px; border-top: 1px solid #333; }
-        .chat-input-area input { flex: 1; padding: 12px 20px; border-radius: 25px; border: none; background: var(--surface3); color: #fff; }
-        .circle-btn { 
-            width: 44px; height: 44px; border-radius: 50%; background: var(--gold-gradient);
-            border: none; color: #000; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: var(--transition); font-size: 1.3rem;
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
         }
-        .circle-btn:hover { transform: scale(1.1); }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--surface);
+            border-bottom: 1px solid #222;
+            gap: 10px;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+        .chat-header img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+        }
+        .chat-header .group-name {
+            font-weight: bold;
+            color: var(--gold);
+            flex: 1;
+            font-size: 1.1rem;
+        }
+        .chat-header .status-text {
+            font-size: 0.75rem;
+            color: var(--text2);
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #0d0d15;
+            background-size: cover;
+            background-position: center;
+            -webkit-overflow-scrolling: touch;
+        }
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        .message.sent {
+            align-items: flex-end;
+        }
+        .message.received {
+            align-items: flex-start;
+        }
+        .bubble {
+            max-width: 82%;
+            padding: 10px 16px;
+            border-radius: 20px;
+            background: var(--surface2);
+            color: #fff;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .message.sent .bubble {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #000;
+        }
+        .bubble img, .bubble video {
+            max-width: 200px;
+            border-radius: 12px;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .bubble .file-link {
+            color: var(--gold);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .message .msg-meta {
+            font-size: 0.65rem;
+            color: #777;
+            margin: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .message.sent .msg-meta {
+            justify-content: flex-end;
+        }
+        .reply-preview {
+            background: rgba(255,193,7,0.1);
+            border-right: 3px solid var(--gold);
+            padding: 6px 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            color: var(--text2);
+            cursor: pointer;
+        }
+        .deleted-msg {
+            font-style: italic;
+            color: #666;
+            padding: 8px;
+        }
+        .locked-banner {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,71,87,0.2);
+            color: var(--danger);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
 
-        /* ========== المنبثقات والمودال ========== */
+        /* ========== إدخال الشات ========== */
+        .chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            padding-bottom: calc(10px + var(--safe-bottom));
+            background: var(--surface);
+            border-top: 1px solid #222;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 25px;
+            border: none;
+            background: var(--surface2);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .chat-input-area input:focus {
+            background: var(--surface3);
+            box-shadow: 0 0 10px rgba(255,193,7,0.2);
+        }
+        .chat-input-area input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .circle-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+        .circle-btn.send {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #000;
+        }
+        .circle-btn.attach {
+            background: var(--surface3);
+            color: var(--gold);
+            border: 1px solid #333;
+        }
+        .circle-btn:active {
+            transform: scale(0.9);
+        }
+        .circle-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ========== القائمة المنسدلة ========== */
+        .dropdown {
+            position: absolute;
+            top: 55px;
+            left: 10px;
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 55;
+            display: none;
+            min-width: 180px;
+            padding: 6px;
+            border: 1px solid #333;
+        }
+        .dropdown.active {
+            display: block;
+            animation: fadeInDown 0.2s ease-out;
+        }
+        .dropdown-item {
+            display: block;
+            padding: 11px 16px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .dropdown-item:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* ========== النوافذ المنبثقة ========== */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 500;
-            display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
             backdrop-filter: blur(5px);
         }
         .modal {
-            background: var(--surface); border-radius: var(--radius-lg); padding: 30px;
-            width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto;
-            box-shadow: var(--shadow-lg); animation: scaleIn 0.4s ease-out;
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 25px;
+            width: 90%;
+            max-width: 380px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            animation: scaleIn 0.4s ease-out;
         }
-        .modal h2 { color: var(--gold); margin-bottom: 20px; }
-
-        .menu-toggle { 
-            display: none; position: fixed; top: 20px; right: 20px; z-index: 150;
-            background: var(--gold); border: none; font-size: 2rem; padding: 10px 18px;
-            border-radius: 14px; cursor: pointer; box-shadow: var(--shadow);
-        }
-
-        /* ========== تبويبات ========== */
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab { 
-            padding: 10px 20px; background: var(--surface2); border: none; color: var(--text2);
-            border-radius: 12px; cursor: pointer; transition: var(--transition); font-weight: bold;
-        }
-        .tab.active { background: var(--gold); color: #000; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s; }
-
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; top: 0; right: 0; bottom: 0; transform: translateX(100%); width: 85%; z-index: 200; }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-right: 0; padding: 20px; }
-            .menu-toggle { display: block; }
-            .chat-container { height: calc(100vh - 150px); }
-            .page-header h1 { font-size: 1.6rem; }
+        .modal h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-align: center;
         }
 
-        /* ========== تأثيرات إضافية ========== */
-        .ripple { position: relative; overflow: hidden; }
-        .ripple::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.2); border-radius: 50%;
-            transform: scale(0); animation: ripple 0.6s linear; pointer-events: none;
+        /* ========== معلومات المجموعة ========== */
+        .info-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            margin: 15px 0;
+            box-shadow: var(--shadow);
         }
-        .tooltip {
-            position: relative;
+        .info-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--gold);
+            object-fit: cover;
         }
-        .tooltip::after {
-            content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%;
-            transform: translateX(-50%); background: #000; color: #fff; padding: 5px 10px;
-            border-radius: 6px; font-size: 0.7rem; white-space: nowrap; opacity: 0;
-            pointer-events: none; transition: var(--transition);
+
+        /* ========== روابط الدعم ========== */
+        .support-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 25px;
+            flex-wrap: wrap;
         }
-        .tooltip:hover::after { opacity: 1; }
+        .support-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .support-link img {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+        }
+        .support-link:active {
+            transform: scale(0.9);
+        }
+
+        /* ========== القصص ========== */
+        .stories-bar {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 8px 0;
+            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .stories-bar::-webkit-scrollbar {
+            height: 3px;
+        }
+        .story-item {
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .story-item:active {
+            transform: scale(0.9);
+        }
+        .story-item .story-ring {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
+            margin-bottom: 5px;
+        }
+        .story-item .story-ring img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--bg);
+        }
+        .story-item span {
+            font-size: 0.7rem;
+            color: var(--text2);
+            display: block;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ========== شبكة الوسائط ========== */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .media-item {
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .media-item:active {
+            transform: scale(0.95);
+        }
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+        .media-item .file-placeholder {
+            background: var(--surface2);
+            border-radius: 12px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* ========== قائمة المستخدمين ========== */
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--surface2);
+            margin: 6px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .user-list-item:hover {
+            background: var(--surface3);
+            transform: translateX(-5px);
+        }
+        .user-list-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== سكرول بار ========== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
 <div id="app">
-    <!-- شاشة الدخول -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-box">
-            <h2>🔐 لوحة التحكم</h2>
-            <p class="login-subtitle">Web Egypt - نظام الإدارة المتكامل</p>
-            <div class="input-icon">
-                <span class="icon">📧</span>
-                <input type="email" id="adminEmail" class="input-field" placeholder="البريد الإلكتروني" dir="ltr" autocomplete="email">
-            </div>
-            <div class="input-icon">
-                <span class="icon">🔒</span>
-                <input type="password" id="adminPassword" class="input-field" placeholder="كلمة المرور" dir="ltr" autocomplete="current-password">
-            </div>
-            <button class="btn ripple" onclick="adminLogin()" style="width:100%; margin-top:20px;">🚀 تسجيل الدخول</button>
-            <div id="loginSpinner" class="spinner"></div>
+    <!-- شاشة التحميل -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p class="loading-text">⏳ جاري التحميل...</p>
+    </div>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card scale-in">
+            <div class="app-icon">🏫</div>
+            <h1>Web Egypt</h1>
+            <p class="subtitle">منصة التعليم الذكية</p>
+            <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10">
+            <button class="btn pulse-animation" onclick="studentLogin()">🚀 دخول</button>
             <p id="loginError" class="error-text"></p>
-            <p style="color:var(--text3); font-size:0.7rem; margin-top:20px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
+            <p style="color:var(--text2); font-size:0.7rem; margin-top:15px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
         </div>
     </div>
 
-    <!-- التطبيق الأساسي -->
-    <div id="appLayout" class="app-layout" style="display:none;">
-        <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <img src="https://via.placeholder.com/80" class="admin-avatar" id="adminAvatar">
-                <h2 id="adminNameDisplay">أدمن</h2>
-                <span class="role-badge"><span class="status-dot"></span> مدير النظام</span>
-            </div>
-            <div class="sidebar-divider"></div>
-            <div class="nav-section-title">القائمة الرئيسية</div>
-            <div class="nav-links">
-                <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">📊</span><span class="label">الإحصائيات</span></div>
-                <div class="nav-item" onclick="switchPage('users')"><span class="icon">👥</span><span class="label">المستخدمين</span><span class="badge-count" id="userCountBadge">0</span></div>
-                <div class="nav-item" onclick="switchPage('groups')"><span class="icon">📋</span><span class="label">المجموعات</span><span class="badge-count" id="groupCountBadge">0</span></div>
-                <div class="nav-item" onclick="switchPage('create-group')"><span class="icon">➕</span><span class="label">إنشاء مجموعة</span></div>
-                <div class="nav-item" onclick="switchPage('codes')"><span class="icon">🔑</span><span class="label">أكواد الطلاب</span></div>
-                <div class="nav-item" onclick="switchPage('private-chats')"><span class="icon">💬</span><span class="label">المحادثات الخاصة</span></div>
-                <div class="nav-item" onclick="switchPage('stories')"><span class="icon">📖</span><span class="label">القصص</span></div>
-                <div class="nav-item" onclick="switchPage('media')"><span class="icon">📁</span><span class="label">الوسائط</span></div>
-                <div class="nav-item" onclick="switchPage('reports')"><span class="icon">🚨</span><span class="label">البلاغات</span><span class="badge-count" id="reportCountBadge">0</span></div>
-                <div class="nav-item" onclick="switchPage('analytics')"><span class="icon">📈</span><span class="label">تحليلات</span></div>
-                <div class="nav-item" onclick="switchPage('backup')"><span class="icon">💾</span><span class="label">النسخ الاحتياطي</span></div>
-                <div class="nav-item" onclick="switchPage('settings')"><span class="icon">⚙️</span><span class="label">الإعدادات</span></div>
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <img src="https://via.placeholder.com/40" id="adminAvatarSmall">
-                    <div>
-                        <strong style="color:var(--gold);" id="adminNameSmall">أدمن</strong>
-                        <br><small style="color:var(--text2);">مشرف عام</small>
-                    </div>
-                </div>
-                <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+    <!-- التطبيق الرئيسي -->
+    <div id="mainScreen" class="hidden" style="flex:1; display:flex; flex-direction:column;">
+        <div class="app-header">
+            <div class="logo" onclick="navigate('groups')">Web Egypt</div>
+            <div class="header-icons">
+                <button class="icon-btn" onclick="navigate('stories')" title="القصص">📖</button>
+                <button class="icon-btn" onclick="navigate('private-chats')" title="المحادثات">💬</button>
+                <button class="icon-btn" onclick="navigate('media')" title="الوسائط">📁</button>
+                <button class="icon-btn" onclick="navigate('support')" title="الدعم">📞</button>
+                <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
             </div>
         </div>
-        <div class="main-content" id="mainContent"></div>
+        <div id="contentArea" class="screen fade-in"></div>
     </div>
 </div>
 
 <script>
     /********************************************************
-     *  إعدادات Firebase والخدمات
+     *  إعدادات Firebase و Cloudinary
      ********************************************************/
-    const firebaseConfig = {
+    firebase.initializeApp({
         apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY",
         authDomain: "schoolchatapp-2c5b7.firebaseapp.com",
         projectId: "schoolchatapp-2c5b7",
         storageBucket: "schoolchatapp-2c5b7.appspot.com",
         messagingSenderId: "979995006662",
         appId: "1:979995006662:web:eb08f33a68f41cc283e9c7"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    });
     const db = firebase.firestore();
-    const storage = firebase.storage();
-    
-    // إعدادات Cloudinary
     const CLOUD_NAME = "dlcjb79w0";
     const UPLOAD_PRESET = "school_preset";
-    
-    // متغيرات عامة
-    let currentAdmin = null;
-    let currentPage = 'dashboard';
-    let chatUnsub = null;
-    let currentChatGroupId = null;
-    let membersUnsub = null;
-    let privateChatUnsub = null;
+
+    // ========== المتغيرات العامة ==========
+    let currentUser = null;
+    let currentGroupId = null;
+    let currentGroupData = null;
+    let chatUnsubscribe = null;
+    let typingTimeout = null;
+    let replyToMessage = null;
     let currentPrivateChatUser = null;
-    let realtimeListeners = [];
+    let allListeners = [];
 
-    // ========== دوال عامة ==========
-    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+    // ========== أدوات مساعدة ==========
+    function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
     
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        const colors = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
-        toast.style.cssText = `
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: ${colors[type] || colors.info}; color: #000; padding: 14px 28px;
-            border-radius: 30px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: slideUp 0.3s ease-out;
-        `;
-        toast.textContent = message;
+    function showToast(msg, type) {
+        type = type || 'info';
+        var colors = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:25px; font-weight:bold; z-index:9999; box-shadow:0 8px 25px rgba(0,0,0,0.5); animation:slideUp 0.3s ease-out; color:#000; max-width:90%; text-align:center;';
+        toast.style.background = colors[type] || colors.info;
+        toast.textContent = msg;
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.animation = 'fadeIn 0.3s reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            toast.style.transition = '0.3s';
+            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+        }, 2500);
     }
 
-    function switchPage(page, data = null) {
-        // تنظيف المستمعين السابقين
-        if (chatUnsub) { chatUnsub(); chatUnsub = null; }
-        if (membersUnsub) { membersUnsub(); membersUnsub = null; }
-        if (privateChatUnsub) { privateChatUnsub(); privateChatUnsub = null; }
-        realtimeListeners.forEach(unsub => { try { unsub(); } catch(e) {} });
-        realtimeListeners = [];
-        
-        currentPage = page;
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        const activeLink = [...document.querySelectorAll('.nav-item')].find(el => 
-            el.querySelector('.label')?.textContent.includes(getPageTitle(page))
-        );
-        if (activeLink) activeLink.classList.add('active');
-        closeSidebar();
-        
-        const main = document.getElementById('mainContent');
-        main.innerHTML = '<div style="text-align:center; padding:50px;"><div class="spinner" style="display:block; margin:0 auto;"></div><p style="color:var(--gold); margin-top:15px;">جاري التحميل...</p></div>';
-        
-        setTimeout(() => {
-            switch(page) {
-                case 'dashboard': renderDashboard(); break;
-                case 'users': renderUsers(); break;
-                case 'groups': renderGroups(); break;
-                case 'create-group': renderCreateGroup(); break;
-                case 'edit-group': renderEditGroup(data); break;
-                case 'codes': renderCodes(); break;
-                case 'private-chats': renderPrivateChats(); break;
-                case 'private-chat': renderPrivateChat(data); break;
-                case 'stories': renderStories(); break;
-                case 'media': renderMediaPage(); break;
-                case 'reports': renderReports(); break;
-                case 'analytics': renderAnalytics(); break;
-                case 'backup': renderBackup(); break;
-                case 'settings': renderSettings(); break;
-                case 'chat': renderChat(data); break;
-                case 'members': renderMembers(data); break;
-                default: renderDashboard();
-            }
-        }, 100);
-    }
-    
-    function getPageTitle(page) {
-        const map = { 
-            'dashboard': 'الإحصائيات', 'users': 'المستخدمين', 'groups': 'المجموعات',
-            'create-group': 'إنشاء مجموعة', 'codes': 'أكواد الطلاب', 'private-chats': 'المحادثات الخاصة',
-            'stories': 'القصص', 'media': 'الوسائط', 'reports': 'البلاغات',
-            'analytics': 'تحليلات', 'backup': 'النسخ الاحتياطي', 'settings': 'الإعدادات'
-        };
-        return map[page] || '';
+    function cleanListeners() {
+        allListeners.forEach(function(fn) { try { fn(); } catch(e) {} });
+        allListeners = [];
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        clearTimeout(typingTimeout);
+        replyToMessage = null;
     }
 
-    // تحديث العدادات في القائمة الجانبية
-    function updateSidebarCounts() {
-        Promise.all([
-            db.collection('users').get(),
-            db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
-            db.collection('reports').where('status', '==', 'pending').get()
-        ]).then(([usersSnap, groupsSnap, reportsSnap]) => {
-            const userBadge = document.getElementById('userCountBadge');
-            const groupBadge = document.getElementById('groupCountBadge');
-            const reportBadge = document.getElementById('reportCountBadge');
-            if (userBadge) userBadge.textContent = usersSnap.size;
-            if (groupBadge) groupBadge.textContent = groupsSnap.size;
-            if (reportBadge) reportBadge.textContent = reportsSnap.size;
-        });
+    function navigate(page, data) {
+        data = data || null;
+        cleanListeners();
+        var content = document.getElementById('contentArea');
+        content.classList.remove('fade-in');
+        void content.offsetWidth;
+        content.classList.add('fade-in');
+        
+        switch(page) {
+            case 'groups': renderGroups(); break;
+            case 'chat': renderChat(data); break;
+            case 'stories': renderStories(); break;
+            case 'private-chats': renderPrivateChatsList(); break;
+            case 'private-chat': renderPrivateChat(data); break;
+            case 'media': renderMediaPage(); break;
+            case 'support': renderSupport(); break;
+            case 'group-info': renderGroupInfo(); break;
+            default: renderGroups();
+        }
+    }
+
+    // ========== معرف الجهاز ==========
+    function getDeviceID() {
+        var deviceID = localStorage.getItem('webEgyptDeviceID');
+        if (!deviceID) {
+            deviceID = 'DEV-' + Math.random().toString(36).substr(2, 12) + '-' + Date.now().toString(36);
+            localStorage.setItem('webEgyptDeviceID', deviceID);
+        }
+        return deviceID;
     }
 
     // ========== تسجيل الدخول ==========
-    window.adminLogin = function() {
-        const email = document.getElementById('adminEmail').value.trim();
-        const pass = document.getElementById('adminPassword').value.trim();
-        const errEl = document.getElementById('loginError');
-        const spinner = document.getElementById('loginSpinner');
+    window.studentLogin = function() {
+        var codeInput = document.getElementById('codeInput');
+        var code = codeInput.value.trim().toUpperCase();
+        var errEl = document.getElementById('loginError');
         errEl.textContent = '';
-        if (!email || !pass) { errEl.textContent = '⚠️ الرجاء ملء جميع الحقول'; return; }
-        spinner.style.display = 'block';
-        auth.signInWithEmailAndPassword(email, pass)
-            .then(cred => db.collection('users').doc(cred.user.uid).get().then(doc => {
-                if (!doc.exists) {
-                    return db.collection('users').doc(cred.user.uid).set({
-                        userID: cred.user.uid, name: email.split('@')[0], email: email,
-                        role: 'admin', phone: '', profilePic: '', online: true,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    }).then(() => ({ role: 'admin', uid: cred.user.uid, name: email.split('@')[0] }));
-                } else {
-                    const userData = doc.data();
-                    if (userData.role !== 'admin') throw new Error('⛔ غير مصرح لك بالدخول');
-                    // تحديث آخر دخول
-                    doc.ref.update({ lastLogin: firebase.firestore.FieldValue.serverTimestamp(), online: true });
-                    return { uid: cred.user.uid, ...userData };
+        
+        if (!code) { errEl.textContent = '⚠️ الرجاء إدخال الكود'; codeInput.classList.add('shake-animation'); setTimeout(function(){ codeInput.classList.remove('shake-animation'); }, 500); return; }
+        if (code.length < 4) { errEl.textContent = '⚠️ الكود قصير جداً (4 أحرف على الأقل)'; return; }
+        
+        showLoading();
+        var deviceID = getDeviceID();
+        
+        db.collection('student_codes').where('code', '==', code).limit(1).get().then(function(codeSnap) {
+            if (codeSnap.empty) throw new Error('❌ الكود غير صحيح');
+            
+            var codeDoc = codeSnap.docs[0];
+            var codeData = codeDoc.data();
+            
+            if (codeData.usedBy && codeData.usedByDevice && codeData.usedByDevice !== deviceID) {
+                throw new Error('⚠️ هذا الكود مستخدم على جهاز آخر');
+            }
+            
+            var userId = codeData.studentNumber || codeDoc.id;
+            var userRef = db.collection('users').doc(userId);
+            
+            var promises = [];
+            
+            if (!codeData.usedBy) {
+                promises.push(codeDoc.ref.update({
+                    usedBy: userId,
+                    usedByDevice: deviceID,
+                    activatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }));
+            }
+            
+            return Promise.all(promises).then(function() {
+                return userRef.get().then(function(userDoc) {
+                    if (!userDoc.exists) {
+                        return userRef.set({
+                            userID: userId,
+                            name: codeData.studentName || 'طالب',
+                            phone: codeData.studentNumber || '',
+                            role: 'user',
+                            chatBg: '',
+                            online: true,
+                            deviceID: deviceID,
+                            lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        return userRef.update({
+                            online: true,
+                            deviceID: deviceID,
+                            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                });
+            }).then(function() {
+                // إضافة الطالب للمجموعات المرتبطة
+                if (codeData.allowedGroups && codeData.allowedGroups.length > 0) {
+                    var batch = db.batch();
+                    codeData.allowedGroups.forEach(function(groupId) {
+                        var groupRef = db.collection('groups').doc(groupId);
+                        batch.update(groupRef, {
+                            members: firebase.firestore.FieldValue.arrayUnion(userId)
+                        });
+                        batch.update(groupRef, {
+                            memberCount: firebase.firestore.FieldValue.increment(1)
+                        });
+                    });
+                    return batch.commit();
                 }
-            }))
-            .then(data => {
-                spinner.style.display = 'none';
-                currentAdmin = { uid: auth.currentUser.uid, ...data };
-                document.getElementById('adminNameDisplay').textContent = currentAdmin.name || 'أدمن';
-                document.getElementById('adminNameSmall').textContent = currentAdmin.name || 'أدمن';
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appLayout').style.display = 'flex';
-                showToast('✅ مرحباً بك ' + currentAdmin.name, 'success');
-                switchPage('dashboard');
-                updateSidebarCounts();
-            })
-            .catch(err => { 
-                spinner.style.display = 'none'; 
-                errEl.textContent = '❌ خطأ: ' + (err.code === 'auth/user-not-found' ? 'المستخدم غير موجود' : err.code === 'auth/wrong-password' ? 'كلمة المرور خاطئة' : err.message);
+                return Promise.resolve();
+            }).then(function() {
+                return userRef.get();
+            }).then(function(userDoc) {
+                currentUser = { uid: userId, name: userDoc.data().name, phone: userDoc.data().phone, role: userDoc.data().role, chatBg: userDoc.data().chatBg || '', online: true };
+                localStorage.setItem('webEgyptUserID', userId);
+                hideLoading();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainScreen').classList.remove('hidden');
+                navigate('groups');
+                showToast('✅ أهلاً بك في Web Egypt!', 'success');
             });
-    };
-
-    window.logout = () => {
-        if (currentAdmin) {
-            db.collection('users').doc(currentAdmin.uid).update({ online: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
-        }
-        auth.signOut().then(() => {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('appLayout').style.display = 'none';
-            currentAdmin = null;
-            realtimeListeners.forEach(unsub => { try { unsub(); } catch(e) {} });
-            realtimeListeners = [];
+        }).catch(function(e) {
+            hideLoading();
+            errEl.textContent = e.message || 'حدث خطأ غير متوقع';
+            console.error('Login error:', e);
         });
     };
 
-    // استعادة الجلسة
-    auth.onAuthStateChanged(async user => {
-        if (user) {
-            const doc = await db.collection('users').doc(user.uid).get();
-            if (doc.exists && doc.data().role === 'admin') {
-                currentAdmin = { uid: user.uid, ...doc.data() };
-                document.getElementById('adminNameDisplay').textContent = currentAdmin.name || 'أدمن';
-                document.getElementById('adminNameSmall').textContent = currentAdmin.name || 'أدمن';
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appLayout').style.display = 'flex';
-                switchPage('dashboard');
-                updateSidebarCounts();
-            } else {
-                auth.signOut();
-            }
+    // ========== تسجيل دخول تلقائي ==========
+    function autoLogin() {
+        var savedUserID = localStorage.getItem('webEgyptUserID');
+        var deviceID = getDeviceID();
+        if (!savedUserID) return Promise.resolve(false);
+        
+        return db.collection('users').doc(savedUserID).get().then(function(userDoc) {
+            if (!userDoc.exists) return false;
+            var userData = userDoc.data();
+            
+            return db.collection('student_codes').where('usedBy', '==', savedUserID).where('usedByDevice', '==', deviceID).limit(1).get().then(function(codeSnap) {
+                if (codeSnap.empty && userData.role !== 'admin') return false;
+                
+                currentUser = { uid: savedUserID, name: userData.name, phone: userData.phone, role: userData.role, chatBg: userData.chatBg || '', online: true };
+                return db.collection('users').doc(savedUserID).update({
+                    online: true,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(function() {
+                    return true;
+                });
+            });
+        }).catch(function(e) {
+            console.error('Auto login error:', e);
+            return false;
+        });
+    }
+
+    window.logout = function() {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({
+                online: false,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(function() {});
+        }
+        currentUser = null;
+        currentGroupId = null;
+        localStorage.removeItem('webEgyptUserID');
+        cleanListeners();
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('mainScreen').classList.add('hidden');
+        var codeInput = document.getElementById('codeInput');
+        if (codeInput) codeInput.value = '';
+    };
+
+    window.addEventListener('beforeunload', function() {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ online: false }).catch(function() {});
         }
     });
 
-    // ========== صفحة الإحصائيات المتقدمة ==========
-    async function renderDashboard() {
-        const [usersSnap, groupsSnap, codesSnap, reportsSnap, messagesSnap] = await Promise.all([
-            db.collection('users').get(),
-            db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
-            db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get(),
-            db.collection('reports').get(),
-            db.collection('groups').get()
-        ]);
-        
-        // حساب إجمالي الرسائل
-        let totalMessages = 0;
-        const msgPromises = [];
-        groupsSnap.forEach(gDoc => {
-            msgPromises.push(
-                db.collection('groups').doc(gDoc.id).collection('messages').get().then(snap => {
-                    totalMessages += snap.size;
-                })
-            );
-        });
-        await Promise.all(msgPromises);
-        
-        const usedCodes = codesSnap.docs.filter(d => d.data().usedBy).length;
-        const activeUsers = usersSnap.docs.filter(d => d.data().online).length;
-        
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header">
-                <div>
-                    <h1>📊 لوحة الإحصائيات</h1>
-                    <p class="breadcrumb">الرئيسية <span>»</span> الإحصائيات</p>
-                </div>
-                <div>
-                    <button class="btn btn-sm" onclick="switchPage('dashboard')">🔄 تحديث</button>
-                    <button class="btn btn-sm btn-outline" onclick="exportDashboard()">📤 تصدير</button>
-                </div>
-            </div>
-            
-            <div class="grid-4">
-                <div class="card stat-card card-glow fade-in">
-                    <div class="icon-stat">👥</div>
-                    <div class="stat-value">${usersSnap.size}</div>
-                    <div class="stat-label">إجمالي المستخدمين</div>
-                    <div class="stat-change positive">🟢 ${activeUsers} متصل</div>
-                </div>
-                <div class="card stat-card fade-in" style="animation-delay:0.1s;">
-                    <div class="icon-stat">📋</div>
-                    <div class="stat-value">${groupsSnap.size}</div>
-                    <div class="stat-label">المجموعات</div>
-                    <div class="stat-change">📝 ${totalMessages} رسالة</div>
-                </div>
-                <div class="card stat-card fade-in" style="animation-delay:0.2s;">
-                    <div class="icon-stat">🔑</div>
-                    <div class="stat-value">${codesSnap.size}</div>
-                    <div class="stat-label">أكواد الطلاب</div>
-                    <div class="stat-change positive">✅ ${usedCodes} مستخدم</div>
-                </div>
-                <div class="card stat-card fade-in" style="animation-delay:0.3s;">
-                    <div class="icon-stat">🚨</div>
-                    <div class="stat-value">${reportsSnap.size}</div>
-                    <div class="stat-label">البلاغات</div>
-                    <div class="stat-change ${reportsSnap.docs.filter(d => d.data().status === 'pending').length > 0 ? 'negative' : 'positive'}">⚠️ ${reportsSnap.docs.filter(d => d.data().status === 'pending').length} معلقة</div>
-                </div>
-            </div>
-            
-            <div class="grid-2">
-                <div class="card fade-in" style="animation-delay:0.4s;">
-                    <div class="card-header"><h3>📈 النشاط الأسبوعي</h3></div>
-                    <canvas id="activityChart" height="250"></canvas>
-                </div>
-                <div class="card fade-in" style="animation-delay:0.5s;">
-                    <div class="card-header"><h3>🍩 توزيع المستخدمين</h3></div>
-                    <canvas id="userDistributionChart" height="250"></canvas>
-                </div>
-            </div>
-            
-            <div class="card fade-in" style="animation-delay:0.6s;">
-                <div class="card-header"><h3>⚡ إجراءات سريعة</h3></div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn" onclick="broadcastMessage()">📢 بث للكل</button>
-                    <button class="btn btn-info" onclick="switchPage('create-group')">➕ مجموعة جديدة</button>
-                    <button class="btn btn-warning" onclick="switchPage('codes')">🔑 توليد أكواد</button>
-                    <button class="btn btn-danger" onclick="switchPage('reports')">🚨 مراجعة البلاغات</button>
-                    <button class="btn btn-success" onclick="exportAllData()">📤 تصدير كامل</button>
-                </div>
-            </div>`;
-        
-        // رسم المخططات
-        setTimeout(() => {
-            const ctx1 = document.getElementById('activityChart')?.getContext('2d');
-            if (ctx1) {
-                new Chart(ctx1, { 
-                    type: 'line', 
-                    data: { 
-                        labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'], 
-                        datasets: [
-                            { label: 'رسائل', data: [12, 19, 25, 18, 30, 22, 15], borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0.4 },
-                            { label: 'مستخدمين جدد', data: [3, 7, 5, 8, 4, 6, 2], borderColor: '#2ED573', backgroundColor: 'rgba(46,213,115,0.1)', tension: 0.4 }
-                        ] 
-                    },
-                    options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: '#aaa' } }, y: { ticks: { color: '#aaa' } } } }
-                });
-            }
-            const ctx2 = document.getElementById('userDistributionChart')?.getContext('2d');
-            if (ctx2) {
-                new Chart(ctx2, { 
-                    type: 'doughnut', 
-                    data: { 
-                        labels: ['مشرفين', 'طلاب', 'نشط', 'غير نشط'], 
-                        datasets: [{ data: [1, usersSnap.size - 1, activeUsers, usersSnap.size - activeUsers], backgroundColor: ['#FFC107', '#1E90FF', '#2ED573', '#FF4757'] }] 
-                    },
-                    options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
-                });
-            }
-        }, 500);
-        
-        updateSidebarCounts();
-    }
-
-    window.broadcastMessage = () => {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal">
-                <h2>📢 بث رسالة للجميع</h2>
-                <div class="form-group"><label>نص الرسالة</label><textarea id="broadcastMsg" class="input-field" placeholder="اكتب رسالتك هنا..."></textarea></div>
-                <div class="form-group"><label>المستهدفين</label>
-                    <select id="broadcastTarget" class="input-field">
-                        <option value="all">جميع المستخدمين</option>
-                        <option value="active">المتصلين فقط</option>
-                        <option value="students">الطلاب فقط</option>
-                    </select>
-                </div>
-                <button class="btn" onclick="sendBroadcast()">🚀 إرسال</button>
-                <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()">إلغاء</button>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-    };
-    
-    window.sendBroadcast = async function() {
-        const msg = document.getElementById('broadcastMsg').value.trim();
-        const target = document.getElementById('broadcastTarget').value;
-        if (!msg) return showToast('⚠️ الرجاء كتابة رسالة', 'warning');
-        
-        showToast('📤 جاري إرسال البث...', 'info');
-        
-        // حفظ البث في قاعدة البيانات
-        await db.collection('broadcasts').add({
-            adminID: currentAdmin.uid,
-            adminName: currentAdmin.name,
-            message: msg,
-            target: target,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            readBy: []
-        });
-        
-        // إرسال للمجموعات
-        const groupsSnap = await db.collection('groups').where('adminID', '==', currentAdmin.uid).get();
-        const batch = db.batch();
-        groupsSnap.forEach(doc => {
-            const ref = db.collection('groups').doc(doc.id).collection('messages').doc();
-            batch.set(ref, {
-                senderID: currentAdmin.uid, senderName: '📢 ' + currentAdmin.name,
-                type: 'broadcast', content: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                isBroadcast: true
-            });
-        });
-        await batch.commit();
-        
-        document.querySelector('.modal-overlay')?.remove();
-        showToast('✅ تم إرسال البث بنجاح!', 'success');
-    };
-
-    window.exportDashboard = () => {
-        showToast('📤 جاري تصدير البيانات...', 'info');
-        setTimeout(() => showToast('✅ تم التصدير بصيغة PDF', 'success'), 1500);
-    };
-    
-    window.exportAllData = async () => {
-        showToast('📤 جاري تجهيز التصدير الشامل...', 'info');
-        const data = [];
-        const usersSnap = await db.collection('users').get();
-        usersSnap.forEach(doc => data.push({ type: 'مستخدم', ...doc.data() }));
-        
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "بيانات التطبيق");
-        XLSX.writeFile(wb, "WebEgypt_Export.xlsx");
-        showToast('✅ تم تصدير البيانات بنجاح!', 'success');
-    };
-
-    // ========== صفحة المستخدمين ==========
-    function renderUsers() {
-        const unsub = db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            let rows = '';
-            snap.forEach(doc => {
-                const u = doc.data();
-                rows += `<tr>
-                    <td><img src="${u.profilePic || 'https://via.placeholder.com/35'}" style="width:35px;height:35px;border-radius:50%;vertical-align:middle;margin-left:8px;">${u.name || 'غير معروف'}</td>
-                    <td>${u.email || '-'}</td>
-                    <td>${u.phone || '-'}</td>
-                    <td><span class="badge ${u.role==='admin'?'badge-admin':u.role==='moderator'?'badge-moderator':'badge-user'}">${u.role === 'admin' ? 'مشرف' : u.role === 'moderator' ? 'مشرف مساعد' : 'طالب'}</span></td>
-                    <td>${u.online ? '<span style="color:var(--online);">● متصل</span>' : '<span style="color:var(--text3);">○ غير متصل</span>'}</td>
-                    <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('ar-EG') : '-'}</td>
-                    <td>
-                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                            <button class="btn btn-xs" onclick="viewUser('${doc.id}')" title="عرض">👁️</button>
-                            <button class="btn btn-xs btn-info" onclick="changeUserRole('${doc.id}','${u.role || 'user'}')" title="تغيير الدور">🔄</button>
-                            <button class="btn btn-xs btn-warning" onclick="resetUserCode('${doc.id}')" title="إعادة تعيين">🔑</button>
-                            <button class="btn btn-xs btn-danger" onclick="deleteUser('${doc.id}')" title="حذف">🗑️</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header">
-                    <div><h1>👥 إدارة المستخدمين</h1><p class="breadcrumb">الرئيسية <span>»</span> المستخدمين</p></div>
-                    <div>
-                        <input class="input-field" id="userSearch" placeholder="🔍 بحث..." oninput="filterTable('userSearch','userTable')" style="width:250px; display:inline-block;">
-                        <button class="btn btn-sm" onclick="exportUsers()">📤 تصدير</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="data-table" id="userTable">
-                            <thead><tr><th>المستخدم</th><th>البريد</th><th>الهاتف</th><th>الدور</th><th>الحالة</th><th>تاريخ التسجيل</th><th>إجراءات</th></tr></thead>
-                            <tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:var(--text3);">لا يوجد مستخدمين</td></tr>'}</tbody>
-                        </table>
-                    </div>
-                </div>`;
-        });
-        realtimeListeners.push(unsub);
-        updateSidebarCounts();
-    }
-    
-    window.viewUser = async (uid) => {
-        const doc = await db.collection('users').doc(uid).get();
-        if (!doc.exists) return showToast('المستخدم غير موجود', 'error');
-        const u = doc.data();
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal">
-                <h2>👤 معلومات المستخدم</h2>
-                <div style="text-align:center; margin-bottom:20px;">
-                    <img src="${u.profilePic || 'https://via.placeholder.com/100'}" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);">
-                    <h3 style="color:var(--gold); margin-top:10px;">${u.name || 'غير معروف'}</h3>
-                </div>
-                <p><strong>المعرف:</strong> ${uid}</p>
-                <p><strong>البريد:</strong> ${u.email || '-'}</p>
-                <p><strong>الهاتف:</strong> ${u.phone || '-'}</p>
-                <p><strong>الدور:</strong> ${u.role || 'user'}</p>
-                <p><strong>الحالة:</strong> ${u.online ? 'متصل' : 'غير متصل'}</p>
-                <p><strong>تاريخ التسجيل:</strong> ${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleString('ar-EG') : '-'}</p>
-                <p><strong>آخر ظهور:</strong> ${u.lastSeen ? new Date(u.lastSeen.toDate()).toLocaleString('ar-EG') : '-'}</p>
-                <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()">إغلاق</button>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-    };
-    
-    window.changeUserRole = async (uid, currentRole) => {
-        const roles = ['user', 'moderator', 'admin'];
-        const currentIndex = roles.indexOf(currentRole);
-        const nextRole = roles[(currentIndex + 1) % roles.length];
-        const roleNames = { user: 'طالب', moderator: 'مشرف مساعد', admin: 'مدير' };
-        
-        if (confirm(`تغيير دور المستخدم من "${roleNames[currentRole] || currentRole}" إلى "${roleNames[nextRole]}"؟`)) {
-            await db.collection('users').doc(uid).update({ role: nextRole });
-            showToast(`✅ تم تغيير الدور إلى ${roleNames[nextRole]}`, 'success');
-        }
-    };
-    
-    window.resetUserCode = async (uid) => {
-        if (confirm('هل تريد إعادة تعيين كود هذا المستخدم؟ سيتم إنشاء كود جديد له.')) {
-            const userDoc = await db.collection('users').doc(uid).get();
-            const userData = userDoc.data();
-            const newCode = Math.random().toString(36).substring(2,8).toUpperCase();
-            await db.collection('student_codes').add({
-                adminID: currentAdmin.uid, code: newCode,
-                studentName: userData.name, studentNumber: userData.phone || uid,
-                studentClass: '', type: 'طالب', usedBy: null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast(`✅ الكود الجديد: ${newCode}`, 'success');
-        }
-    };
-    
-    window.deleteUser = uid => { 
-        if (confirm('⚠️ هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع!')) {
-            db.collection('users').doc(uid).delete().then(() => showToast('✅ تم الحذف', 'success'));
-        }
-    };
-    
-    window.exportUsers = async () => {
-        const snap = await db.collection('users').get();
-        const data = [];
-        snap.forEach(doc => data.push(doc.data()));
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "المستخدمين");
-        XLSX.writeFile(wb, "Users_Export.xlsx");
-        showToast('✅ تم تصدير بيانات المستخدمين', 'success');
-    };
-
-    // ========== المجموعات ==========
+    // ========== عرض المجموعات ==========
     function renderGroups() {
-        const unsub = db.collection('groups').where('adminID', '==', currentAdmin.uid).orderBy('createdAt', 'desc').onSnapshot(snap => {
-            let html = '';
-            snap.forEach(doc => {
-                const g = doc.data();
-                html += `
-                <div class="card fade-in" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <img src="${g.picture || 'https://via.placeholder.com/60'}" style="width:60px;height:60px;border-radius:50%;border:3px solid var(--gold);">
-                        <div>
-                            <h3 style="color:var(--gold);">${g.name} ${g.isLocked ? '🔒' : '🟢'}</h3>
-                            <p>👥 ${g.memberCount || 0} أعضاء | 📝 ${g.type === 'open' ? 'مفتوح' : 'مقفول'}</p>
-                            <p style="font-size:0.8rem; color:var(--text2);">${g.description || ''}</p>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-sm" onclick="openAdminChat('${doc.id}')">💬 شات</button>
-                        <button class="btn btn-sm btn-info" onclick="switchPage('members', '${doc.id}')">👤 الأعضاء</button>
-                        <button class="btn btn-sm ${g.isLocked ? 'btn-success' : 'btn-warning'}" onclick="toggleLock('${doc.id}', ${!g.isLocked})">${g.isLocked ? '🔓 فتح' : '🔒 قفل'}</button>
-                        <button class="btn btn-sm btn-outline" onclick="switchPage('edit-group', '${doc.id}')">✏️ تعديل</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteGroup('${doc.id}')">🗑️ حذف</button>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header">
-                    <div><h1>📋 المجموعات</h1><p class="breadcrumb">الرئيسية <span>»</span> المجموعات</p></div>
-                    <button class="btn" onclick="switchPage('create-group')">➕ مجموعة جديدة</button>
-                </div>
-                ${html || '<div class="card" style="text-align:center; padding:50px;"><p style="color:var(--text3); font-size:1.2rem;">📭 لا توجد مجموعات بعد</p><button class="btn btn-outline" onclick="switchPage(\'create-group\')">إنشاء أول مجموعة</button></div>'}`;
-        });
-        realtimeListeners.push(unsub);
-    }
-
-    window.toggleLock = (gid, lock) => {
-        db.collection('groups').doc(gid).update({ 
-            isLocked: lock,
-            lockedAt: lock ? firebase.firestore.FieldValue.serverTimestamp() : null,
-            lockedBy: lock ? currentAdmin.uid : null
-        }).then(() => showToast(lock ? '🔒 تم قفل المجموعة' : '🔓 تم فتح المجموعة', 'success'));
-    };
-    
-    window.deleteGroup = gid => { 
-        if (confirm('⚠️ هل أنت متأكد من حذف هذه المجموعة نهائياً؟ سيتم حذف جميع الرسائل!')) {
-            db.collection('groups').doc(gid).delete().then(() => showToast('✅ تم الحذف', 'success'));
-        }
-    };
-
-    // ========== صفحة الأعضاء ==========
-    function renderMembers(groupId) {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>👤 أعضاء المجموعة</h1></div>
-            <div id="membersList"></div>
-            <button class="btn btn-outline" onclick="switchPage('groups')">⬅️ رجوع</button>`;
-        const unsub = db.collection('groups').doc(groupId).onSnapshot(doc => {
-            const members = doc.data()?.members || [];
-            const container = document.getElementById('membersList');
-            if (!container) return;
-            let html = '<div class="card"><ul style="list-style:none; padding:0;">';
-            members.forEach((uid, index) => {
-                html += `<li style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--surface2); margin:8px 0; border-radius:12px;">
-                    <span>👤 ${uid}</span>
-                    <button class="btn btn-sm btn-danger" onclick="removeMember('${groupId}','${uid}')">❌ إزالة</button>
-                </li>`;
-            });
-            html += '</ul>';
-            html += `<div style="display:flex; gap:10px; margin-top:20px;">
-                <input class="input-field" id="newMemberId" placeholder="🔍 معرف المستخدم للإضافة">
-                <button class="btn btn-sm" onclick="addMember('${groupId}')">➕ إضافة</button>
-            </div></div>`;
-            container.innerHTML = html;
-        });
-        realtimeListeners.push(unsub);
-    }
-    
-    window.removeMember = (gid, uid) => {
-        if (confirm('إزالة هذا العضو من المجموعة؟')) {
-            db.collection('groups').doc(gid).update({
-                members: firebase.firestore.FieldValue.arrayRemove(uid),
-                memberCount: firebase.firestore.FieldValue.increment(-1)
-            }).then(() => showToast('✅ تمت الإزالة', 'success'));
-        }
-    };
-    
-    window.addMember = gid => {
-        const newId = document.getElementById('newMemberId').value.trim();
-        if (!newId) return showToast('⚠️ أدخل معرف المستخدم', 'warning');
-        db.collection('groups').doc(gid).update({
-            members: firebase.firestore.FieldValue.arrayUnion(newId),
-            memberCount: firebase.firestore.FieldValue.increment(1)
-        }).then(() => showToast('✅ تمت الإضافة', 'success'));
-    };
-
-    // ========== إنشاء مجموعة ==========
-    function renderCreateGroup() {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>➕ إنشاء مجموعة جديدة</h1></div>
-            <div class="card fade-in">
-                <div class="form-row">
-                    <div class="form-group"><label>📝 اسم المجموعة *</label><input id="gName" class="input-field" placeholder="مثال: فصل 3/1"></div>
-                    <div class="form-group"><label>🏷️ النوع</label><select id="gType" class="input-field"><option value="open">مفتوح - يمكن للجميع الكتابة</option><option value="closed">مقفول - المشرف فقط يكتب</option></select></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>🖼️ رابط الصورة</label><input id="gPic" class="input-field" value="https://via.placeholder.com/150" placeholder="رابط صورة المجموعة"></div>
-                    <div class="form-group"><label>🎨 لون المجموعة</label><input id="gColor" type="color" class="input-field" value="#FFC107" style="height:50px; padding:5px;"></div>
-                </div>
-                <div class="form-group"><label>📄 الوصف</label><textarea id="gDesc" class="input-field" placeholder="وصف المجموعة..."></textarea></div>
-                <div class="form-group"><label>🔑 أكواد للانضمام (اختياري - يمكن إضافتها لاحقاً)</label><input id="gCode" class="input-field" placeholder="أدخل كود الانضمام (اختياري)"></div>
-                <h4 style="color:var(--gold); margin:20px 0;">⚙️ الصلاحيات</h4>
-                <div class="grid-3">
-                    <div class="toggle-switch"><label>📝 إرسال نصوص</label><input type="checkbox" id="gText" checked></div>
-                    <div class="toggle-switch"><label>🖼️ إرسال صور</label><input type="checkbox" id="gImg" checked></div>
-                    <div class="toggle-switch"><label>🎥 إرسال فيديو</label><input type="checkbox" id="gVid" checked></div>
-                    <div class="toggle-switch"><label>🎤 رسائل صوتية</label><input type="checkbox" id="gAudio" checked></div>
-                    <div class="toggle-switch"><label>📎 ملفات</label><input type="checkbox" id="gFile" checked></div>
-                    <div class="toggle-switch"><label>🔗 روابط</label><input type="checkbox" id="gLink" checked></div>
-                </div>
-                <button class="btn" onclick="createGroup()" style="margin-top:25px; width:100%;">🚀 إنشاء المجموعة</button>
-            </div>`;
-    }
-    
-    window.createGroup = async () => {
-        const name = document.getElementById('gName').value.trim();
-        if (!name) return showToast('⚠️ اسم المجموعة مطلوب', 'warning');
+        var content = document.getElementById('contentArea');
+        content.innerHTML = '<h2 class="section-title">📚 مجموعاتي</h2><div id="groupsList" class="groups-grid"><p style="color:var(--text2); text-align:center; grid-column:1/-1;">⏳ جاري تحميل المجموعات...</p></div>';
         
-        const groupData = {
-            name: name,
-            type: document.getElementById('gType').value,
-            picture: document.getElementById('gPic').value,
-            color: document.getElementById('gColor').value,
-            description: document.getElementById('gDesc').value,
-            adminID: currentAdmin.uid,
-            adminName: currentAdmin.name,
-            members: [currentAdmin.uid],
-            memberCount: 1,
-            permissions: {
-                allowText: document.getElementById('gText').checked,
-                allowImages: document.getElementById('gImg').checked,
-                allowVideos: document.getElementById('gVid').checked,
-                allowAudio: document.getElementById('gAudio').checked,
-                allowFiles: document.getElementById('gFile').checked,
-                allowLinks: document.getElementById('gLink').checked
-            },
-            isLocked: false,
-            joinCode: document.getElementById('gCode').value || null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        var unsub = db.collection('groups').where('members', 'array-contains', currentUser.uid).onSnapshot(function(snap) {
+            var listEl = document.getElementById('groupsList');
+            if (!listEl) return;
+            
+            if (snap.empty) {
+                listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text2); grid-column:1/-1;"><p style="font-size:3rem;">📭</p><p>لم تنضم لأي مجموعة بعد</p><p style="font-size:0.8rem;">تواصل مع الأدمن للحصول على كود التفعيل</p></div>';
+                return;
+            }
+            
+            var html = '';
+            snap.forEach(function(doc) {
+                var g = doc.data();
+                html += '<div class="group-card bounce-in" onclick="openChat(\'' + doc.id + '\')">';
+                html += '<span class="member-count">👥 ' + (g.memberCount || 0) + '</span>';
+                if (g.isLocked) html += '<span class="locked-badge">🔒</span>';
+                html += '<img src="' + (g.picture || 'https://via.placeholder.com/70') + '" alt="صورة" loading="lazy">';
+                html += '<h3>' + (g.name || 'مجموعة') + '</h3>';
+                html += '<p>' + ((g.description || 'مجموعة دراسية').substring(0, 30)) + '</p>';
+                html += '</div>';
+            });
+            listEl.innerHTML = html;
+        });
+        allListeners.push(unsub);
+    }
+
+    function openChat(groupId) {
+        currentGroupId = groupId;
+        navigate('chat');
+    }
+
+    // ========== الشات ==========
+    function renderChat(groupId) {
+        if (groupId) currentGroupId = groupId;
+        if (!currentGroupId) { navigate('groups'); return; }
+        
+        var content = document.getElementById('contentArea');
+        content.innerHTML = '<p style="color:var(--text2); text-align:center; padding:40px;">⏳ جاري تحميل المحادثة...</p>';
+        
+        db.collection('groups').doc(currentGroupId).get().then(function(doc) {
+            if (!doc.exists) { navigate('groups'); return; }
+            currentGroupData = doc.data();
+            var g = currentGroupData;
+            var perms = g.permissions || {};
+            var isLocked = g.isLocked || false;
+            var isAdmin = (g.adminID === currentUser.uid);
+            var canWrite = !isLocked && (g.type === 'open' || isAdmin);
+
+            var html = '<div class="chat-container">';
+            html += '<div class="chat-header">';
+            html += '<img src="' + (g.picture || 'https://via.placeholder.com/40') + '" alt="صورة">';
+            html += '<div>';
+            html += '<div class="group-name">' + (g.name || 'مجموعة') + '</div>';
+            html += '<div class="status-text">' + (isLocked ? '🔒 مقفول' : '🟢 مفتوح') + ' | ' + (g.memberCount || 0) + ' أعضاء</div>';
+            html += '</div>';
+            html += '<button class="icon-btn" onclick="navigate(\'group-info\')" title="معلومات">ℹ️</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')" style="margin-right:auto;">⬅️ رجوع</button>';
+            html += '</div>';
+            
+            if (isLocked && !isAdmin) {
+                html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف</div>';
+            }
+            
+            html += '<div class="chat-messages" id="chatMessages" style="background-image:url(\'' + (currentUser.chatBg || '') + '\');"></div>';
+            
+            if (canWrite) {
+                html += '<div class="chat-input-area">';
+                html += '<input id="msgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key===\'Enter\')sendMessage()" oninput="handleTyping()">';
+                html += '<button class="circle-btn attach" onclick="uploadMedia()">📎</button>';
+                html += '<button class="circle-btn send" onclick="sendMessage()">➤</button>';
+                html += '</div>';
+            } else if (isLocked) {
+                html += '';
+            } else {
+                html += '<div style="text-align:center; padding:12px; color:var(--text2); background:var(--surface);">🔇 المشرف فقط يمكنه الكتابة في هذه المجموعة</div>';
+            }
+            
+            html += '<div id="replyPreview" class="hidden" style="padding:0 15px; margin-bottom:5px;"></div>';
+            html += '</div>';
+            
+            content.innerHTML = html;
+            loadMessages();
+        }).catch(function(e) {
+            console.error('Chat load error:', e);
+            content.innerHTML = '<p style="color:var(--danger); text-align:center; padding:40px;">❌ حدث خطأ في تحميل المحادثة</p>';
+        });
+    }
+
+    function loadMessages() {
+        var div = document.getElementById('chatMessages');
+        if (!div) return;
+        
+        var unsub = db.collection('groups').doc(currentGroupId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(snap) {
+            div.innerHTML = '';
+            if (snap.empty) {
+                div.innerHTML = '<p style="text-align:center; color:#555; padding:30px;">💬 لا توجد رسائل بعد</p>';
+                return;
+            }
+            snap.forEach(function(doc) {
+                var m = doc.data();
+                m.id = doc.id;
+                
+                if (m.deleted) {
+                    div.innerHTML += '<div class="message"><div class="bubble deleted-msg">🗑️ تم حذف الرسالة</div></div>';
+                    return;
+                }
+                
+                var isSent = (m.senderID === currentUser.uid);
+                var cls = isSent ? 'sent' : 'received';
+                var contentHtml = '';
+                
+                if (m.type === 'image') {
+                    contentHtml = '<img src="' + m.content + '" onclick="window.open(\'' + m.content + '\')" loading="lazy" style="max-width:200px; border-radius:12px; cursor:pointer;">';
+                } else if (m.type === 'video') {
+                    contentHtml = '<video controls src="' + m.content + '" style="max-width:200px; border-radius:12px;" preload="metadata"></video>';
+                } else if (m.type === 'file') {
+                    contentHtml = '<span class="file-link" onclick="window.open(\'' + m.content + '\')">📄 ' + (m.fileName || 'ملف مرفق') + '</span>';
+                } else if (m.type === 'broadcast') {
+                    contentHtml = '<strong>📢 ' + (m.content || '') + '</strong>';
+                } else {
+                    contentHtml = (m.content || '').replace(/\n/g, '<br>');
+                }
+                
+                var replyHtml = '';
+                if (m.replyTo) {
+                    replyHtml = '<div class="reply-preview" onclick="scrollToMsg(\'' + m.replyTo.id + '\')">↩️ ' + (m.replyTo.text || '').substring(0, 30) + '</div>';
+                }
+                
+                var time = '';
+                if (m.timestamp) {
+                    try {
+                        time = new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
+                    } catch(e) {
+                        time = '';
+                    }
+                }
+                
+                var msgHtml = '<div class="message ' + cls + '" id="msg-' + m.id + '">';
+                msgHtml += replyHtml;
+                msgHtml += '<div class="bubble">' + contentHtml + '</div>';
+                msgHtml += '<div class="msg-meta">';
+                if (!isSent) msgHtml += '<strong>' + (m.senderName || '') + '</strong> • ';
+                msgHtml += time;
+                if (isSent) msgHtml += ' ' + (m.seen ? '✓✓' : '✓');
+                msgHtml += '</div>';
+                msgHtml += '</div>';
+                
+                div.innerHTML += msgHtml;
+            });
+            div.scrollTop = div.scrollHeight;
+        });
+        allListeners.push(unsub);
+        chatUnsubscribe = unsub;
+    }
+
+    window.sendMessage = function() {
+        var input = document.getElementById('msgInput');
+        if (!input || input.disabled) return;
+        var text = input.value.trim();
+        if (!text) return;
+        
+        var msgData = {
+            senderID: currentUser.uid,
+            senderName: currentUser.name || 'طالب',
+            type: 'text',
+            content: text,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            seen: false
         };
         
-        const docRef = await db.collection('groups').add(groupData);
-        showToast('✅ تم إنشاء المجموعة بنجاح!', 'success');
-        switchPage('groups');
-    };
-
-    // ========== تعديل مجموعة ==========
-    function renderEditGroup(groupId) {
-        db.collection('groups').doc(groupId).get().then(doc => {
-            const g = doc.data();
-            const perms = g.permissions || {};
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header"><h1>✏️ تعديل: ${g.name}</h1></div>
-                <div class="card">
-                    <div class="form-row">
-                        <div class="form-group"><label>📝 الاسم</label><input id="eName" class="input-field" value="${g.name}"></div>
-                        <div class="form-group"><label>🏷️ النوع</label><select id="eType" class="input-field"><option value="open" ${g.type==='open'?'selected':''}>مفتوح</option><option value="closed" ${g.type==='closed'?'selected':''}>مقفول</option></select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>🖼️ الصورة</label><input id="ePic" class="input-field" value="${g.picture || ''}"></div>
-                        <div class="form-group"><label>🎨 اللون</label><input id="eColor" type="color" class="input-field" value="${g.color || '#FFC107'}" style="height:50px;"></div>
-                    </div>
-                    <div class="form-group"><label>📄 الوصف</label><textarea id="eDesc" class="input-field">${g.description || ''}</textarea></div>
-                    <div class="form-group"><label>🔑 كود الانضمام</label><input id="eCode" class="input-field" value="${g.joinCode || ''}"></div>
-                    <h4 style="color:var(--gold);">⚙️ الصلاحيات</h4>
-                    <div class="grid-3">
-                        <div class="toggle-switch"><label>📝 نصوص</label><input type="checkbox" id="eText" ${perms.allowText !== false ? 'checked' : ''}></div>
-                        <div class="toggle-switch"><label>🖼️ صور</label><input type="checkbox" id="eImg" ${perms.allowImages !== false ? 'checked' : ''}></div>
-                        <div class="toggle-switch"><label>🎥 فيديو</label><input type="checkbox" id="eVid" ${perms.allowVideos !== false ? 'checked' : ''}></div>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:20px;">
-                        <button class="btn" onclick="saveEdit('${groupId}')">💾 حفظ التعديلات</button>
-                        <button class="btn btn-outline" onclick="switchPage('groups')">إلغاء</button>
-                    </div>
-                </div>`;
-        });
-    }
-    
-    window.saveEdit = groupId => {
-        db.collection('groups').doc(groupId).update({
-            name: document.getElementById('eName').value,
-            type: document.getElementById('eType').value,
-            picture: document.getElementById('ePic').value,
-            color: document.getElementById('eColor').value,
-            description: document.getElementById('eDesc').value,
-            joinCode: document.getElementById('eCode').value || null,
-            permissions: {
-                allowText: document.getElementById('eText').checked,
-                allowImages: document.getElementById('eImg').checked,
-                allowVideos: document.getElementById('eVid').checked
-            },
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            showToast('✅ تم حفظ التعديلات', 'success');
-            switchPage('groups');
-        });
-    };
-
-    // ========== الأكواد ==========
-    function renderCodes() {
-        const unsub = db.collection('student_codes').where('adminID', '==', currentAdmin.uid).orderBy('createdAt', 'desc').onSnapshot(async snap => {
-            // جلب المجموعات للربط
-            const groupsSnap = await db.collection('groups').where('adminID', '==', currentAdmin.uid).get();
-            let groupOptions = '';
-            groupsSnap.forEach(g => groupOptions += `<option value="${g.id}">${g.data().name}</option>`);
-            
-            let rows = '';
-            snap.forEach(doc => {
-                const c = doc.data();
-                rows += `<tr>
-                    <td>${c.studentName || '-'}</td>
-                    <td><strong style="color:var(--gold); font-size:1.1rem;">${c.code}</strong></td>
-                    <td>${c.studentClass || '-'}</td>
-                    <td>${c.type || '-'}</td>
-                    <td>${c.usedBy ? '<span class="badge badge-locked">مستخدم</span>' : '<span class="badge badge-open">متاح</span>'}</td>
-                    <td>${c.createdAt ? new Date(c.createdAt.toDate()).toLocaleDateString('ar-EG') : '-'}</td>
-                    <td>
-                        <button class="btn btn-xs btn-danger" onclick="deleteCode('${doc.id}')">🗑️</button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header">
-                    <div><h1>🔑 أكواد الطلاب</h1></div>
-                    <button class="btn" onclick="generateBulkCodes()">📦 توليد批量</button>
-                </div>
-                <div class="card fade-in">
-                    <h3 style="color:var(--gold); margin-bottom:15px;">🎫 توليد كود جديد</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>👤 اسم الطالب</label><input id="stuName" class="input-field" placeholder="الاسم الكامل"></div>
-                        <div class="form-group"><label>📱 الرقم</label><input id="stuNumber" class="input-field" placeholder="رقم الهاتف أو المعرف"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>📚 الصف</label><input id="stuClass" class="input-field" placeholder="مثال: الثالث الإعدادي"></div>
-                        <div class="form-group"><label>👤 النوع</label><select id="stuType" class="input-field"><option>طالب</option><option>طالبة</option></select></div>
-                    </div>
-                    <div class="form-group"><label>📋 ربط بمجموعات (اختياري)</label>
-                        <select id="stuGroups" class="input-field" multiple style="min-height:120px;">
-                            ${groupOptions}
-                        </select>
-                        <small style="color:var(--text2);">اضغط Ctrl للاختيار المتعدد</small>
-                    </div>
-                    <button class="btn" onclick="generateCode()">🎫 توليد كود</button>
-                    <div id="newCode" style="font-size:1.8rem; color:var(--gold); margin:20px 0; text-align:center; font-weight:bold;"></div>
-                </div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead><tr><th>الطالب</th><th>الكود</th><th>الصف</th><th>النوع</th><th>الحالة</th><th>التاريخ</th><th>حذف</th></tr></thead>
-                            <tbody>${rows || '<tr><td colspan="7" style="text-align:center;">لا توجد أكواد</td></tr>'}</tbody>
-                        </table>
-                    </div>
-                </div>`;
-        });
-        realtimeListeners.push(unsub);
-    }
-    
-    window.generateCode = async () => {
-        const studentName = document.getElementById('stuName').value.trim();
-        if (!studentName) return showToast('⚠️ اسم الطالب مطلوب', 'warning');
-        
-        const code = Math.random().toString(36).substring(2,8).toUpperCase();
-        const selectedGroups = Array.from(document.getElementById('stuGroups').selectedOptions).map(o => o.value);
-        
-        await db.collection('student_codes').add({
-            adminID: currentAdmin.uid,
-            code: code,
-            studentName: studentName,
-            studentNumber: document.getElementById('stuNumber').value,
-            studentClass: document.getElementById('stuClass').value,
-            type: document.getElementById('stuType').value,
-            allowedGroups: selectedGroups,
-            usedBy: null,
-            usedByDevice: null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        document.getElementById('newCode').innerHTML = `✅ الكود: <span style="background:var(--surface2); padding:10px 20px; border-radius:10px;">${code}</span>`;
-        showToast('✅ تم توليد الكود بنجاح', 'success');
-    };
-    
-    window.generateBulkCodes = () => {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal">
-                <h2>📦 توليد أكواد批量</h2>
-                <div class="form-group"><label>عدد الأكواد</label><input id="bulkCount" type="number" class="input-field" value="10" min="1" max="100"></div>
-                <div class="form-group"><label>الصف (اختياري)</label><input id="bulkClass" class="input-field" placeholder="مثال: الصف الثالث"></div>
-                <button class="btn" onclick="generateBulk()">🚀 توليد</button>
-                <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()">إلغاء</button>
-            </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-    };
-    
-    window.generateBulk = async () => {
-        const count = parseInt(document.getElementById('bulkCount').value) || 10;
-        const className = document.getElementById('bulkClass').value;
-        const batch = db.batch();
-        
-        for (let i = 0; i < count; i++) {
-            const code = Math.random().toString(36).substring(2,8).toUpperCase();
-            const ref = db.collection('student_codes').doc();
-            batch.set(ref, {
-                adminID: currentAdmin.uid, code: code,
-                studentName: `طالب ${i + 1}`, studentNumber: '',
-                studentClass: className, type: 'طالب', usedBy: null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+        if (replyToMessage) {
+            msgData.replyTo = { id: replyToMessage.id, text: (replyToMessage.content || '').substring(0, 50) };
+            replyToMessage = null;
+            var previewEl = document.getElementById('replyPreview');
+            if (previewEl) previewEl.classList.add('hidden');
         }
         
-        await batch.commit();
-        document.querySelector('.modal-overlay')?.remove();
-        showToast(`✅ تم توليد ${count} كود بنجاح!`, 'success');
+        db.collection('groups').doc(currentGroupId).collection('messages').add(msgData).then(function() {
+            input.value = '';
+            input.focus();
+            // إيقاف مؤشر الكتابة
+            db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
+        }).catch(function(e) {
+            console.error('Send error:', e);
+            showToast('❌ فشل الإرسال', 'error');
+        });
     };
-    
-    window.deleteCode = id => { 
-        if (confirm('حذف الكود؟')) {
-            db.collection('student_codes').doc(id).delete().then(() => showToast('✅ تم الحذف', 'success'));
+
+    window.uploadMedia = function() {
+        if (typeof cloudinary === 'undefined') {
+            showToast('⚠️ خاصية الرفع غير متاحة حالياً', 'warning');
+            return;
         }
-    };
-
-    // ========== المحادثات الخاصة ==========
-    function renderPrivateChats() {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>💬 المحادثات الخاصة</h1></div>
-            <div class="card">
-                <input class="input-field" id="privateSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchPrivateUsers()">
-                <div id="privateUsersList"></div>
-            </div>`;
-        searchPrivateUsers();
-    }
-    
-    window.searchPrivateUsers = async () => {
-        const query = document.getElementById('privateSearch')?.value?.toLowerCase() || '';
-        const snap = await db.collection('users').limit(50).get();
-        let html = '';
-        snap.forEach(doc => {
-            const u = doc.data();
-            if (doc.id === currentAdmin.uid) return;
-            if (query && !u.name?.toLowerCase().includes(query) && !u.email?.toLowerCase().includes(query)) return;
-            html += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--surface2); margin:8px 0; border-radius:12px; cursor:pointer;" onclick="switchPage('private-chat', '${doc.id}')">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${u.profilePic || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:50%;">
-                    <div>
-                        <strong>${u.name || 'غير معروف'}</strong>
-                        <br><small style="color:var(--text2);">${u.online ? '🟢 متصل' : '○ غير متصل'}</small>
-                    </div>
-                </div>
-                <button class="btn btn-xs">💬 محادثة</button>
-            </div>`;
-        });
-        document.getElementById('privateUsersList').innerHTML = html || '<p style="color:var(--text3); text-align:center;">لا يوجد مستخدمين</p>';
-    };
-    
-    function renderPrivateChat(userId) {
-        currentPrivateChatUser = userId;
-        db.collection('users').doc(userId).get().then(doc => {
-            const u = doc.data();
-            const chatId = [currentAdmin.uid, userId].sort().join('_');
-            document.getElementById('mainContent').innerHTML = `
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <img src="${u.profilePic || 'https://via.placeholder.com/40'}" width="40" height="40" style="border-radius:50%;">
-                        <strong style="color:var(--gold);">${u.name}</strong>
-                        <span style="color:var(--text2); font-size:0.8rem;">${u.online ? '🟢 متصل' : '○ غير متصل'}</span>
-                        <button class="btn btn-outline btn-sm" onclick="switchPage('private-chats')" style="margin-right:auto;">رجوع</button>
-                    </div>
-                    <div class="chat-messages" id="privateChatMessages"></div>
-                    <div class="chat-input-area">
-                        <input id="privateMsgInput" placeholder="اكتب رسالة خاصة..." onkeydown="if(event.key==='Enter')sendPrivateMsg()">
-                        <button class="circle-btn" onclick="sendPrivateMsg()">➤</button>
-                    </div>
-                </div>`;
-            loadPrivateMessages(chatId);
-        });
-    }
-    
-    function loadPrivateMessages(chatId) {
-        const container = document.getElementById('privateChatMessages');
-        if (privateChatUnsub) privateChatUnsub();
-        privateChatUnsub = db.collection('private_chats').doc(chatId).collection('messages')
-            .orderBy('timestamp', 'asc').onSnapshot(snap => {
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    const m = doc.data();
-                    const isSent = m.senderID === currentAdmin.uid;
-                    container.innerHTML += `
-                    <div class="message ${isSent ? 'sent' : ''}">
-                        <div class="bubble">${m.content}</div>
-                        <div style="font-size:0.7rem; color:#888;">${new Date(m.timestamp?.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})}</div>
-                    </div>`;
-                });
-                container.scrollTop = container.scrollHeight;
-            });
-        realtimeListeners.push(privateChatUnsub);
-    }
-    
-    window.sendPrivateMsg = () => {
-        const input = document.getElementById('privateMsgInput');
-        if (!input?.value.trim() || !currentPrivateChatUser) return;
-        const chatId = [currentAdmin.uid, currentPrivateChatUser].sort().join('_');
-        db.collection('private_chats').doc(chatId).set({
-            participants: [currentAdmin.uid, currentPrivateChatUser],
-            lastMessage: input.value.trim(),
-            lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        db.collection('private_chats').doc(chatId).collection('messages').add({
-            senderID: currentAdmin.uid,
-            senderName: currentAdmin.name,
-            content: input.value.trim(),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        input.value = '';
-    };
-
-    // ========== القصص (Stories) ==========
-    function renderStories() {
-        db.collection('stories').where('adminID', '==', currentAdmin.uid).orderBy('createdAt', 'desc').get().then(snap => {
-            let html = '';
-            snap.forEach(doc => {
-                const s = doc.data();
-                html += `
-                <div class="card" style="display:flex; gap:15px; align-items:center;">
-                    <img src="${s.mediaURL}" style="width:80px; height:80px; border-radius:15px; object-fit:cover;">
-                    <div style="flex:1;">
-                        <strong>${s.title || 'قصة'}</strong>
-                        <p style="color:var(--text2);">${s.caption || ''}</p>
-                        <small>${s.createdAt ? new Date(s.createdAt.toDate()).toLocaleString('ar-EG') : ''}</small>
-                    </div>
-                    <button class="btn btn-sm btn-danger" onclick="deleteStory('${doc.id}')">🗑️</button>
-                </div>`;
-            });
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header"><h1>📖 القصص</h1></div>
-                <div class="card">
-                    <h3 style="color:var(--gold);">إضافة قصة جديدة</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>عنوان</label><input id="storyTitle" class="input-field"></div>
-                        <div class="form-group"><label>رابط الصورة/الفيديو</label><input id="storyMedia" class="input-field"></div>
-                    </div>
-                    <div class="form-group"><label>نص</label><textarea id="storyCaption" class="input-field"></textarea></div>
-                    <button class="btn" onclick="addStory()">➕ إضافة قصة</button>
-                </div>
-                ${html || '<p style="color:var(--text3);">لا توجد قصص</p>'}`;
-        });
-    }
-    
-    window.addStory = async () => {
-        const title = document.getElementById('storyTitle').value.trim();
-        const media = document.getElementById('storyMedia').value.trim();
-        if (!title && !media) return showToast('⚠️ أدخل عنوان أو صورة', 'warning');
-        
-        await db.collection('stories').add({
-            adminID: currentAdmin.uid,
-            title: title,
-            mediaURL: media,
-            caption: document.getElementById('storyCaption').value,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // تنتهي بعد 24 ساعة
-        });
-        showToast('✅ تمت إضافة القصة', 'success');
-        renderStories();
-    };
-    
-    window.deleteStory = id => {
-        if (confirm('حذف القصة؟')) {
-            db.collection('stories').doc(id).delete().then(() => { showToast('✅ تم الحذف', 'success'); renderStories(); });
-        }
-    };
-
-    // ========== الوسائط ==========
-    function renderMediaPage() {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>📁 الوسائط</h1></div>
-            <div class="card">
-                <select id="mediaGroupSelect" class="input-field"><option value="">اختر مجموعة</option></select>
-                <div class="tabs" style="margin-top:15px;">
-                    <button class="tab active" onclick="filterMedia('all')">الكل</button>
-                    <button class="tab" onclick="filterMedia('image')">🖼️ صور</button>
-                    <button class="tab" onclick="filterMedia('video')">🎥 فيديو</button>
-                    <button class="tab" onclick="filterMedia('file')">📎 ملفات</button>
-                </div>
-                <div id="mediaGrid" style="display:flex; flex-wrap:wrap; gap:15px; margin-top:20px;"></div>
-            </div>`;
-        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(snap => {
-            let opts = '';
-            snap.forEach(doc => opts += `<option value="${doc.id}">${doc.data().name}</option>`);
-            document.getElementById('mediaGroupSelect').innerHTML += opts;
-        });
-        document.getElementById('mediaGroupSelect').addEventListener('change', function() {
-            if (this.value) loadMedia(this.value);
-        });
-    }
-    
-    window.currentMediaFilter = 'all';
-    window.filterMedia = (type) => {
-        currentMediaFilter = type;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        const groupId = document.getElementById('mediaGroupSelect').value;
-        if (groupId) loadMedia(groupId);
-    };
-    
-    function loadMedia(groupId) {
-        let query = db.collection('groups').doc(groupId).collection('messages')
-            .orderBy('timestamp', 'desc').limit(100);
-        
-        if (currentMediaFilter !== 'all') {
-            query = query.where('type', '==', currentMediaFilter);
-        } else {
-            query = query.where('type', 'in', ['image', 'video', 'file']);
-        }
-        
-        query.get().then(snap => {
-            let html = '';
-            snap.forEach(doc => {
-                const m = doc.data();
-                if (m.type === 'image') html += `<div style="width:120px; height:120px; overflow:hidden; border-radius:15px; cursor:pointer;" onclick="window.open('${m.content}')"><img src="${m.content}" style="width:100%; height:100%; object-fit:cover;"></div>`;
-                else if (m.type === 'video') html += `<div style="width:120px;"><video src="${m.content}" controls style="width:100%; border-radius:15px;"></video></div>`;
-                else html += `<div style="width:120px; height:120px; background:var(--surface2); display:flex; align-items:center; justify-content:center; border-radius:15px; cursor:pointer;" onclick="window.open('${m.content}')">📄 ملف</div>`;
-            });
-            document.getElementById('mediaGrid').innerHTML = html || '<p style="color:var(--text3); width:100%; text-align:center;">لا توجد وسائط</p>';
-        });
-    }
-
-    // ========== البلاغات ==========
-    function renderReports() {
-        db.collection('reports').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            let html = '';
-            snap.forEach(doc => {
-                const r = doc.data();
-                html += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <strong style="color:var(--gold);">🚨 ${r.reason || 'بلاغ'}</strong>
-                            <p>من: ${r.reporterName || 'مجهول'} | بخصوص: ${r.reportedUserName || r.reportedUserID}</p>
-                            <small style="color:var(--text2);">${r.createdAt ? new Date(r.createdAt.toDate()).toLocaleString('ar-EG') : ''}</small>
-                        </div>
-                        <div>
-                            <span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'resolved' ? 'badge-open' : 'badge-locked'}">${r.status === 'pending' ? 'معلق' : r.status === 'resolved' ? 'تم الحل' : 'مرفوض'}</span>
-                            <button class="btn btn-sm btn-success" onclick="resolveReport('${doc.id}')" ${r.status !== 'pending' ? 'disabled' : ''}>✅ حل</button>
-                            <button class="btn btn-sm btn-danger" onclick="dismissReport('${doc.id}')" ${r.status !== 'pending' ? 'disabled' : ''}>❌ رفض</button>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header"><h1>🚨 البلاغات</h1></div>
-                ${html || '<p style="color:var(--text3);">لا توجد بلاغات</p>'}`;
-            updateSidebarCounts();
-        });
-    }
-    
-    window.resolveReport = id => {
-        db.collection('reports').doc(id).update({ 
-            status: 'resolved', 
-            resolvedBy: currentAdmin.uid,
-            resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => showToast('✅ تم حل البلاغ', 'success'));
-    };
-    
-    window.dismissReport = id => {
-        db.collection('reports').doc(id).update({ 
-            status: 'dismissed',
-            dismissedBy: currentAdmin.uid,
-            dismissedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => showToast('❌ تم رفض البلاغ', 'info'));
-    };
-
-    // ========== التحليلات ==========
-    function renderAnalytics() {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>📈 التحليلات المتقدمة</h1></div>
-            <div class="grid-2">
-                <div class="card"><h3 style="color:var(--gold);">📊 نشاط المستخدمين</h3><canvas id="analyticsChart1" height="200"></canvas></div>
-                <div class="card"><h3 style="color:var(--gold);">💬 الرسائل اليومية</h3><canvas id="analyticsChart2" height="200"></canvas></div>
-                <div class="card"><h3 style="color:var(--gold);">🔑 استخدام الأكواد</h3><canvas id="analyticsChart3" height="200"></canvas></div>
-                <div class="card"><h3 style="color:var(--gold);">🌐 توزيع المجموعات</h3><canvas id="analyticsChart4" height="200"></canvas></div>
-            </div>`;
-        
-        setTimeout(() => {
-            ['analyticsChart1', 'analyticsChart2', 'analyticsChart3', 'analyticsChart4'].forEach((id, i) => {
-                const ctx = document.getElementById(id)?.getContext('2d');
-                if (ctx) {
-                    new Chart(ctx, {
-                        type: ['line', 'bar', 'pie', 'doughnut'][i],
-                        data: {
-                            labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
-                            datasets: [{
-                                data: [65, 59, 80, 81, 56, 95],
-                                backgroundColor: ['#FFC107', '#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#FFD54F'],
-                                borderColor: '#FFC107'
-                            }]
-                        },
-                        options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
-                    });
-                }
-            });
-        }, 300);
-    }
-
-    // ========== النسخ الاحتياطي ==========
-    function renderBackup() {
-        document.getElementById('mainContent').innerHTML = `
-            <div class="page-header"><h1>💾 النسخ الاحتياطي</h1></div>
-            <div class="card">
-                <h3 style="color:var(--gold);">إدارة النسخ الاحتياطية</h3>
-                <p style="color:var(--text2);">قم بتصدير بيانات التطبيق بالكامل أو استعادتها</p>
-                <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
-                    <button class="btn" onclick="createBackup()">💾 إنشاء نسخة احتياطية</button>
-                    <button class="btn btn-outline" onclick="exportAllData()">📤 تصدير Excel</button>
-                </div>
-                <div id="backupList" style="margin-top:20px;"></div>
-            </div>`;
-        loadBackups();
-    }
-    
-    function loadBackups() {
-        db.collection('backups').where('adminID', '==', currentAdmin.uid).orderBy('createdAt', 'desc').get().then(snap => {
-            let html = '<h4 style="color:var(--gold);">النسخ السابقة</h4>';
-            snap.forEach(doc => {
-                const b = doc.data();
-                html += `<div style="padding:10px; background:var(--surface2); margin:5px 0; border-radius:10px;">
-                    📅 ${new Date(b.createdAt?.toDate()).toLocaleString('ar-EG')} - ${b.type}
-                </div>`;
-            });
-            document.getElementById('backupList').innerHTML = html || '<p style="color:var(--text3);">لا توجد نسخ سابقة</p>';
-        });
-    }
-    
-    window.createBackup = async () => {
-        showToast('💾 جاري إنشاء النسخة الاحتياطية...', 'info');
-        await db.collection('backups').add({
-            adminID: currentAdmin.uid,
-            type: 'manual',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        showToast('✅ تم إنشاء النسخة الاحتياطية', 'success');
-        loadBackups();
-    };
-
-    // ========== الإعدادات ==========
-    function renderSettings() {
-        db.collection('config').doc('support').get().then(doc => {
-            const s = doc.exists ? doc.data() : {};
-            document.getElementById('mainContent').innerHTML = `
-                <div class="page-header"><h1>⚙️ الإعدادات</h1></div>
-                <div class="card fade-in">
-                    <h3 style="color:var(--gold);">📞 بيانات الدعم الفني</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>🖼️ صورة الأدمن</label><input id="supImg" class="input-field" value="${s.adminImageURL || ''}"></div>
-                        <div class="form-group"><label>📱 واتساب</label><input id="supWa" class="input-field" value="${s.whatsapp || ''}"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>📘 فيسبوك</label><input id="supFb" class="input-field" value="${s.facebook || ''}"></div>
-                        <div class="form-group"><label>🎵 تيك توك</label><input id="supTt" class="input-field" value="${s.tiktok || ''}"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>▶️ يوتيوب</label><input id="supYt" class="input-field" value="${s.youtube || ''}"></div>
-                        <div class="form-group"><label>📸 انستغرام</label><input id="supIg" class="input-field" value="${s.instagram || ''}"></div>
-                    </div>
-                    <button class="btn" onclick="saveSupport()">💾 حفظ</button>
-                </div>
-                <div class="card fade-in">
-                    <h3 style="color:var(--gold);">🔒 تغيير كلمة المرور</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>كلمة المرور الحالية</label><input id="currentPass" type="password" class="input-field"></div>
-                        <div class="form-group"><label>كلمة المرور الجديدة</label><input id="newPass" type="password" class="input-field"></div>
-                    </div>
-                    <button class="btn" onclick="changePassword()">🔐 تحديث</button>
-                </div>
-                <div class="card fade-in">
-                    <h3 style="color:var(--gold);">🎨 تخصيص التطبيق</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>اسم التطبيق</label><input id="appName" class="input-field" value="${s.appName || 'Web Egypt'}"></div>
-                        <div class="form-group"><label>اللون الرئيسي</label><input id="primaryColor" type="color" class="input-field" value="${s.primaryColor || '#FFC107'}" style="height:50px;"></div>
-                    </div>
-                    <button class="btn" onclick="saveAppSettings()">💾 حفظ التخصيص</button>
-                </div>`;
-        });
-    }
-    
-    window.saveSupport = () => {
-        db.collection('config').doc('support').set({
-            adminImageURL: document.getElementById('supImg').value,
-            whatsapp: document.getElementById('supWa').value,
-            facebook: document.getElementById('supFb').value,
-            tiktok: document.getElementById('supTt').value,
-            youtube: document.getElementById('supYt').value,
-            instagram: document.getElementById('supIg').value
-        }, { merge: true }).then(() => showToast('✅ تم الحفظ', 'success'));
-    };
-    
-    window.saveAppSettings = () => {
-        db.collection('config').doc('support').set({
-            appName: document.getElementById('appName').value,
-            primaryColor: document.getElementById('primaryColor').value
-        }, { merge: true }).then(() => showToast('✅ تم حفظ الإعدادات', 'success'));
-    };
-    
-    window.changePassword = () => {
-        const currentPass = document.getElementById('currentPass').value;
-        const newPass = document.getElementById('newPass').value;
-        if (!newPass) return showToast('⚠️ أدخل كلمة المرور الجديدة', 'warning');
-        
-        const credential = firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, currentPass);
-        auth.currentUser.reauthenticateWithCredential(credential)
-            .then(() => auth.currentUser.updatePassword(newPass))
-            .then(() => showToast('✅ تم تغيير كلمة المرور', 'success'))
-            .catch(e => showToast('❌ ' + e.message, 'error'));
-    };
-
-    // ========== الشات المدمج ==========
-    window.openAdminChat = groupId => { currentChatGroupId = groupId; switchPage('chat'); };
-    
-    function renderChat(groupId) {
-        currentChatGroupId = groupId || currentChatGroupId;
-        db.collection('groups').doc(currentChatGroupId).get().then(doc => {
-            const g = doc.data();
-            document.getElementById('mainContent').innerHTML = `
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <img src="${g.picture || 'https://via.placeholder.com/40'}" width="40" height="40" style="border-radius:50%;">
-                        <strong style="color:var(--gold);">${g.name}</strong>
-                        <button class="btn btn-outline btn-sm" onclick="switchPage('groups')" style="margin-right:auto;">⬅️ رجوع</button>
-                    </div>
-                    <div class="chat-messages" id="adminChatMessages"></div>
-                    <div class="chat-input-area">
-                        <input id="adminMsgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendAdminMsg()">
-                        <button class="circle-btn" onclick="uploadAdminMedia()">📎</button>
-                        <button class="circle-btn" onclick="sendAdminMsg()">➤</button>
-                    </div>
-                </div>`;
-            loadAdminMessages(currentChatGroupId);
-        });
-    }
-    
-    function loadAdminMessages(groupId) {
-        const container = document.getElementById('adminChatMessages');
-        if (chatUnsub) chatUnsub();
-        chatUnsub = db.collection('groups').doc(groupId).collection('messages')
-            .orderBy('timestamp', 'asc').onSnapshot(snap => {
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    const m = doc.data();
-                    const isSent = m.senderID === currentAdmin.uid;
-                    container.innerHTML += `
-                    <div class="message ${isSent ? 'sent' : ''}">
-                        <div class="bubble">${m.content || ''}</div>
-                        <div style="font-size:0.7rem; color:#888;">${m.senderName || ''} • ${m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : ''}</div>
-                    </div>`;
-                });
-                container.scrollTop = container.scrollHeight;
-            });
-        realtimeListeners.push(chatUnsub);
-    }
-    
-    window.sendAdminMsg = () => {
-        const input = document.getElementById('adminMsgInput');
-        if (!input?.value.trim()) return;
-        db.collection('groups').doc(currentChatGroupId).collection('messages').add({
-            senderID: currentAdmin.uid,
-            senderName: currentAdmin.name,
-            type: 'text',
-            content: input.value.trim(),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        input.value = '';
-    };
-    
-    window.uploadAdminMedia = () => {
         cloudinary.createUploadWidget({
-            cloudName: CLOUD_NAME, 
+            cloudName: CLOUD_NAME,
             uploadPreset: UPLOAD_PRESET,
             sources: ['local', 'url', 'camera'],
-            multiple: true
-        }, (err, result) => {
-            if (!err && result.event === 'success') {
-                const url = result.info.secure_url;
-                const type = result.info.resource_type === 'image' ? 'image' : 
-                             result.info.resource_type === 'video' ? 'video' : 'file';
-                db.collection('groups').doc(currentChatGroupId).collection('messages').add({
-                    senderID: currentAdmin.uid,
-                    senderName: currentAdmin.name,
-                    type, content: url,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            multiple: false,
+            maxFileSize: 20000000,
+            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'mp3', 'pdf', 'doc', 'docx']
+        }, function(error, result) {
+            if (!error && result && result.event === 'success') {
+                var url = result.info.secure_url;
+                var resource = result.info.resource_type;
+                var type = 'file';
+                if (resource === 'image') type = 'image';
+                else if (resource === 'video') type = 'video';
+                
+                db.collection('groups').doc(currentGroupId).collection('messages').add({
+                    senderID: currentUser.uid,
+                    senderName: currentUser.name || 'طالب',
+                    type: type,
+                    content: url,
+                    fileName: result.info.original_filename || 'ملف',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    seen: false
+                }).catch(function(e) {
+                    console.error('Media upload error:', e);
                 });
             }
         }).open();
     };
 
-    // ========== بحث ==========
-    window.filterTable = (inputId, tableId) => {
-        const filter = document.getElementById(inputId)?.value?.toUpperCase() || '';
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const rows = table.getElementsByTagName('tr');
-        for (let i = 1; i < rows.length; i++) {
-            const td = rows[i].getElementsByTagName('td')[0];
-            if (td) {
-                const txt = td.textContent || td.innerText;
-                rows[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? '' : 'none';
-            }
+    window.scrollToMsg = function(msgId) {
+        var el = document.getElementById('msg-' + msgId);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.background = 'rgba(255,193,7,0.2)';
+            setTimeout(function() { el.style.background = ''; }, 1500);
         }
     };
 
-    // ========== أحداث لوحة المفاتيح ==========
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelector('.modal-overlay')?.remove();
-            closeSidebar();
-        }
-    });
+    function handleTyping() {
+        clearTimeout(typingTimeout);
+        var ref = db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid);
+        ref.set({ name: currentUser.name || 'طالب', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        typingTimeout = setTimeout(function() { ref.delete(); }, 3000);
+    }
+
+    // ========== معلومات المجموعة ==========
+    function renderGroupInfo() {
+        if (!currentGroupId) { navigate('groups'); return; }
+        var content = document.getElementById('contentArea');
+        db.collection('groups').doc(currentGroupId).get().then(function(doc) {
+            var g = doc.data();
+            var html = '<div class="info-card scale-in">';
+            html += '<img src="' + (g.picture || 'https://via.placeholder.com/100') + '" alt="صورة المجموعة">';
+            html += '<h2 style="color:var(--gold); margin:15px 0;">' + (g.name || 'مجموعة') + '</h2>';
+            html += '<p style="color:var(--text2);">' + (g.description || 'لا يوجد وصف') + '</p>';
+            html += '<p style="color:var(--gold); font-size:1.2rem; margin:10px 0;">👥 ' + (g.memberCount || 0) + ' عضو</p>';
+            html += '<p>🏷️ النوع: ' + (g.type === 'open' ? 'مفتوح' : 'مقفول') + '</p>';
+            html += '<p>الحالة: ' + (g.isLocked ? '🔒 مقفول' : '🟢 مفتوح') + '</p>';
+            html += '<p style="color:var(--text2);">👤 المشرف: ' + (g.adminName || 'الأدمن') + '</p>';
+            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'chat\')" style="margin-top:15px;">⬅️ رجوع للمحادثة</button>';
+            html += '</div>';
+            content.innerHTML = html;
+        });
+    }
+
+    // ========== القصص ==========
+    function renderStories() {
+        var content = document.getElementById('contentArea');
+        content.innerHTML = '<h2 class="section-title">📖 القصص</h2><div id="storiesList"></div>';
+        
+        db.collection('stories').orderBy('createdAt', 'desc').limit(20).get().then(function(snap) {
+            var html = '<div class="stories-bar">';
+            snap.forEach(function(doc) {
+                var s = doc.data();
+                html += '<div class="story-item" onclick="viewStory(\'' + doc.id + '\')">';
+                html += '<div class="story-ring"><img src="' + (s.mediaURL || 'https://via.placeholder.com/65') + '" alt="قصة"></div>';
+                html += '<span>' + ((s.title || 'قصة').substring(0, 10)) + '</span>';
+                html += '</div>';
+            });
+            html += '</div>';
+            document.getElementById('storiesList').innerHTML = html || '<p style="color:var(--text2); text-align:center;">لا توجد قصص حالياً</p>';
+        });
+    }
+
+    window.viewStory = function(storyId) {
+        db.collection('stories').doc(storyId).get().then(function(doc) {
+            var s = doc.data();
+            var modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            var modalHTML = '<div class="modal" style="text-align:center;">';
+            if (s.mediaURL) modalHTML += '<img src="' + s.mediaURL + '" style="width:100%; max-height:300px; object-fit:cover; border-radius:15px;">';
+            if (s.title) modalHTML += '<h3 style="color:var(--gold); margin-top:15px;">' + s.title + '</h3>';
+            if (s.caption) modalHTML += '<p style="color:var(--text2);">' + s.caption + '</p>';
+            modalHTML += '<button class="btn btn-outline btn-sm" style="margin-top:15px;">إغلاق</button>';
+            modalHTML += '</div>';
+            modal.innerHTML = modalHTML;
+            document.body.appendChild(modal);
+            
+            var closeBtn = modal.querySelector('button');
+            if (closeBtn) closeBtn.onclick = function() { modal.remove(); };
+            modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+        });
+    };
+
+    // ========== المحادثات الخاصة ==========
+    function renderPrivateChatsList() {
+        var content = document.getElementById('contentArea');
+        content.innerHTML = '<h2 class="section-title">💬 المحادثات الخاصة</h2><input class="input-field" id="privateUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchPrivateUsers()" style="text-align:right; letter-spacing:0;"><div id="privateUsersList"></div>';
+        searchPrivateUsers();
+    }
+
+    window.searchPrivateUsers = function() {
+        var queryInput = document.getElementById('privateUserSearch');
+        var query = queryInput ? queryInput.value.toLowerCase() : '';
+        
+        db.collection('users').limit(30).get().then(function(snap) {
+            var html = '';
+            snap.forEach(function(doc) {
+                var u = doc.data();
+                if (doc.id === currentUser.uid) return;
+                if (query && (!u.name || !u.name.toLowerCase().includes(query))) return;
+                
+                html += '<div class="user-list-item" onclick="navigate(\'private-chat\', \'' + doc.id + '\')">';
+                html += '<div style="display:flex; align-items:center; gap:10px;">';
+                html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" alt="صورة">';
+                html += '<div>';
+                html += '<strong>' + (u.name || 'مستخدم') + '</strong>';
+                html += '<br><small style="color:' + (u.online ? 'var(--online)' : 'var(--text2)') + ';">' + (u.online ? '🟢 متصل' : '○ غير متصل') + '</small>';
+                html += '</div>';
+                html += '</div>';
+                html += '<button class="btn btn-xs">💬</button>';
+                html += '</div>';
+            });
+            var listEl = document.getElementById('privateUsersList');
+            if (listEl) listEl.innerHTML = html || '<p style="color:var(--text2); text-align:center;">لا يوجد مستخدمين</p>';
+        });
+    };
+
+    function renderPrivateChat(userId) {
+        if (!userId) { navigate('private-chats'); return; }
+        currentPrivateChatUser = userId;
+        var content = document.getElementById('contentArea');
+        
+        db.collection('users').doc(userId).get().then(function(doc) {
+            var u = doc.data();
+            var chatId = [currentUser.uid, userId].sort().join('_');
+            
+            var html = '<div class="chat-container">';
+            html += '<div class="chat-header">';
+            html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" width="40" height="40" style="border-radius:50%;">';
+            html += '<div>';
+            html += '<div class="group-name">' + (u.name || 'مستخدم') + '</div>';
+            html += '<div class="status-text">' + (u.online ? '🟢 متصل' : '○ غير متصل') + '</div>';
+            html += '</div>';
+            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'private-chats\')" style="margin-right:auto;">⬅️ رجوع</button>';
+            html += '</div>';
+            html += '<div class="chat-messages" id="privateChatMessages"></div>';
+            html += '<div class="chat-input-area">';
+            html += '<input id="privateMsgInput" placeholder="رسالة خاصة..." onkeydown="if(event.key===\'Enter\')sendPrivateMsg()">';
+            html += '<button class="circle-btn send" onclick="sendPrivateMsg()">➤</button>';
+            html += '</div>';
+            html += '</div>';
+            
+            content.innerHTML = html;
+            loadPrivateMessages(chatId);
+        });
+    }
+
+    function loadPrivateMessages(chatId) {
+        var container = document.getElementById('privateChatMessages');
+        if (!container) return;
+        
+        var unsub = db.collection('private_chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(snap) {
+            if (snap.empty) {
+                container.innerHTML = '<p style="text-align:center; color:#555; padding:30px;">💬 لا توجد رسائل خاصة</p>';
+                return;
+            }
+            container.innerHTML = '';
+            snap.forEach(function(doc) {
+                var m = doc.data();
+                var isSent = (m.senderID === currentUser.uid);
+                container.innerHTML += '<div class="message ' + (isSent ? 'sent' : 'received') + '"><div class="bubble">' + (m.content || '') + '</div><div class="msg-meta">' + (m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '') + '</div></div>';
+            });
+            container.scrollTop = container.scrollHeight;
+        });
+        allListeners.push(unsub);
+    }
+
+    window.sendPrivateMsg = function() {
+        var input = document.getElementById('privateMsgInput');
+        if (!input || !input.value.trim() || !currentPrivateChatUser) return;
+        
+        var chatId = [currentUser.uid, currentPrivateChatUser].sort().join('_');
+        var content = input.value.trim();
+        
+        db.collection('private_chats').doc(chatId).set({
+            participants: [currentUser.uid, currentPrivateChatUser],
+            lastMessage: content,
+            lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).then(function() {
+            return db.collection('private_chats').doc(chatId).collection('messages').add({
+                senderID: currentUser.uid,
+                senderName: currentUser.name || 'طالب',
+                content: content,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }).then(function() {
+            input.value = '';
+        }).catch(function(e) {
+            console.error('Private msg error:', e);
+        });
+    };
+
+    // ========== الوسائط ==========
+    function renderMediaPage() {
+        var content = document.getElementById('contentArea');
+        content.innerHTML = '<h2 class="section-title">📁 الوسائط</h2><div id="mediaGrid" class="media-grid"><p style="color:var(--text2); grid-column:1/-1; text-align:center;">⏳ جاري تحميل الوسائط...</p></div>';
+        loadAllMedia();
+    }
+
+    function loadAllMedia() {
+        var container = document.getElementById('mediaGrid');
+        if (!container) return;
+        
+        db.collection('groups').where('members', 'array-contains', currentUser.uid).get().then(function(groupsSnap) {
+            var allMedia = [];
+            var promises = [];
+            
+            groupsSnap.forEach(function(gDoc) {
+                var p = db.collection('groups').doc(gDoc.id).collection('messages').where('type', 'in', ['image', 'video', 'file']).orderBy('timestamp', 'desc').limit(50).get().then(function(msgSnap) {
+                    msgSnap.forEach(function(doc) { allMedia.push(doc.data()); });
+                });
+                promises.push(p);
+            });
+            
+            return Promise.all(promises).then(function() { return allMedia; });
+        }).then(function(allMedia) {
+            if (!container) return;
+            if (allMedia.length === 0) {
+                container.innerHTML = '<p style="color:var(--text2); text-align:center; grid-column:1/-1;">لا توجد وسائط</p>';
+                return;
+            }
+            
+            var html = '';
+            allMedia.forEach(function(m) {
+                if (m.type === 'image') {
+                    html += '<div class="media-item" onclick="window.open(\'' + m.content + '\')"><img src="' + m.content + '" alt="صورة" loading="lazy"></div>';
+                } else if (m.type === 'video') {
+                    html += '<div class="media-item"><video src="' + m.content + '" controls preload="metadata"></video></div>';
+                } else {
+                    html += '<div class="media-item"><div class="file-placeholder" onclick="window.open(\'' + m.content + '\')">📄</div></div>';
+                }
+            });
+            container.innerHTML = html;
+        }).catch(function(e) {
+            console.error('Media load error:', e);
+            if (container) container.innerHTML = '<p style="color:var(--danger); grid-column:1/-1; text-align:center;">❌ حدث خطأ</p>';
+        });
+    }
+
+    // ========== الدعم الفني ==========
+    function renderSupport() {
+        var content = document.getElementById('contentArea');
+        db.collection('config').doc('support').get().then(function(doc) {
+            var s = doc.exists ? doc.data() : {};
+            var html = '<div class="info-card scale-in">';
+            html += '<img src="' + (s.adminImageURL || 'https://via.placeholder.com/100') + '" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);">';
+            html += '<h2 style="color:var(--gold); margin:15px 0;">📞 الدعم الفني</h2>';
+            html += '<p style="color:var(--text2);">للتواصل والاستفسارات</p>';
+            html += '<div class="support-links">';
+            if (s.whatsapp) html += '<a href="' + s.whatsapp + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png" alt="واتساب"><span>واتساب</span></a>';
+            if (s.facebook) html += '<a href="' + s.facebook + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png" alt="فيسبوك"><span>فيسبوك</span></a>';
+            if (s.tiktok) html += '<a href="' + s.tiktok + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/tiktok--v1.png" alt="تيك توك"><span>تيك توك</span></a>';
+            if (s.youtube) html += '<a href="' + s.youtube + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/youtube-play.png" alt="يوتيوب"><span>يوتيوب</span></a>';
+            html += '</div>';
+            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')" style="margin-top:20px;">⬅️ رجوع</button>';
+            html += '</div>';
+            content.innerHTML = html;
+        }).catch(function(e) {
+            content.innerHTML = '<p style="color:var(--danger); text-align:center;">❌ حدث خطأ في تحميل بيانات الدعم</p>';
+        });
+    }
 
     // ========== بدء التطبيق ==========
-    console.log('🚀 Web Egypt Admin Panel v3.0 - Loaded Successfully');
-    console.log('📊 Features: Dashboard, Users, Groups, Codes, Private Chats, Stories, Media, Reports, Analytics, Backup, Settings');
-    console.log('💾 Connected to Firebase & Cloudinary');
+    document.addEventListener('DOMContentLoaded', function() {
+        showLoading();
+        autoLogin().then(function(loggedIn) {
+            hideLoading();
+            if (!loggedIn) {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }).catch(function() {
+            hideLoading();
+            document.getElementById('loginScreen').classList.remove('hidden');
+        });
+    });
+
+    console.log('🚀 Web Egypt Student App v4.0 - Loaded Successfully');
+    console.log('📱 Features: Groups, Real-time Chat, Private Messages, Stories, Media Gallery, Support');
+    console.log('🔒 Device Binding: Active');
+    console.log('🔗 Connected to Firebase & Cloudinary');
 </script>
 </body>
 </html>
