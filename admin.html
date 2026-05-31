@@ -19,7 +19,7 @@
             --danger: #FF4757; --success: #2ED573; --info: #1E90FF; --warning: #FFA502;
             --radius: 16px; --radius-sm: 10px; --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow: 0 4px 15px rgba(0,0,0,0.4); --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
-            --safe-bottom: env(safe-area-inset-bottom, 0px); --header-height: 60px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -115,7 +115,6 @@
         .toggle-switch input[type="checkbox"]::before { content: ''; width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: var(--transition); }
         .toggle-switch input[type="checkbox"]:checked::before { left: 22px; }
         
-        /* ========== شات محسن يملّي الشاشة ========== */
         .chat-fullscreen { display: flex; flex-direction: column; height: 100%; background: #0d0d14; position: relative; }
         .chat-header-bar { display: flex; align-items: center; padding: 12px 15px; background: var(--surface); border-bottom: 1px solid #1a1a25; gap: 10px; flex-shrink: 0; z-index: 10; }
         .chat-header-bar .back-btn { font-size: 1.3rem; cursor: pointer; color: var(--gold); padding: 5px; }
@@ -123,7 +122,7 @@
         .chat-header-bar .group-info { flex: 1; min-width: 0; }
         .chat-header-bar .group-name { font-weight: bold; color: var(--gold); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-header-bar .group-subtitle { font-size: 0.7rem; color: var(--text2); }
-        .chat-messages-area { flex: 1; padding: 12px 15px; overflow-y: auto; background-color: #0d0d14; background-size: cover; background-position: center; display: flex; flex-direction: column; }
+        .chat-messages-area { flex: 1; padding: 12px 15px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; overscroll-behavior: contain; touch-action: pan-y; -webkit-transform: translateZ(0); transform: translateZ(0); }
         .msg-wrapper { margin-bottom: 6px; display: flex; flex-direction: column; animation: messageIn 0.3s ease-out; }
         .msg-wrapper.sent { align-items: flex-end; }
         .msg-wrapper.received { align-items: flex-start; }
@@ -161,6 +160,9 @@
         .permission-card .perm-icon { font-size: 1.4rem; }
         .permission-card .perm-info { flex: 1; }
         .permission-card .perm-name { font-weight: bold; font-size: 0.9rem; }
+        .chat-list-item { display: flex; align-items: center; padding: 10px; background: var(--surface2); margin: 4px 0; border-radius: 10px; cursor: pointer; transition: var(--transition); }
+        .chat-list-item:hover { background: var(--surface3); }
+        .chat-list-item img { width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; object-fit: cover; }
 
         @media (max-width: 768px) {
             .sidebar { position: fixed; top: 0; right: 0; bottom: 0; transform: translateX(100%); width: 80%; z-index: 200; padding-bottom: var(--safe-bottom); }
@@ -285,7 +287,6 @@
     window.logout = function() { if (currentAdmin) db.collection('users').doc(currentAdmin.uid).update({ online: false }); auth.signOut().then(function() { document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appLayout').style.display = 'none'; currentAdmin = null; }); };
     auth.onAuthStateChanged(function(user) { if (user) { db.collection('users').doc(user.uid).get().then(function(doc) { if (doc.exists && doc.data().role === 'admin') { currentAdmin = { uid: user.uid, name: doc.data().name, role: 'admin' }; document.getElementById('adminNameDisplay').textContent = currentAdmin.name; document.getElementById('loginScreen').style.display = 'none'; document.getElementById('appLayout').style.display = 'flex'; switchPage('dashboard'); updateSidebarCounts(); } else { auth.signOut(); } }); } });
 
-    // ========== الإحصائيات ==========
     async function renderDashboard() {
         var results = await Promise.all([db.collection('users').get(), db.collection('groups').where('adminID', '==', currentAdmin.uid).get(), db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get(), db.collection('reports').get()]);
         var u = results[0], g = results[1], c = results[2], r = results[3];
@@ -299,7 +300,6 @@
     window.broadcastMessage = function() { var msg = prompt('📢 رسالة البث:'); if (!msg) return; db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(function(snap) { var batch = db.batch(); snap.forEach(function(doc) { batch.set(db.collection('groups').doc(doc.id).collection('messages').doc(), { senderID: currentAdmin.uid, senderName: '📢 ' + currentAdmin.name, type: 'broadcast', content: msg, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }); return batch.commit(); }).then(function() { showToast('✅ تم!', 'success'); }); };
     window.exportData = async function() { var snap = await db.collection('users').get(); var data = []; snap.forEach(function(d) { data.push(d.data()); }); var ws = XLSX.utils.json_to_sheet(data); var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "بيانات"); XLSX.writeFile(wb, "WebEgypt_Export.xlsx"); showToast('✅ تم', 'success'); };
 
-    // ========== المستخدمين ==========
     function renderUsers() {
         document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>👥 المستخدمين</h1><input class="input-field" id="userSearch" placeholder="🔍 بحث..." oninput="filterTable(\'userSearch\',\'userTable\')" style="width:200px;"></div><div class="card"><div class="table-responsive"><table class="data-table" id="userTable"><thead><tr><th>المستخدم</th><th>البريد</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody><tr><td colspan="5">⏳ جاري التحميل...</td></tr></tbody></table></div></div>';
         db.collection('users').get().then(function(snap) {
@@ -313,7 +313,6 @@
     window.changeRole = async function(uid, cr) { var nr = cr === 'admin' ? 'user' : cr === 'user' ? 'moderator' : 'admin'; if (confirm('تغيير إلى ' + nr + '؟')) { await db.collection('users').doc(uid).update({ role: nr }); showToast('✅ تم', 'success'); renderUsers(); } };
     window.deleteUser = function(uid) { if (confirm('⚠️ حذف؟')) { db.collection('users').doc(uid).delete().then(function() { showToast('✅ تم', 'success'); renderUsers(); }); } };
 
-    // ========== المجموعات ==========
     function renderGroups() {
         document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>📋 المجموعات</h1><button class="btn btn-sm" onclick="switchPage(\'create-group\')">➕ جديدة</button></div><div style="text-align:center; padding:30px;"><div class="spinner"></div></div>';
         db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(function(snap) {
@@ -334,7 +333,6 @@
     function renderCreateGroup() { document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>➕ إنشاء مجموعة</h1></div><div class="card"><div class="form-row"><div class="form-group"><label>📝 الاسم *</label><input id="gName" class="input-field" placeholder="اسم المجموعة"></div><div class="form-group"><label>🏷️ النوع</label><select id="gType" class="input-field"><option value="open">مفتوح</option><option value="closed">مقفول</option></select></div></div><div class="form-group"><label>🖼️ الصورة</label><input id="gPic" class="input-field" value="https://via.placeholder.com/150"></div><div class="form-group"><label>📄 الوصف</label><textarea id="gDesc" class="input-field" placeholder="وصف..."></textarea></div><button class="btn" onclick="createGroup()" style="width:100%;">🚀 إنشاء</button></div>'; }
     window.createGroup = async function() { var n = document.getElementById('gName').value.trim(); if (!n) return showToast('⚠️ الاسم مطلوب', 'warning'); await db.collection('groups').add({ name: n, type: document.getElementById('gType').value, picture: document.getElementById('gPic').value, description: document.getElementById('gDesc').value, adminID: currentAdmin.uid, adminName: currentAdmin.name, members: [currentAdmin.uid], memberCount: 1, permissions: { allowText: true, allowImages: true, allowVideos: true, allowFiles: true, allowAudio: true, allowLinks: true }, isLocked: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); showToast('✅ تم!', 'success'); switchPage('groups'); };
 
-    // ========== تعديل المجموعة ==========
     function renderEditGroup(groupId) {
         db.collection('groups').doc(groupId).get().then(function(doc) {
             var g = doc.data(), perms = g.permissions || {};
@@ -357,7 +355,6 @@
         db.collection('groups').doc(groupId).update(update).then(function() { showToast('✅ تم الحفظ' + (isLocked ? ' 🔒' : ' 🔓'), 'success'); switchPage('groups'); }).catch(function(err) { showToast('❌ ' + err.message, 'error'); });
     };
 
-    // ========== الأكواد ==========
     function renderCodes() {
         document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>🔑 أكواد الطلاب</h1><button class="btn btn-sm" onclick="generateBulkCodes()">📦批量</button></div><div style="text-align:center; padding:30px;"><div class="spinner"></div></div>';
         Promise.all([db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get(), db.collection('groups').where('adminID', '==', currentAdmin.uid).get()]).then(function(r) {
@@ -367,17 +364,16 @@
             var avail = 0, used = 0; codes.forEach(function(c) { c.usedBy ? used++ : avail++; });
             var rows = ''; codes.forEach(function(c) { rows += '<tr><td>' + (c.studentName || '-') + '</td><td><span style="background:var(--surface2); padding:4px 10px; border-radius:6px; color:var(--gold); font-weight:bold;">' + c.code + '</span></td><td>' + (c.studentClass || '-') + '</td><td>' + (c.type || '-') + '</td><td>' + (c.usedBy ? '<span class="badge badge-locked">مستخدم</span>' : '<span class="badge badge-open">متاح</span>') + '</td><td><button class="btn btn-xs btn-danger" onclick="deleteCode(\'' + c.id + '\')">🗑️</button></td></tr>'; });
             var html = '<div class="grid-3" style="margin-bottom:14px;"><div class="card stat-card"><div class="stat-value" style="font-size:1.8rem;">' + codes.length + '</div><div class="stat-label">إجمالي</div></div><div class="card stat-card"><div class="stat-value" style="font-size:1.8rem; color:var(--success);">' + avail + '</div><div class="stat-label">🟢 متاحة</div></div><div class="card stat-card"><div class="stat-value" style="font-size:1.8rem; color:var(--danger);">' + used + '</div><div class="stat-label">🔒 مستخدمة</div></div></div>';
-            html += '<div class="card"><h3 style="color:var(--gold);">🎫 توليد كود</h3><div class="form-row"><div class="form-group"><label>👤 الاسم *</label><input id="stuName" class="input-field" placeholder="اسم الطالب"></div><div class="form-group"><label>📱 الرقم</label><input id="stuNumber" class="input-field" placeholder="رقم"></div></div><div class="form-row"><div class="form-group"><label>📚 الصف</label><input id="stuClass" class="input-field" placeholder="الصف"></div><div class="form-group"><label>👤 النوع</label><select id="stuType" class="input-field"><option>طالب</option><option>طالبة</option></select></div></div><div class="form-group"><label>📋 ربط بمجموعات</label><select id="stuGroups" class="input-field" multiple style="min-height:100px;">' + go + '</select><small style="color:var(--warning);">⚠️ اختر المجموعات</small></div><button class="btn" onclick="generateCode()" style="width:100%;">🎫 توليد</button><div id="newCodeDisplay" style="font-size:1.4rem; color:var(--gold); margin:12px 0; text-align:center;"></div></div>';
+            html += '<div class="card"><h3 style="color:var(--gold);">🎫 توليد كود</h3><div class="form-row"><div class="form-group"><label>👤 الاسم *</label><input id="stuName" class="input-field" placeholder="اسم الطالب"></div><div class="form-group"><label>📱 الرقم</label><input id="stuNumber" class="input-field" placeholder="رقم"></div></div><div class="form-row"><div class="form-group"><label>📚 الصف</label><input id="stuClass" class="input-field" placeholder="الصف"></div><div class="form-group"><label>👤 النوع</label><select id="stuType" class="input-field"><option>طالب</option><option>طالبة</option></select></div></div><div class="form-group"><label>📋 ربط بمجموعات</label><select id="stuGroups" class="input-field" multiple style="min-height:100px;">' + go + '</select><small style="color:var(--warning);">⚠️ اختر المجموعات اللي الطالب هينضم ليها</small></div><button class="btn" onclick="generateCode()" style="width:100%;">🎫 توليد</button><div id="newCodeDisplay" style="font-size:1.4rem; color:var(--gold); margin:12px 0; text-align:center;"></div></div>';
             html += '<div class="card"><h3 style="color:var(--gold);">📋 قائمة الأكواد</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>الطالب</th><th>الكود</th><th>الصف</th><th>النوع</th><th>الحالة</th><th>حذف</th></tr></thead><tbody>' + (rows || '<tr><td colspan="6">لا توجد أكواد</td></tr>') + '</tbody></table></div></div>';
             document.getElementById('mainContent').innerHTML = html;
         });
     }
-    window.generateCode = async function() { var n = document.getElementById('stuName').value.trim(); if (!n) return showToast('⚠️ الاسم مطلوب', 'warning'); var code = Math.random().toString(36).substring(2, 8).toUpperCase(); var sg = []; var sel = document.getElementById('stuGroups'); if (sel) for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].selected) sg.push(sel.options[i].value); } await db.collection('student_codes').add({ adminID: currentAdmin.uid, code: code, studentName: n, studentNumber: document.getElementById('stuNumber').value, studentClass: document.getElementById('stuClass').value, type: document.getElementById('stuType').value, allowedGroups: sg, usedBy: null, usedByDevice: null, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); var d = document.getElementById('newCodeDisplay'); if (d) { d.innerHTML = '✅ الكود: <span style="background:var(--surface2); padding:8px 16px; border-radius:8px;">' + code + '</span>'; if (sg.length === 0) d.innerHTML += '<p style="color:var(--warning); font-size:0.8rem;">⚠️ لم تختر مجموعات!</p>'; } showToast('✅ تم', 'success'); renderCodes(); };
+    window.generateCode = async function() { var n = document.getElementById('stuName').value.trim(); if (!n) return showToast('⚠️ الاسم مطلوب', 'warning'); var code = Math.random().toString(36).substring(2, 8).toUpperCase(); var sg = []; var sel = document.getElementById('stuGroups'); if (sel) for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].selected) sg.push(sel.options[i].value); } console.log('🎫 Creating code:', code, 'Groups:', sg); await db.collection('student_codes').add({ adminID: currentAdmin.uid, code: code, studentName: n, studentNumber: document.getElementById('stuNumber').value, studentClass: document.getElementById('stuClass').value, type: document.getElementById('stuType').value, allowedGroups: sg, usedBy: null, usedByDevice: null, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); var d = document.getElementById('newCodeDisplay'); if (d) { d.innerHTML = '✅ الكود: <span style="background:var(--surface2); padding:8px 16px; border-radius:8px;">' + code + '</span>'; if (sg.length === 0) d.innerHTML += '<p style="color:var(--warning); font-size:0.8rem;">⚠️ لم تختر مجموعات! الطالب مش هيشوف حاجة.</p>'; } showToast('✅ تم', 'success'); renderCodes(); };
     window.generateBulkCodes = function() { var m = document.createElement('div'); m.className = 'modal-overlay'; m.innerHTML = '<div class="modal"><h2>📦 توليد批量</h2><div class="form-group"><label>العدد</label><input id="bulkCount" type="number" class="input-field" value="10"></div><button class="btn" onclick="generateBulk()">🚀 توليد</button><button class="btn btn-outline btn-sm" onclick="this.closest(\'.modal-overlay\').remove()">إلغاء</button></div>'; document.body.appendChild(m); m.addEventListener('click', function(e) { if (e.target === m) m.remove(); }); };
     window.generateBulk = async function() { var c = parseInt(document.getElementById('bulkCount').value) || 10; var b = db.batch(); for (var i = 0; i < c; i++) { b.set(db.collection('student_codes').doc(), { adminID: currentAdmin.uid, code: Math.random().toString(36).substring(2,8).toUpperCase(), studentName: 'طالب ' + (i+1), type: 'طالب', usedBy: null, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); } await b.commit(); document.querySelector('.modal-overlay')?.remove(); showToast('✅ تم ' + c + ' كود', 'success'); };
     window.deleteCode = function(id) { if (confirm('حذف؟')) { db.collection('student_codes').doc(id).delete().then(function() { showToast('✅ تم', 'success'); renderCodes(); }); } };
 
-    // ========== المحادثات ==========
     function renderChatsList() {
         document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>💬 المحادثات</h1></div><div style="text-align:center; padding:30px;"><div class="spinner"></div></div>';
         db.collection('private_chats').where('participants', 'array-contains', currentAdmin.uid).get().then(function(s) {
@@ -387,7 +383,7 @@
             chats.sort(function(a, b) { return (b.time?.toDate().getTime() || 0) - (a.time?.toDate().getTime() || 0); });
             var h = '<div class="card"><input class="input-field" id="adminChatSearch" placeholder="🔍 بحث..." oninput="searchAdminChats()" style="margin-bottom:10px;">';
             if (chats.length === 0) h += '<div class="empty-state"><div class="icon">💬</div><h3>لا توجد محادثات</h3></div>';
-            else chats.forEach(function(c) { h += '<div class="chat-list-item" onclick="switchPage(\'private-chat\',\'' + c.uid + '\')" style="display:flex; align-items:center; padding:10px; background:var(--surface2); margin:4px 0; border-radius:10px; cursor:pointer;"><img src="' + (c.u.profilePic || 'https://via.placeholder.com/40') + '" style="width:40px;height:40px;border-radius:50%; margin-left:10px;"><div style="flex:1;"><strong>' + (c.u.name || 'مستخدم') + '</strong> ' + (c.u.online?'🟢':'○') + '<br><small style="color:var(--text2);">' + (c.last || '...') + '</small></div></div>'; });
+            else chats.forEach(function(c) { h += '<div class="chat-list-item" onclick="switchPage(\'private-chat\',\'' + c.uid + '\')"><img src="' + (c.u.profilePic || 'https://via.placeholder.com/40') + '" style="width:40px;height:40px;border-radius:50%; margin-left:10px;"><div style="flex:1;"><strong>' + (c.u.name || 'مستخدم') + '</strong> ' + (c.u.online?'🟢':'○') + '<br><small style="color:var(--text2);">' + (c.last || '...') + '</small></div></div>'; });
             h += '<div style="margin-top:10px;"><input class="input-field" id="newChatUserId" placeholder="معرف المستخدم"><button class="btn btn-sm" onclick="startNewChat()" style="width:auto; margin-top:6px;">➕ محادثة</button></div></div>';
             document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>💬 المحادثات</h1></div>' + h;
         });
@@ -398,7 +394,6 @@
     function loadPrivateMessages(cid) { var c = document.getElementById('privateChatMessages'); if (!c) return; if (privateChatUnsub) privateChatUnsub(); privateChatUnsub = db.collection('private_chats').doc(cid).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(s) { c.innerHTML = ''; s.forEach(function(d) { var m = d.data(), isSent = m.senderID === currentAdmin.uid; c.innerHTML += '<div class="msg-wrapper ' + (isSent?'sent':'received') + '"><div class="msg-bubble">' + (m.content||'') + '</div><div class="msg-meta-info">' + (m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}):'') + '</div></div>'; }); c.scrollTop = c.scrollHeight; }); realtimeListeners.push(privateChatUnsub); }
     window.sendPrivateMsg = function() { var i = document.getElementById('privateMsgInput'); if (!i?.value.trim() || !currentPrivateChatUser) return; var cid = [currentAdmin.uid, currentPrivateChatUser].sort().join('_'); db.collection('private_chats').doc(cid).set({ participants: [currentAdmin.uid, currentPrivateChatUser], lastMessage: i.value.trim(), lastMessageTime: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); db.collection('private_chats').doc(cid).collection('messages').add({ senderID: currentAdmin.uid, senderName: currentAdmin.name, content: i.value.trim(), timestamp: firebase.firestore.FieldValue.serverTimestamp() }); i.value = ''; };
 
-    // ========== باقي الصفحات ==========
     function renderStories() { document.getElementById('mainContent').innerHTML = '<div class="page-header"><h1>📖 القصص</h1></div><div class="card"><h3 style="color:var(--gold);">إضافة قصة</h3><div class="form-row"><div class="form-group"><label>عنوان</label><input id="storyTitle" class="input-field"></div><div class="form-group"><label>رابط الصورة</label><input id="storyMedia" class="input-field"></div></div><div class="form-group"><label>نص</label><textarea id="storyCaption" class="input-field"></textarea></div><button class="btn" onclick="addStory()">➕ إضافة</button></div><div id="storiesContainer"></div>'; db.collection('stories').where('adminID', '==', currentAdmin.uid).get().then(function(s) { var h = ''; s.forEach(function(d) { var st = d.data(); h += '<div class="card" style="display:flex; gap:10px; align-items:center;"><img src="' + (st.mediaURL||'https://via.placeholder.com/60') + '" style="width:60px;height:60px;border-radius:10px;object-fit:cover;"><div style="flex:1;"><strong>' + (st.title||'') + '</strong><p style="font-size:0.8rem;">' + (st.caption||'') + '</p></div><button class="btn btn-xs btn-danger" onclick="deleteStory(\'' + d.id + '\')">🗑️</button></div>'; }); document.getElementById('storiesContainer').innerHTML = h || '<p style="color:var(--text3);">لا توجد قصص</p>'; }); }
     window.addStory = async function() { var t = document.getElementById('storyTitle').value.trim(), m = document.getElementById('storyMedia').value.trim(); if (!t && !m) return; await db.collection('stories').add({ adminID: currentAdmin.uid, title: t, mediaURL: m, caption: document.getElementById('storyCaption').value, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); showToast('✅ تم', 'success'); renderStories(); };
     window.deleteStory = function(id) { if (confirm('حذف؟')) { db.collection('stories').doc(id).delete().then(function() { showToast('✅ تم', 'success'); renderStories(); }); } };
@@ -412,7 +407,7 @@
     window.saveSupport = function() { db.collection('config').doc('support').set({ whatsapp: document.getElementById('supWa').value, facebook: document.getElementById('supFb').value }, { merge: true }).then(function() { showToast('✅ تم', 'success'); }); };
     window.changePass = function() { var p = document.getElementById('newPass').value; if (!p) return; auth.currentUser.updatePassword(p).then(function() { showToast('✅ تم', 'success'); }).catch(function(e) { showToast('❌ ' + e.message, 'error'); }); };
 
-    // ========== الشات الجماعي (المحسن) ==========
+    // ========== الشات الجماعي ==========
     function renderChat(gid) {
         if (gid) currentChatGroupId = gid;
         if (!currentChatGroupId) { switchPage('groups'); return; }
@@ -431,8 +426,15 @@
         if (!c) return;
         if (chatUnsub) chatUnsub();
         var lastDate = null;
+        var shouldAutoScroll = true;
+        
+        c.addEventListener('scroll', function() {
+            var bottom = c.scrollHeight - c.scrollTop - c.clientHeight;
+            shouldAutoScroll = bottom < 60;
+        }, { passive: true });
+        
         chatUnsub = db.collection('groups').doc(gid).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(s) {
-            c.innerHTML = '';
+            c.innerHTML = ''; lastDate = null;
             if (s.empty) { c.innerHTML = '<div style="text-align:center; color:#555; padding:40px;">💬 لا توجد رسائل</div>'; return; }
             s.forEach(function(d) {
                 var m = d.data(); m.id = d.id;
@@ -443,34 +445,27 @@
                     try {
                         var d1 = new Date(m.timestamp.toDate());
                         var dateStr = d1.toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'});
-                        if (dateStr !== lastDate) {
-                            c.innerHTML += '<div class="date-divider"><span>' + dateStr + '</span></div>';
-                            lastDate = dateStr;
-                        }
+                        if (dateStr !== lastDate) { c.innerHTML += '<div class="date-divider"><span>' + dateStr + '</span></div>'; lastDate = dateStr; }
                         msgDate = d1.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
                     } catch(e) {}
                 }
                 
                 var isSent = m.senderID === currentAdmin.uid;
                 var contentHtml = '';
-                
-                if (m.type === 'image') {
-                    contentHtml = '<img src="' + m.content + '" onclick="window.open(\'' + m.content + '\')" style="max-width:220px; border-radius:8px; cursor:pointer; display:block;" loading="lazy" onerror="this.style.display=\'none\'">';
-                    if (m.fileName) contentHtml += '<small style="font-size:0.7rem; color:#888;">📷 ' + m.fileName + '</small>';
-                } else if (m.type === 'video') {
-                    contentHtml = '<video controls src="' + m.content + '" style="max-width:220px; border-radius:8px;" preload="metadata" playsinline></video>';
-                    if (m.fileName) contentHtml += '<small style="font-size:0.7rem; color:#888;">🎥 ' + m.fileName + '</small>';
-                } else if (m.type === 'audio') {
-                    contentHtml = '<audio controls src="' + m.content + '" style="max-width:200px;" preload="metadata"></audio>';
-                } else if (m.type === 'file') {
-                    contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.5rem;">📄</span><div><strong style="font-size:0.85rem;">' + (m.fileName || 'ملف') + '</strong><br><small style="color:var(--text2);">اضغط للتحميل</small></div></div>';
-                } else {
-                    contentHtml = (m.content || '').replace(/\n/g, '<br>');
-                }
+                if (m.type === 'image') { contentHtml = '<img src="' + m.content + '" onclick="window.open(\'' + m.content + '\')" style="max-width:220px; border-radius:8px; cursor:pointer; display:block;" loading="lazy" onerror="this.style.display=\'none\'">'; if (m.fileName) contentHtml += '<small style="font-size:0.7rem; color:#888;">📷 ' + m.fileName + '</small>'; }
+                else if (m.type === 'video') { contentHtml = '<video controls src="' + m.content + '" style="max-width:220px; border-radius:8px;" preload="metadata" playsinline></video>'; if (m.fileName) contentHtml += '<small style="font-size:0.7rem; color:#888;">🎥 ' + m.fileName + '</small>'; }
+                else if (m.type === 'audio') { contentHtml = '<audio controls src="' + m.content + '" style="max-width:200px;" preload="metadata"></audio>'; }
+                else if (m.type === 'file') { contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.5rem;">📄</span><div><strong style="font-size:0.85rem;">' + (m.fileName || 'ملف') + '</strong><br><small style="color:var(--text2);">اضغط للتحميل</small></div></div>'; }
+                else { contentHtml = (m.content || '').replace(/\n/g, '<br>'); }
                 
                 c.innerHTML += '<div class="msg-wrapper ' + (isSent ? 'sent' : 'received') + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || '') + '</strong> • ' : '') + msgDate + (isSent ? ' <span class="seen-check">✓✓</span> <button class="delete-btn" onclick="deleteAdminMsg(\'' + m.id + '\')">🗑️</button>' : '') + '</div></div>';
             });
-            c.scrollTop = c.scrollHeight;
+            
+            if (shouldAutoScroll) {
+                requestAnimationFrame(function() {
+                    c.scrollTop = c.scrollHeight;
+                });
+            }
         });
         realtimeListeners.push(chatUnsub);
     }
@@ -523,7 +518,7 @@
     };
 
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.querySelector('.modal-overlay')?.remove(); closeSidebar(); } });
-    console.log('🚀 Admin Panel v10 FINAL - WhatsApp Style Chat Ready!');
+    console.log('🚀 Admin Panel v11 FINAL - Optimized & Enhanced! ✅');
 </script>
 </body>
 </html>
