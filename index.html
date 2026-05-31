@@ -1619,16 +1619,6 @@
     console.log('✅ New: Delete messages, report, stories with links');
     console.log('✅ New: Leaderboard, notes, profile name change');
     console.log('✅ New: Pull to refresh, improved animations');
-    // ضيف الكود ده في آخر الصفحة قبل </script>
-setInterval(function() {
-    var chatDiv = document.getElementById('chatMessages');
-    if (chatDiv) {
-        var isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 150;
-        if (isNearBottom) {
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-        }
-    }
-}, 500);
 </script>
 </body>
 </html>
