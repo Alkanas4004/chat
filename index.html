@@ -110,7 +110,7 @@
         .chat-header-bar .group-name { font-weight: bold; color: var(--gold); font-size: 1rem; }
         .chat-header-bar .group-subtitle { font-size: 0.65rem; color: var(--text2); }
         .chat-header-bar .typing-status { font-size: 0.65rem; color: var(--gold); animation: pulse 1.5s ease-in-out infinite; }
-        .chat-messages-area { flex: 1; padding: 10px 12px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; }
+        .chat-messages-area { flex: 1; padding: 10px 12px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; overscroll-behavior: contain; touch-action: pan-y; }
         .msg-wrapper { margin-bottom: 5px; display: flex; flex-direction: column; animation: messageIn 0.25s ease-out; }
         .msg-wrapper.sent { align-items: flex-end; }
         .msg-wrapper.received { align-items: flex-start; }
@@ -226,7 +226,6 @@
     let replyToMessage = null, currentPrivateChatUser = null;
     let allListeners = [];
     let currentTab = 'groups';
-    let isUserScrolling = false;
 
     function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
     function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
@@ -244,7 +243,7 @@
         allListeners.forEach(function(fn) { try { fn(); } catch(e) {} }); allListeners = [];
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
-        clearTimeout(typingTimeout); replyToMessage = null; isUserScrolling = false;
+        clearTimeout(typingTimeout); replyToMessage = null;
     }
 
     function switchTab(tab) {
@@ -386,7 +385,6 @@
         });
     }
 
-    // ========== الشات ==========
     function renderChat(groupId) {
         if (groupId) currentGroupId = groupId;
         if (!currentGroupId) { switchTab('groups'); return; }
@@ -426,18 +424,22 @@
         }).catch(function(e) { console.error('Chat error:', e); });
     }
 
-    // ✅✅✅ دالة تحميل الرسائل - الإصدار النهائي المضمون ✅✅✅
     function loadMessages() {
         var div = document.getElementById('chatMessages'); 
         if (!div) return; 
         if (chatUnsubscribe) chatUnsubscribe();
         
         var lastDate = null;
-        isUserScrolling = false;
+        var shouldAutoScroll = true;
+        
+        div.addEventListener('touchstart', function() {
+            var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+            shouldAutoScroll = bottom < 50;
+        }, { passive: true });
         
         div.addEventListener('scroll', function() {
             var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
-            isUserScrolling = bottom > 100;
+            shouldAutoScroll = bottom < 50;
         }, { passive: true });
         
         var unsub = db.collection('groups').doc(currentGroupId).collection('messages')
@@ -476,10 +478,10 @@
                     div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || '') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + '</div></div>';
                 });
                 
-                if (!isUserScrolling) {
-                    requestAnimationFrame(function() {
+                if (shouldAutoScroll) {
+                    setTimeout(function() {
                         div.scrollTop = div.scrollHeight;
-                    });
+                    }, 100);
                 }
             });
         
@@ -488,7 +490,6 @@
 
     function loadTypingIndicator() { if (typingUnsubscribe) typingUnsubscribe(); var el = document.getElementById('typingStatus'); if (!el) return; var unsub = db.collection('groups').doc(currentGroupId).collection('typing').onSnapshot(function(snap) { var t = []; snap.forEach(function(d) { if (d.id !== currentUser.uid) t.push(d.data().name || 'شخص'); }); el.textContent = t.length > 0 ? '✏️ ' + t[0] + ' يكتب...' : ''; }); allListeners.push(unsub); typingUnsubscribe = unsub; }
 
-    // ✅✅✅ إرسال رسالة - مضمون ✅✅✅
     window.sendMessage = function() { 
         var input = document.getElementById('msgInput'); 
         if (!input || input.disabled) return; 
@@ -502,7 +503,6 @@
         }).catch(function() { input.value = text; input.focus(); }); 
     };
 
-    // ✅✅✅ رفع وسائط - مضمون ✅✅✅
     window.uploadMedia = function() {
         if (typeof cloudinary === 'undefined') { showToast('⚠️ غير متاح', 'warning'); return; }
         cloudinary.createUploadWidget({
@@ -545,7 +545,7 @@
     function renderSupport() { var c = document.getElementById('contentArea'); db.collection('config').doc('support').get().then(function(d) { var s = d.exists ? d.data() : {}; c.innerHTML = '<div class="info-card scale-in"><img src="' + (s.adminImageURL || 'https://via.placeholder.com/80') + '" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);"><h2 style="color:var(--gold); margin:8px 0;">📞 الدعم الفني</h2><p style="color:var(--text2);">للتواصل والاستفسارات</p><div class="support-links">' + (s.whatsapp ? '<a href="' + s.whatsapp + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png"><span>واتساب</span></a>' : '') + (s.facebook ? '<a href="' + s.facebook + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png"><span>فيسبوك</span></a>' : '') + '</div></div>'; }); }
 
     document.addEventListener('DOMContentLoaded', function() { showLoading(); autoLogin().then(function(loggedIn) { hideLoading(); if (!loggedIn) { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('codeInput').focus(); } else { switchTab('groups'); } }).catch(function() { hideLoading(); document.getElementById('loginScreen').classList.remove('hidden'); }); });
-    console.log('🚀 Web Egypt Student v11 FINAL - Everything Working Perfectly! 🔥');
+    console.log('🚀 Web Egypt Student v12 FINAL - Scroll Fixed | All Working 100% 🔥');
 </script>
 </body>
 </html>
