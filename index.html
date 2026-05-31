@@ -12,143 +12,66 @@
             --gold: #FFC107;
             --gold-dark: #B8860B;
             --gold-light: #FFD54F;
+            --gold-gradient: linear-gradient(135deg, #FFC107, #B8860B, #FFD54F);
             --bg: #0A0A0F;
             --surface: #15151F;
             --surface2: #1E1E2A;
             --surface3: #252532;
             --text: #FFFFFF;
             --text2: #AAAAAA;
+            --text3: #777777;
             --danger: #FF4757;
             --success: #2ED573;
             --online: #2ED573;
+            --warning: #FFA502;
             --radius: 24px;
+            --radius-sm: 16px;
             --shadow: 0 8px 25px rgba(0,0,0,0.5);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.6);
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.15s ease;
             --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --header-height: 65px;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background: #000;
-            color: var(--text);
+            background: #000; color: var(--text);
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
-            direction: rtl;
-            overscroll-behavior: none;
-            height: 100dvh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            -webkit-tap-highlight-color: transparent;
+            direction: rtl; overscroll-behavior: none;
+            height: 100dvh; display: flex; justify-content: center; align-items: center;
+            -webkit-tap-highlight-color: transparent; user-select: none;
             background-image: radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.08) 0%, transparent 60%);
         }
         #app {
-            width: 100%;
-            max-width: 520px;
-            height: 100dvh;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            width: 100%; max-width: 520px; height: 100dvh;
+            background: var(--bg); display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
             box-shadow: 0 0 60px rgba(255,193,7,0.2);
         }
         @media (min-width: 600px) {
-            #app {
-                max-width: 550px;
-                height: 92dvh;
-                border-radius: 35px;
-                margin: 20px;
-            }
+            #app { max-width: 550px; height: 92dvh; border-radius: 35px; margin: 20px; }
         }
 
         /* ========== نظام الحركات المتكامل ========== */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px rgba(255,193,7,0.3); }
-            50% { box-shadow: 0 0 25px rgba(255,193,7,0.7); }
-            100% { box-shadow: 0 0 5px rgba(255,193,7,0.3); }
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes rippleEffect {
-            to { transform: scale(4); opacity: 0; }
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.08); }
-            70% { transform: scale(0.95); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        @keyframes bellRing {
-            0% { transform: rotate(0); }
-            10% { transform: rotate(15deg); }
-            20% { transform: rotate(-15deg); }
-            30% { transform: rotate(10deg); }
-            40% { transform: rotate(-10deg); }
-            50% { transform: rotate(5deg); }
-            60% { transform: rotate(-5deg); }
-            100% { transform: rotate(0); }
-        }
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            80% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeInDown { from { opacity:0; transform:translateY(-30px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes scaleIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+        @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+        @keyframes slideDown { from { transform:translateY(-100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+        @keyframes slideLeft { from { transform:translateX(50px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        @keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.05);} 100%{transform:scale(1);} }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes glow { 0%{box-shadow:0 0 5px rgba(255,193,7,0.3);} 50%{box-shadow:0 0 25px rgba(255,193,7,0.7);} 100%{box-shadow:0 0 5px rgba(255,193,7,0.3);} }
+        @keyframes float { 0%{transform:translateY(0);} 50%{transform:translateY(-8px);} 100%{transform:translateY(0);} }
+        @keyframes bounceIn { 0%{transform:scale(0.3); opacity:0;} 50%{transform:scale(1.08);} 70%{transform:scale(0.95);} 100%{transform:scale(1); opacity:1;} }
+        @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+        @keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 10%,30%,50%,70%,90%{transform:translateX(-5px);} 20%,40%,60%,80%{transform:translateX(5px);} }
+        @keyframes popIn { 0%{transform:scale(0); opacity:0;} 80%{transform:scale(1.1);} 100%{transform:scale(1); opacity:1;} }
+        @keyframes typingDot { 0%,60%,100%{opacity:0.3; transform:translateY(0);} 30%{opacity:1; transform:translateY(-5px);} }
+        @keyframes ripple { to { transform:scale(4); opacity:0; } }
+        @keyframes swing { 20%{transform:rotate(15deg);} 40%{transform:rotate(-10deg);} 60%{transform:rotate(5deg);} 80%{transform:rotate(-5deg);} 100%{transform:rotate(0);} }
         
         .fade-in { animation: fadeInUp 0.5s ease-out; }
         .fade-in-down { animation: fadeInDown 0.5s ease-out; }
@@ -158,706 +81,355 @@
         .pulse-animation { animation: pulse 2s ease-in-out infinite; }
         .glow-animation { animation: glow 2s ease-in-out infinite; }
         .shake-animation { animation: shake 0.5s ease-in-out; }
-        .bell-ring { animation: bellRing 0.8s ease-in-out; }
         .pop-in { animation: popIn 0.4s ease-out; }
 
         /* ========== شاشة التحميل ========== */
         .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(10,10,15,0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            position: absolute; inset: 0; background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(10px); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000;
         }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,193,7,0.2);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .loading-spinner {
+            width: 50px; height: 50px; border: 4px solid rgba(255,193,7,0.2);
+            border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         .loading-text {
-            color: var(--text);
-            margin-top: 15px;
-            font-weight: bold;
+            color: var(--text); margin-top: 15px; font-weight: bold; font-size: 1.1rem;
             background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold-dark));
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-size: 200% auto; -webkit-background-clip: text;
+            background-clip: text; -webkit-text-fill-color: transparent;
             animation: shimmer 2s linear infinite;
-            font-size: 1.1rem;
         }
 
         /* ========== الهيدر ========== */
         .app-header {
-            height: 65px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 18px;
+            height: var(--header-height); display: flex; justify-content: space-between;
+            align-items: center; padding: 0 18px;
             background: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
-            border-bottom: 1px solid #222;
-            z-index: 10;
-            flex-shrink: 0;
+            border-bottom: 1px solid #222; z-index: 10; flex-shrink: 0;
         }
         .logo {
-            font-size: 1.7rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-            transition: var(--transition);
-            animation: gradientShift 3s ease infinite;
+            font-size: 1.7rem; font-weight: bold;
+            background: var(--gold-gradient); background-size: 200% 200%;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; cursor: pointer;
+            transition: var(--transition); animation: gradientShift 3s ease infinite;
         }
-        .logo:active {
-            transform: scale(0.95);
-        }
-        .header-icons {
-            display: flex;
-            gap: 12px;
-        }
+        .logo:active { transform: scale(0.95); }
+        .header-icons { display: flex; gap: 10px; }
         .icon-btn {
-            background: none;
-            border: none;
-            font-size: 1.4rem;
-            color: var(--gold);
-            cursor: pointer;
-            transition: var(--transition);
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
+            background: none; border: none; font-size: 1.3rem; color: var(--gold);
+            cursor: pointer; transition: var(--transition); width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
             position: relative;
         }
-        .icon-btn:hover {
-            background: rgba(255,193,7,0.15);
-        }
-        .icon-btn:active {
-            transform: scale(0.9);
-        }
-        .badge-dot {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 10px;
-            height: 10px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid var(--surface);
+        .icon-btn:hover { background: rgba(255,193,7,0.15); }
+        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn .badge-dot {
+            position: absolute; top: 5px; right: 5px; width: 10px; height: 10px;
+            background: var(--danger); border-radius: 50%; border: 2px solid var(--surface);
+            animation: pulse 2s ease-in-out infinite;
         }
 
         /* ========== الشاشات ========== */
-        .screen {
-            flex: 1;
-            overflow-y: auto;
-            padding: 18px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .hidden {
-            display: none !important;
-        }
+        .screen { flex: 1; overflow-y: auto; padding: 18px; -webkit-overflow-scrolling: touch; }
+        .hidden { display: none !important; }
 
         /* ========== تسجيل الدخول ========== */
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 30px;
-        }
+        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 30px; }
         .login-card {
-            background: var(--surface);
-            border-radius: 30px;
-            padding: 40px 25px;
-            text-align: center;
-            width: 100%;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255,193,7,0.2);
-            position: relative;
-            overflow: hidden;
+            background: var(--surface); border-radius: 30px; padding: 40px 25px;
+            text-align: center; width: 100%; box-shadow: var(--shadow);
+            border: 1px solid rgba(255,193,7,0.2); position: relative; overflow: hidden;
         }
         .login-card::before {
-            content: '';
-            position: absolute;
-            top: -30%;
-            left: -30%;
-            width: 160%;
-            height: 160%;
+            content: ''; position: absolute; top: -30%; left: -30%;
+            width: 160%; height: 160%;
             background: conic-gradient(transparent, rgba(255,193,7,0.08), transparent, rgba(255,193,7,0.08), transparent);
             animation: spin 12s linear infinite;
         }
-        .login-card > * {
-            position: relative;
-            z-index: 1;
-        }
-        .login-card .app-icon {
-            font-size: 4rem;
-            margin-bottom: 10px;
-            animation: float 3s ease-in-out infinite;
-        }
-        .login-card h1 {
-            font-size: 2.4rem;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .login-card .subtitle {
-            color: var(--text2);
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-        }
+        .login-card > * { position: relative; z-index: 1; }
+        .login-card .app-icon { font-size: 4rem; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+        .login-card h1 { font-size: 2.4rem; margin-bottom: 8px; background: var(--gold-gradient); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .login-card .subtitle { color: var(--text2); font-size: 0.9rem; margin-bottom: 25px; }
         .input-field {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 1px solid #333;
-            background: var(--surface2);
-            color: #fff;
-            font-size: 1.3rem;
-            text-align: center;
-            letter-spacing: 4px;
-            outline: none;
-            transition: var(--transition);
-            margin: 10px 0;
-            font-weight: bold;
+            width: 100%; padding: 16px 20px; border-radius: 16px; border: 1px solid #333;
+            background: var(--surface2); color: #fff; font-size: 1.3rem; text-align: center;
+            letter-spacing: 4px; outline: none; transition: var(--transition); margin: 10px 0; font-weight: bold;
         }
-        .input-field:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 25px rgba(255,193,7,0.4);
-            transform: translateY(-2px);
-        }
+        .input-field:focus { border-color: var(--gold); box-shadow: 0 0 25px rgba(255,193,7,0.4); transform: translateY(-2px); }
+        .input-field::placeholder { color: #555; letter-spacing: 2px; font-size: 1rem; }
         .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            border-radius: 30px;
-            border: none;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
-            background-size: 200% 200%;
-            color: #000;
-            width: 100%;
-            margin-top: 15px;
-            box-shadow: 0 6px 20px rgba(255,193,7,0.3);
-            position: relative;
-            overflow: hidden;
-            animation: gradientShift 3s ease infinite;
+            display: inline-block; padding: 15px 30px; border-radius: 30px; border: none;
+            font-weight: bold; font-size: 1rem; cursor: pointer; transition: var(--transition);
+            background: var(--gold-gradient); color: #000; width: 100%; margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(255,193,7,0.3); position: relative; overflow: hidden;
+            background-size: 200% 200%; animation: gradientShift 3s ease infinite;
         }
-        .btn:active {
-            transform: scale(0.96);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            box-shadow: none;
-            animation: none;
-        }
-        .btn-sm {
-            padding: 10px 20px;
-            font-size: 0.85rem;
-            width: auto;
-            border-radius: 25px;
-        }
-        .btn-xs {
-            padding: 6px 14px;
-            font-size: 0.75rem;
-            width: auto;
-            border-radius: 20px;
-        }
-        .error-text {
-            color: var(--danger);
-            margin-top: 12px;
-            font-weight: bold;
-            min-height: 24px;
-        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,193,7,0.5); }
+        .btn:active { transform: scale(0.96); }
+        .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); box-shadow: none; animation: none; }
+        .btn-sm { padding: 10px 20px; font-size: 0.85rem; width: auto; border-radius: 25px; }
+        .btn-xs { padding: 6px 14px; font-size: 0.75rem; width: auto; border-radius: 20px; }
+        .btn-icon { width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .error-text { color: var(--danger); margin-top: 12px; font-weight: bold; min-height: 24px; font-size: 0.9rem; }
 
         /* ========== المجموعات ========== */
         .section-title {
-            color: var(--gold);
-            font-size: 1.5rem;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255,193,7,0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: var(--gold); font-size: 1.5rem; margin-bottom: 18px;
+            padding-bottom: 10px; border-bottom: 2px solid rgba(255,193,7,0.3);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .groups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-        }
+        .section-title .refresh-btn { font-size: 1.2rem; cursor: pointer; transition: var(--transition); }
+        .section-title .refresh-btn:active { transform: rotate(180deg); }
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         .group-card {
             background: linear-gradient(135deg, var(--surface), var(--surface2));
-            border-radius: 20px;
-            padding: 20px 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
+            border-radius: 20px; padding: 20px 12px; text-align: center;
+            cursor: pointer; transition: var(--transition); border: 1px solid transparent;
+            position: relative; overflow: hidden;
         }
-        .group-card:hover {
-            border-color: var(--gold);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255,193,7,0.2);
-        }
-        .group-card:active {
-            transform: scale(0.95);
-        }
+        .group-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 12px 28px rgba(255,193,7,0.25); }
+        .group-card:active { transform: scale(0.95); }
         .group-card img {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 3px solid var(--gold);
-            object-fit: cover;
-            transition: var(--transition);
+            width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold);
+            object-fit: cover; transition: var(--transition);
         }
-        .group-card:hover img {
-            transform: rotate(5deg) scale(1.05);
-        }
-        .group-card h3 {
-            color: var(--gold);
-            font-size: 0.95rem;
-            margin: 10px 0 5px;
-        }
-        .group-card p {
-            color: var(--text2);
-            font-size: 0.75rem;
-        }
+        .group-card:hover img { transform: rotate(8deg) scale(1.08); }
+        .group-card h3 { color: var(--gold); font-size: 0.95rem; margin: 10px 0 5px; }
+        .group-card p { color: var(--text2); font-size: 0.75rem; }
         .group-card .member-count {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            color: var(--gold);
+            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8);
+            padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; color: var(--gold);
+            backdrop-filter: blur(5px);
         }
-        .group-card .locked-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1rem;
+        .group-card .locked-badge { position: absolute; top: 10px; right: 10px; font-size: 1.1rem; }
+        .group-card .unread-badge {
+            position: absolute; top: -5px; right: -5px; width: 25px; height: 25px;
+            background: var(--danger); border-radius: 50%; font-size: 0.7rem;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;
         }
 
         /* ========== الشات ========== */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-        }
+        .chat-container { display: flex; flex-direction: column; height: 100%; position: relative; }
         .chat-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: var(--surface);
-            border-bottom: 1px solid #222;
-            gap: 10px;
-            flex-shrink: 0;
-            z-index: 5;
+            display: flex; align-items: center; padding: 12px 15px;
+            background: var(--surface); border-bottom: 1px solid #222;
+            gap: 10px; flex-shrink: 0; z-index: 5;
         }
-        .chat-header img {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-        }
-        .chat-header .group-name {
-            font-weight: bold;
-            color: var(--gold);
-            flex: 1;
-            font-size: 1.1rem;
-        }
-        .chat-header .status-text {
-            font-size: 0.75rem;
-            color: var(--text2);
-        }
+        .chat-header .back-btn { font-size: 1.4rem; cursor: pointer; padding: 5px; }
+        .chat-header img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--gold); }
+        .chat-header .group-info { flex: 1; min-width: 0; }
+        .chat-header .group-name { font-weight: bold; color: var(--gold); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-header .status-text { font-size: 0.7rem; color: var(--text2); }
+        .chat-header .typing-status { font-size: 0.7rem; color: var(--gold); animation: pulse 1.5s ease-in-out infinite; }
+        .chat-header .header-actions { display: flex; gap: 5px; }
+        
         .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background-color: #0d0d15;
-            background-size: cover;
-            background-position: center;
-            -webkit-overflow-scrolling: touch;
+            flex: 1; padding: 15px; overflow-y: auto; background-color: #0d0d15;
+            background-size: cover; background-position: center;
+            -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
         }
-        .message {
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            animation: fadeInUp 0.3s ease-out;
-        }
-        .message.sent {
-            align-items: flex-end;
-        }
-        .message.received {
-            align-items: flex-start;
-        }
+        .message { margin-bottom: 8px; display: flex; flex-direction: column; animation: slideLeft 0.3s ease-out; }
+        .message.sent { align-items: flex-end; }
+        .message.received { align-items: flex-start; }
         .bubble {
-            max-width: 82%;
-            padding: 10px 16px;
-            border-radius: 20px;
-            background: var(--surface2);
-            color: #fff;
-            word-break: break-word;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            max-width: 82%; padding: 10px 16px; border-radius: 20px;
+            background: var(--surface2); color: #fff; word-break: break-word;
+            position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: var(--transition-fast);
         }
-        .message.sent .bubble {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #000;
-        }
-        .bubble img, .bubble video {
-            max-width: 200px;
-            border-radius: 12px;
-            margin-top: 6px;
-            cursor: pointer;
-        }
-        .bubble .file-link {
-            color: var(--gold);
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .message .msg-meta {
-            font-size: 0.65rem;
-            color: #777;
-            margin: 3px 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .message.sent .msg-meta {
-            justify-content: flex-end;
-        }
+        .message.sent .bubble { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #000; }
+        .bubble:hover { transform: scale(1.01); }
+        .bubble img, .bubble video { max-width: 200px; border-radius: 12px; margin-top: 6px; cursor: pointer; }
+        .bubble .file-link { color: var(--gold); text-decoration: underline; cursor: pointer; }
+        .bubble .mention { color: #1E90FF; font-weight: bold; cursor: pointer; }
+        .message .msg-meta { font-size: 0.65rem; color: #777; margin: 3px 8px; display: flex; align-items: center; gap: 6px; }
+        .message.sent .msg-meta { justify-content: flex-end; }
+        .message .msg-meta .seen-icon { color: var(--gold); font-size: 0.9rem; }
+        
         .reply-preview {
-            background: rgba(255,193,7,0.1);
-            border-right: 3px solid var(--gold);
-            padding: 6px 12px;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            font-size: 0.78rem;
-            color: var(--text2);
-            cursor: pointer;
+            background: rgba(255,193,7,0.1); border-right: 3px solid var(--gold);
+            padding: 6px 12px; margin-bottom: 8px; border-radius: 10px;
+            font-size: 0.78rem; color: var(--text2); cursor: pointer; display: flex; justify-content: space-between; align-items: center;
         }
-        .deleted-msg {
-            font-style: italic;
-            color: #666;
-            padding: 8px;
+        .pinned-message {
+            background: rgba(46,213,115,0.1); border-bottom: 1px solid var(--success);
+            padding: 8px 15px; font-size: 0.8rem; color: var(--success);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
+        .deleted-msg { font-style: italic; color: #666; padding: 8px; }
         .locked-banner {
-            text-align: center;
-            padding: 10px;
-            background: rgba(255,71,87,0.2);
-            color: var(--danger);
-            font-size: 0.9rem;
-            font-weight: bold;
+            text-align: center; padding: 10px; background: rgba(255,71,87,0.2);
+            color: var(--danger); font-size: 0.9rem; font-weight: bold;
         }
+        .date-separator {
+            text-align: center; margin: 15px 0; color: var(--text3); font-size: 0.75rem;
+            position: relative;
+        }
+        .date-separator::before, .date-separator::after {
+            content: ''; position: absolute; top: 50%; width: 30%; height: 1px; background: #333;
+        }
+        .date-separator::before { left: 0; }
+        .date-separator::after { right: 0; }
 
         /* ========== إدخال الشات ========== */
         .chat-input-area {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
+            display: flex; align-items: center; padding: 10px 12px;
             padding-bottom: calc(10px + var(--safe-bottom));
-            background: var(--surface);
-            border-top: 1px solid #222;
-            gap: 8px;
-            flex-shrink: 0;
+            background: var(--surface); border-top: 1px solid #222;
+            gap: 8px; flex-shrink: 0; z-index: 5;
         }
         .chat-input-area input {
-            flex: 1;
-            padding: 12px 18px;
-            border-radius: 25px;
-            border: none;
-            background: var(--surface2);
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-            transition: var(--transition);
+            flex: 1; padding: 12px 18px; border-radius: 25px; border: none;
+            background: var(--surface2); color: #fff; font-size: 0.9rem;
+            outline: none; transition: var(--transition);
         }
-        .chat-input-area input:focus {
-            background: var(--surface3);
-            box-shadow: 0 0 10px rgba(255,193,7,0.2);
-        }
-        .chat-input-area input:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .chat-input-area input:focus { background: var(--surface3); box-shadow: 0 0 10px rgba(255,193,7,0.2); }
+        .chat-input-area input:disabled { opacity: 0.5; cursor: not-allowed; }
+        .chat-input-area input::placeholder { color: #555; }
         .circle-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            flex-shrink: 0;
-            font-size: 1.2rem;
+            width: 42px; height: 42px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition); flex-shrink: 0; font-size: 1.2rem;
         }
-        .circle-btn.send {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #000;
-        }
-        .circle-btn.attach {
-            background: var(--surface3);
-            color: var(--gold);
-            border: 1px solid #333;
-        }
-        .circle-btn:active {
-            transform: scale(0.9);
-        }
-        .circle-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .circle-btn.send { background: var(--gold-gradient); color: #000; }
+        .circle-btn.attach { background: var(--surface3); color: var(--gold); border: 1px solid #333; }
+        .circle-btn.voice { background: var(--surface3); color: var(--gold); border: 1px solid #333; }
+        .circle-btn:active { transform: scale(0.9); }
+        .circle-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .circle-btn.recording { background: var(--danger); animation: pulse 0.8s ease-in-out infinite; }
 
         /* ========== القائمة المنسدلة ========== */
         .dropdown {
-            position: absolute;
-            top: 55px;
-            left: 10px;
-            background: var(--surface);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            z-index: 55;
-            display: none;
-            min-width: 180px;
-            padding: 6px;
-            border: 1px solid #333;
+            position: absolute; top: 55px; left: 10px; background: var(--surface);
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 55; display: none; min-width: 180px; padding: 6px; border: 1px solid #333;
         }
-        .dropdown.active {
-            display: block;
-            animation: fadeInDown 0.2s ease-out;
-        }
+        .dropdown.active { display: block; animation: fadeInDown 0.2s ease-out; }
         .dropdown-item {
-            display: block;
-            padding: 11px 16px;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: var(--transition);
-            cursor: pointer;
-            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+            color: #fff; text-decoration: none; border-radius: 10px;
+            transition: var(--transition); cursor: pointer; font-size: 0.9rem;
         }
-        .dropdown-item:hover {
-            background: var(--gold);
-            color: #000;
-        }
+        .dropdown-item:hover { background: var(--gold); color: #000; }
+        .dropdown-item .icon { font-size: 1.2rem; }
 
         /* ========== النوافذ المنبثقة ========== */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s;
-            backdrop-filter: blur(5px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.3s; backdrop-filter: blur(8px);
         }
         .modal {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 25px;
-            width: 90%;
-            max-width: 380px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            animation: scaleIn 0.4s ease-out;
+            background: var(--surface); border-radius: 24px; padding: 25px;
+            width: 90%; max-width: 420px; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8); animation: scaleIn 0.4s ease-out;
         }
-        .modal h3 {
-            color: var(--gold);
-            margin-bottom: 15px;
-            text-align: center;
+        .modal h3 { color: var(--gold); margin-bottom: 15px; text-align: center; font-size: 1.3rem; }
+        .modal .close-modal {
+            position: absolute; top: 15px; right: 15px; cursor: pointer;
+            font-size: 1.5rem; color: var(--text2); transition: var(--transition);
         }
+        .modal .close-modal:hover { color: var(--danger); }
+        
+        .image-viewer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.3s; cursor: pointer;
+        }
+        .image-viewer img { max-width: 95%; max-height: 95vh; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
 
         /* ========== معلومات المجموعة ========== */
         .info-card {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 25px;
-            text-align: center;
-            margin: 15px 0;
-            box-shadow: var(--shadow);
+            background: var(--surface); border-radius: 24px; padding: 25px;
+            text-align: center; margin: 15px 0; box-shadow: var(--shadow);
         }
-        .info-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 4px solid var(--gold);
-            object-fit: cover;
-        }
+        .info-card img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; }
+        .info-card .stat-row { display: flex; justify-content: space-around; margin: 20px 0; }
+        .info-card .stat-item { text-align: center; }
+        .info-card .stat-item .value { font-size: 1.5rem; color: var(--gold); font-weight: bold; }
+        .info-card .stat-item .label { font-size: 0.8rem; color: var(--text2); }
 
         /* ========== روابط الدعم ========== */
-        .support-links {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
+        .support-links { display: flex; justify-content: center; gap: 25px; margin-top: 25px; flex-wrap: wrap; }
         .support-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            color: #fff;
-            text-decoration: none;
-            transition: var(--transition);
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: #fff; text-decoration: none; transition: var(--transition);
         }
-        .support-link img {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-        }
-        .support-link:active {
-            transform: scale(0.9);
-        }
+        .support-link:hover { transform: translateY(-5px); }
+        .support-link img { width: 50px; height: 50px; border-radius: 14px; }
+        .support-link span { font-size: 0.8rem; }
 
         /* ========== القصص ========== */
-        .stories-bar {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 8px 0;
-            margin-bottom: 15px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .stories-bar::-webkit-scrollbar {
-            height: 3px;
-        }
-        .story-item {
-            text-align: center;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-        .story-item:active {
-            transform: scale(0.9);
-        }
+        .stories-bar { display: flex; gap: 14px; overflow-x: auto; padding: 8px 0; margin-bottom: 15px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+        .stories-bar::-webkit-scrollbar { height: 3px; }
+        .story-item { text-align: center; cursor: pointer; flex-shrink: 0; transition: var(--transition); scroll-snap-align: start; }
+        .story-item:active { transform: scale(0.9); }
         .story-item .story-ring {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            padding: 3px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark), var(--gold-light));
-            margin-bottom: 5px;
+            width: 68px; height: 68px; border-radius: 50%; padding: 3px;
+            background: var(--gold-gradient); margin-bottom: 5px;
+            box-shadow: 0 0 15px rgba(255,193,7,0.3);
         }
-        .story-item .story-ring img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--bg);
-        }
-        .story-item span {
-            font-size: 0.7rem;
-            color: var(--text2);
-            display: block;
-            max-width: 70px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .story-item .story-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); }
+        .story-item span { font-size: 0.7rem; color: var(--text2); display: block; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .story-item .add-story { background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--gold); }
 
         /* ========== شبكة الوسائط ========== */
-        .media-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-        }
-        .media-item {
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .media-item:active {
-            transform: scale(0.95);
-        }
-        .media-item img, .media-item video {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-        }
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .media-item { border-radius: 12px; overflow: hidden; cursor: pointer; transition: var(--transition); aspect-ratio: 1; }
+        .media-item:hover { transform: scale(1.03); }
+        .media-item:active { transform: scale(0.95); }
+        .media-item img, .media-item video { width: 100%; height: 100%; object-fit: cover; }
         .media-item .file-placeholder {
-            background: var(--surface2);
-            border-radius: 12px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
+            background: var(--surface2); border-radius: 12px; height: 100%;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;
         }
 
         /* ========== قائمة المستخدمين ========== */
         .user-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: var(--surface2);
-            margin: 6px 0;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: var(--transition);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; background: var(--surface2); margin: 6px 0;
+            border-radius: 14px; cursor: pointer; transition: var(--transition);
         }
-        .user-list-item:hover {
-            background: var(--surface3);
-            transform: translateX(-5px);
+        .user-list-item:hover { background: var(--surface3); transform: translateX(-5px); }
+        .user-list-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .user-list-item .user-info { flex: 1; margin: 0 10px; }
+        .user-list-item .user-name { font-weight: bold; }
+        .user-list-item .user-status { font-size: 0.75rem; }
+
+        /* ========== إحصائيات الطالب ========== */
+        .stats-card {
+            background: var(--surface); border-radius: var(--radius); padding: 20px;
+            margin-bottom: 15px; text-align: center;
         }
-        .user-list-item img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+        .stats-card .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .stats-card .stat-item { text-align: center; }
+        .stats-card .stat-item .value { font-size: 1.8rem; color: var(--gold); font-weight: bold; }
+        .stats-card .stat-item .label { font-size: 0.75rem; color: var(--text2); }
 
         /* ========== سكرول بار ========== */
-        ::-webkit-scrollbar {
-            width: 4px;
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* ========== Toast ========== */
+        .toast-notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 14px 24px; border-radius: 30px; font-weight: bold; z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.4s ease-out;
+            color: #000; max-width: 90%; text-align: center; font-size: 0.9rem;
         }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 10px;
-        }
+
+        /* ========== تأثيرات التمرير ========== */
+        .swipeable { touch-action: pan-y; }
     </style>
 </head>
 <body>
 <div id="app">
     <!-- شاشة التحميل -->
     <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
+        <div class="loading-spinner"></div>
         <p class="loading-text">⏳ جاري التحميل...</p>
     </div>
 
@@ -867,10 +439,10 @@
             <div class="app-icon">🏫</div>
             <h1>Web Egypt</h1>
             <p class="subtitle">منصة التعليم الذكية</p>
-            <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10">
+            <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text">
             <button class="btn pulse-animation" onclick="studentLogin()">🚀 دخول</button>
             <p id="loginError" class="error-text"></p>
-            <p style="color:var(--text2); font-size:0.7rem; margin-top:15px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
+            <p style="color:var(--text3); font-size:0.7rem; margin-top:15px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
         </div>
     </div>
 
@@ -879,6 +451,7 @@
         <div class="app-header">
             <div class="logo" onclick="navigate('groups')">Web Egypt</div>
             <div class="header-icons">
+                <button class="icon-btn" onclick="navigate('stats')" title="إحصائياتي">📊</button>
                 <button class="icon-btn" onclick="navigate('stories')" title="القصص">📖</button>
                 <button class="icon-btn" onclick="navigate('private-chats')" title="المحادثات">💬</button>
                 <button class="icon-btn" onclick="navigate('media')" title="الوسائط">📁</button>
@@ -886,7 +459,12 @@
                 <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
             </div>
         </div>
-        <div id="contentArea" class="screen fade-in"></div>
+        <div id="contentArea" class="screen fade-in swipeable"></div>
+    </div>
+
+    <!-- عارض الصور -->
+    <div id="imageViewer" class="image-viewer hidden" onclick="this.classList.add('hidden')">
+        <img id="viewerImage" src="" alt="صورة">
     </div>
 </div>
 
@@ -911,10 +489,13 @@
     let currentGroupId = null;
     let currentGroupData = null;
     let chatUnsubscribe = null;
+    let typingUnsubscribe = null;
     let typingTimeout = null;
     let replyToMessage = null;
     let currentPrivateChatUser = null;
     let allListeners = [];
+    let pinnedMessageId = null;
+    let lastMessageDate = null;
 
     // ========== أدوات مساعدة ==========
     function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
@@ -924,23 +505,25 @@
         type = type || 'info';
         var colors = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
         var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:25px; font-weight:bold; z-index:9999; box-shadow:0 8px 25px rgba(0,0,0,0.5); animation:slideUp 0.3s ease-out; color:#000; max-width:90%; text-align:center;';
+        toast.className = 'toast-notification';
         toast.style.background = colors[type] || colors.info;
+        toast.style.color = (type === 'info' || type === 'warning') ? '#000' : '#fff';
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(function() {
-            toast.style.opacity = '0';
-            toast.style.transition = '0.3s';
-            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
-        }, 2500);
+            toast.style.animation = 'slideDown 0.4s ease-out reverse';
+            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+        }, 2800);
     }
 
     function cleanListeners() {
         allListeners.forEach(function(fn) { try { fn(); } catch(e) {} });
         allListeners = [];
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
         clearTimeout(typingTimeout);
         replyToMessage = null;
+        lastMessageDate = null;
     }
 
     function navigate(page, data) {
@@ -950,6 +533,7 @@
         content.classList.remove('fade-in');
         void content.offsetWidth;
         content.classList.add('fade-in');
+        content.scrollTop = 0;
         
         switch(page) {
             case 'groups': renderGroups(); break;
@@ -960,6 +544,7 @@
             case 'media': renderMediaPage(); break;
             case 'support': renderSupport(); break;
             case 'group-info': renderGroupInfo(); break;
+            case 'stats': renderStudentStats(); break;
             default: renderGroups();
         }
     }
@@ -974,6 +559,16 @@
         return deviceID;
     }
 
+    // ========== عرض الصور ==========
+    window.viewImage = function(url) {
+        var viewer = document.getElementById('imageViewer');
+        var img = document.getElementById('viewerImage');
+        if (viewer && img) {
+            img.src = url;
+            viewer.classList.remove('hidden');
+        }
+    };
+
     // ========== تسجيل الدخول ==========
     window.studentLogin = function() {
         var codeInput = document.getElementById('codeInput');
@@ -981,7 +576,12 @@
         var errEl = document.getElementById('loginError');
         errEl.textContent = '';
         
-        if (!code) { errEl.textContent = '⚠️ الرجاء إدخال الكود'; codeInput.classList.add('shake-animation'); setTimeout(function(){ codeInput.classList.remove('shake-animation'); }, 500); return; }
+        if (!code) { 
+            errEl.textContent = '⚠️ الرجاء إدخال الكود'; 
+            codeInput.classList.add('shake-animation'); 
+            setTimeout(function(){ codeInput.classList.remove('shake-animation'); }, 500); 
+            return; 
+        }
         if (code.length < 4) { errEl.textContent = '⚠️ الكود قصير جداً (4 أحرف على الأقل)'; return; }
         
         showLoading();
@@ -1014,26 +614,21 @@
                 return userRef.get().then(function(userDoc) {
                     if (!userDoc.exists) {
                         return userRef.set({
-                            userID: userId,
-                            name: codeData.studentName || 'طالب',
-                            phone: codeData.studentNumber || '',
-                            role: 'user',
-                            chatBg: '',
-                            online: true,
-                            deviceID: deviceID,
+                            userID: userId, name: codeData.studentName || 'طالب',
+                            phone: codeData.studentNumber || '', role: 'user',
+                            chatBg: '', online: true, deviceID: deviceID,
+                            totalMessages: 0, groupsJoined: codeData.allowedGroups ? codeData.allowedGroups.length : 0,
                             lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     } else {
                         return userRef.update({
-                            online: true,
-                            deviceID: deviceID,
+                            online: true, deviceID: deviceID,
                             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     }
                 });
             }).then(function() {
-                // إضافة الطالب للمجموعات المرتبطة
                 if (codeData.allowedGroups && codeData.allowedGroups.length > 0) {
                     var batch = db.batch();
                     codeData.allowedGroups.forEach(function(groupId) {
@@ -1045,13 +640,24 @@
                             memberCount: firebase.firestore.FieldValue.increment(1)
                         });
                     });
-                    return batch.commit();
+                    return batch.commit().catch(function(e) {
+                        console.warn('Group join warning:', e);
+                    });
                 }
                 return Promise.resolve();
             }).then(function() {
                 return userRef.get();
             }).then(function(userDoc) {
-                currentUser = { uid: userId, name: userDoc.data().name, phone: userDoc.data().phone, role: userDoc.data().role, chatBg: userDoc.data().chatBg || '', online: true };
+                currentUser = { 
+                    uid: userId, 
+                    name: userDoc.data().name || 'طالب',
+                    phone: userDoc.data().phone || '',
+                    role: userDoc.data().role || 'user',
+                    chatBg: userDoc.data().chatBg || '',
+                    online: true,
+                    totalMessages: userDoc.data().totalMessages || 0,
+                    groupsJoined: userDoc.data().groupsJoined || 0
+                };
                 localStorage.setItem('webEgyptUserID', userId);
                 hideLoading();
                 document.getElementById('loginScreen').classList.add('hidden');
@@ -1079,13 +685,16 @@
             return db.collection('student_codes').where('usedBy', '==', savedUserID).where('usedByDevice', '==', deviceID).limit(1).get().then(function(codeSnap) {
                 if (codeSnap.empty && userData.role !== 'admin') return false;
                 
-                currentUser = { uid: savedUserID, name: userData.name, phone: userData.phone, role: userData.role, chatBg: userData.chatBg || '', online: true };
+                currentUser = { 
+                    uid: savedUserID, name: userData.name || 'طالب',
+                    phone: userData.phone || '', role: userData.role || 'user',
+                    chatBg: userData.chatBg || '', online: true,
+                    totalMessages: userData.totalMessages || 0,
+                    groupsJoined: userData.groupsJoined || 0
+                };
                 return db.collection('users').doc(savedUserID).update({
-                    online: true,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(function() {
-                    return true;
-                });
+                    online: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(function() { return true; });
             });
         }).catch(function(e) {
             console.error('Auto login error:', e);
@@ -1096,8 +705,7 @@
     window.logout = function() {
         if (currentUser) {
             db.collection('users').doc(currentUser.uid).update({
-                online: false,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                online: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(function() {});
         }
         currentUser = null;
@@ -1107,41 +715,48 @@
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('mainScreen').classList.add('hidden');
         var codeInput = document.getElementById('codeInput');
-        if (codeInput) codeInput.value = '';
+        if (codeInput) { codeInput.value = ''; codeInput.focus(); }
     };
 
     window.addEventListener('beforeunload', function() {
         if (currentUser) {
-            db.collection('users').doc(currentUser.uid).update({ online: false }).catch(function() {});
+            try { db.collection('users').doc(currentUser.uid).update({ online: false }); } catch(e) {}
         }
     });
+
+    window.addEventListener('online', function() { if (currentUser) db.collection('users').doc(currentUser.uid).update({ online: true }); });
+    window.addEventListener('offline', function() { if (currentUser) db.collection('users').doc(currentUser.uid).update({ online: false }); });
 
     // ========== عرض المجموعات ==========
     function renderGroups() {
         var content = document.getElementById('contentArea');
-        content.innerHTML = '<h2 class="section-title">📚 مجموعاتي</h2><div id="groupsList" class="groups-grid"><p style="color:var(--text2); text-align:center; grid-column:1/-1;">⏳ جاري تحميل المجموعات...</p></div>';
+        content.innerHTML = '<h2 class="section-title">📚 مجموعاتي <span class="refresh-btn" onclick="renderGroups()">🔄</span></h2><div id="groupsList" class="groups-grid"><p style="color:var(--text2); text-align:center; grid-column:1/-1;">⏳ جاري تحميل المجموعات...</p></div>';
         
         var unsub = db.collection('groups').where('members', 'array-contains', currentUser.uid).onSnapshot(function(snap) {
             var listEl = document.getElementById('groupsList');
             if (!listEl) return;
             
             if (snap.empty) {
-                listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text2); grid-column:1/-1;"><p style="font-size:3rem;">📭</p><p>لم تنضم لأي مجموعة بعد</p><p style="font-size:0.8rem;">تواصل مع الأدمن للحصول على كود التفعيل</p></div>';
+                listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text2); grid-column:1/-1;"><p style="font-size:3rem;">📭</p><p>لم تنضم لأي مجموعة بعد</p><p style="font-size:0.8rem;">تواصل مع الأدمن للحصول على كود التفعيل</p><p style="font-size:0.7rem; color:var(--text3);">الكود يربطك تلقائياً بالمجموعات</p></div>';
                 return;
             }
             
             var html = '';
             snap.forEach(function(doc) {
                 var g = doc.data();
-                html += '<div class="group-card bounce-in" onclick="openChat(\'' + doc.id + '\')">';
+                html += '<div class="group-card bounce-in" onclick="openChat(\'' + doc.id + '\')" style="animation-delay:' + (Math.random() * 0.3) + 's;">';
                 html += '<span class="member-count">👥 ' + (g.memberCount || 0) + '</span>';
                 if (g.isLocked) html += '<span class="locked-badge">🔒</span>';
-                html += '<img src="' + (g.picture || 'https://via.placeholder.com/70') + '" alt="صورة" loading="lazy">';
+                html += '<img src="' + (g.picture || 'https://via.placeholder.com/70') + '" alt="صورة" loading="lazy" onerror="this.src=\'https://via.placeholder.com/70\'">';
                 html += '<h3>' + (g.name || 'مجموعة') + '</h3>';
                 html += '<p>' + ((g.description || 'مجموعة دراسية').substring(0, 30)) + '</p>';
                 html += '</div>';
             });
             listEl.innerHTML = html;
+        }, function(err) {
+            console.error('Groups listener error:', err);
+            var listEl = document.getElementById('groupsList');
+            if (listEl) listEl.innerHTML = '<p style="color:var(--danger); text-align:center; grid-column:1/-1;">❌ خطأ في التحميل</p>';
         });
         allListeners.push(unsub);
     }
@@ -1157,7 +772,7 @@
         if (!currentGroupId) { navigate('groups'); return; }
         
         var content = document.getElementById('contentArea');
-        content.innerHTML = '<p style="color:var(--text2); text-align:center; padding:40px;">⏳ جاري تحميل المحادثة...</p>';
+        content.innerHTML = '<div style="text-align:center; padding:50px;"><div class="loading-spinner" style="margin:0 auto;"></div><p style="color:var(--gold); margin-top:15px;">⏳ جاري تحميل المحادثة...</p></div>';
         
         db.collection('groups').doc(currentGroupId).get().then(function(doc) {
             if (!doc.exists) { navigate('groups'); return; }
@@ -1170,54 +785,97 @@
 
             var html = '<div class="chat-container">';
             html += '<div class="chat-header">';
-            html += '<img src="' + (g.picture || 'https://via.placeholder.com/40') + '" alt="صورة">';
-            html += '<div>';
+            html += '<span class="back-btn" onclick="navigate(\'groups\')">⬅️</span>';
+            html += '<img src="' + (g.picture || 'https://via.placeholder.com/40') + '" alt="صورة" onerror="this.src=\'https://via.placeholder.com/40\'">';
+            html += '<div class="group-info">';
             html += '<div class="group-name">' + (g.name || 'مجموعة') + '</div>';
-            html += '<div class="status-text">' + (isLocked ? '🔒 مقفول' : '🟢 مفتوح') + ' | ' + (g.memberCount || 0) + ' أعضاء</div>';
+            html += '<div class="status-text">' + (isLocked ? '🔒 مقفول' : '🟢 مفتوح') + ' | 👥 ' + (g.memberCount || 0) + ' | <span class="typing-status" id="typingStatus"></span></div>';
             html += '</div>';
+            html += '<div class="header-actions">';
             html += '<button class="icon-btn" onclick="navigate(\'group-info\')" title="معلومات">ℹ️</button>';
-            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')" style="margin-right:auto;">⬅️ رجوع</button>';
+            html += '<button class="icon-btn" onclick="toggleChatMenu(event)" title="المزيد">⋮</button>';
             html += '</div>';
+            html += '</div>';
+            
+            html += '<div id="chatMenu" class="dropdown"><a class="dropdown-item" onclick="navigate(\'group-info\')"><span class="icon">ℹ️</span> معلومات المجموعة</a><a class="dropdown-item" onclick="searchInChat()"><span class="icon">🔍</span> بحث في المحادثة</a></div>';
             
             if (isLocked && !isAdmin) {
-                html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف</div>';
+                html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف - لا يمكنك الكتابة</div>';
             }
             
+            html += '<div id="pinnedMessageContainer"></div>';
             html += '<div class="chat-messages" id="chatMessages" style="background-image:url(\'' + (currentUser.chatBg || '') + '\');"></div>';
             
             if (canWrite) {
+                html += '<div id="replyPreview" class="hidden" style="padding:0 15px; margin-bottom:5px;"></div>';
                 html += '<div class="chat-input-area">';
-                html += '<input id="msgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key===\'Enter\')sendMessage()" oninput="handleTyping()">';
+                html += '<button class="circle-btn voice" onclick="startVoiceRecord()" id="voiceBtn">🎤</button>';
+                html += '<input id="msgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();sendMessage();}" oninput="handleTyping()" autocomplete="off">';
                 html += '<button class="circle-btn attach" onclick="uploadMedia()">📎</button>';
                 html += '<button class="circle-btn send" onclick="sendMessage()">➤</button>';
                 html += '</div>';
-            } else if (isLocked) {
-                html += '';
-            } else {
-                html += '<div style="text-align:center; padding:12px; color:var(--text2); background:var(--surface);">🔇 المشرف فقط يمكنه الكتابة في هذه المجموعة</div>';
+            } else if (!isLocked) {
+                html += '<div style="text-align:center; padding:12px; color:var(--text2); background:var(--surface); font-size:0.85rem;">🔇 المشرف فقط يمكنه الكتابة في هذه المجموعة</div>';
             }
             
-            html += '<div id="replyPreview" class="hidden" style="padding:0 15px; margin-bottom:5px;"></div>';
             html += '</div>';
             
             content.innerHTML = html;
             loadMessages();
+            loadTypingIndicator();
         }).catch(function(e) {
             console.error('Chat load error:', e);
-            content.innerHTML = '<p style="color:var(--danger); text-align:center; padding:40px;">❌ حدث خطأ في تحميل المحادثة</p>';
+            content.innerHTML = '<div style="text-align:center; padding:50px;"><p style="color:var(--danger);">❌ حدث خطأ في تحميل المحادثة</p><p style="color:var(--text2); font-size:0.8rem;">' + (e.message || '') + '</p><button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')">⬅️ رجوع</button></div>';
         });
     }
+
+    function toggleChatMenu(e) {
+        if (e) e.stopPropagation();
+        var menu = document.getElementById('chatMenu');
+        if (menu) {
+            menu.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                setTimeout(function() {
+                    document.addEventListener('click', function closeMenu() {
+                        menu.classList.remove('active');
+                        document.removeEventListener('click', closeMenu);
+                    });
+                }, 100);
+            }
+        }
+    }
+
+    window.searchInChat = function() {
+        var query = prompt('🔍 ابحث في المحادثة:');
+        if (!query || !query.trim()) return;
+        var msgs = document.querySelectorAll('.message');
+        var found = false;
+        msgs.forEach(function(msg) {
+            if (msg.textContent.toLowerCase().includes(query.toLowerCase())) {
+                msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                msg.style.background = 'rgba(255,193,7,0.3)';
+                setTimeout(function() { msg.style.background = ''; }, 2000);
+                found = true;
+                return false;
+            }
+        });
+        if (!found) showToast('🔍 لم يتم العثور على نتائج', 'warning');
+    };
 
     function loadMessages() {
         var div = document.getElementById('chatMessages');
         if (!div) return;
+        if (chatUnsubscribe) chatUnsubscribe();
         
         var unsub = db.collection('groups').doc(currentGroupId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(snap) {
             div.innerHTML = '';
+            lastMessageDate = null;
+            
             if (snap.empty) {
-                div.innerHTML = '<p style="text-align:center; color:#555; padding:30px;">💬 لا توجد رسائل بعد</p>';
+                div.innerHTML = '<p style="text-align:center; color:#555; padding:40px;">💬 لا توجد رسائل بعد<br><span style="font-size:0.8rem;">كن أول من يرسل رسالة!</span></p>';
                 return;
             }
+            
             snap.forEach(function(doc) {
                 var m = doc.data();
                 m.id = doc.id;
@@ -1227,52 +885,83 @@
                     return;
                 }
                 
+                // فاصل التاريخ
+                if (m.timestamp) {
+                    try {
+                        var msgDate = new Date(m.timestamp.toDate()).toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'});
+                        if (msgDate !== lastMessageDate) {
+                            div.innerHTML += '<div class="date-separator">' + msgDate + '</div>';
+                            lastMessageDate = msgDate;
+                        }
+                    } catch(e) {}
+                }
+                
                 var isSent = (m.senderID === currentUser.uid);
                 var cls = isSent ? 'sent' : 'received';
                 var contentHtml = '';
                 
                 if (m.type === 'image') {
-                    contentHtml = '<img src="' + m.content + '" onclick="window.open(\'' + m.content + '\')" loading="lazy" style="max-width:200px; border-radius:12px; cursor:pointer;">';
+                    contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:200px; border-radius:12px; cursor:pointer;">';
                 } else if (m.type === 'video') {
-                    contentHtml = '<video controls src="' + m.content + '" style="max-width:200px; border-radius:12px;" preload="metadata"></video>';
+                    contentHtml = '<video controls src="' + m.content + '" style="max-width:200px; border-radius:12px;" preload="metadata" playsinline></video>';
                 } else if (m.type === 'file') {
                     contentHtml = '<span class="file-link" onclick="window.open(\'' + m.content + '\')">📄 ' + (m.fileName || 'ملف مرفق') + '</span>';
                 } else if (m.type === 'broadcast') {
-                    contentHtml = '<strong>📢 ' + (m.content || '') + '</strong>';
+                    contentHtml = '<strong>📢 ' + (m.content || '').replace(/\n/g, '<br>') + '</strong>';
+                } else if (m.type === 'pinned') {
+                    contentHtml = '📌 <strong>رسالة مثبتة:</strong> ' + (m.content || '').replace(/\n/g, '<br>');
                 } else {
                     contentHtml = (m.content || '').replace(/\n/g, '<br>');
                 }
                 
                 var replyHtml = '';
                 if (m.replyTo) {
-                    replyHtml = '<div class="reply-preview" onclick="scrollToMsg(\'' + m.replyTo.id + '\')">↩️ ' + (m.replyTo.text || '').substring(0, 30) + '</div>';
+                    replyHtml = '<div class="reply-preview" onclick="scrollToMsg(\'' + m.replyTo.id + '\')">↩️ رد على: ' + (m.replyTo.text || '').substring(0, 35) + '...</div>';
                 }
                 
                 var time = '';
                 if (m.timestamp) {
-                    try {
-                        time = new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
-                    } catch(e) {
-                        time = '';
-                    }
+                    try { time = new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}); } catch(e) {}
                 }
                 
                 var msgHtml = '<div class="message ' + cls + '" id="msg-' + m.id + '">';
                 msgHtml += replyHtml;
-                msgHtml += '<div class="bubble">' + contentHtml + '</div>';
+                msgHtml += '<div class="bubble" oncontextmenu="showMsgOptions(event, \'' + m.id + '\', ' + isSent + ')">' + contentHtml + '</div>';
                 msgHtml += '<div class="msg-meta">';
-                if (!isSent) msgHtml += '<strong>' + (m.senderName || '') + '</strong> • ';
+                if (!isSent) msgHtml += '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ';
                 msgHtml += time;
-                if (isSent) msgHtml += ' ' + (m.seen ? '✓✓' : '✓');
+                if (isSent) msgHtml += ' <span class="seen-icon">' + (m.seen ? '✓✓' : '✓') + '</span>';
                 msgHtml += '</div>';
                 msgHtml += '</div>';
                 
                 div.innerHTML += msgHtml;
             });
             div.scrollTop = div.scrollHeight;
+        }, function(err) {
+            console.error('Messages error:', err);
         });
         allListeners.push(unsub);
         chatUnsubscribe = unsub;
+    }
+
+    function loadTypingIndicator() {
+        if (typingUnsubscribe) typingUnsubscribe();
+        var statusEl = document.getElementById('typingStatus');
+        if (!statusEl) return;
+        
+        var unsub = db.collection('groups').doc(currentGroupId).collection('typing').onSnapshot(function(snap) {
+            var typers = [];
+            snap.forEach(function(doc) {
+                if (doc.id !== currentUser.uid) typers.push(doc.data().name || 'شخص');
+            });
+            if (typers.length > 0) {
+                statusEl.textContent = '✏️ ' + typers[0] + ' يكتب...';
+            } else {
+                statusEl.textContent = '';
+            }
+        });
+        allListeners.push(unsub);
+        typingUnsubscribe = unsub;
     }
 
     window.sendMessage = function() {
@@ -1294,30 +983,28 @@
             msgData.replyTo = { id: replyToMessage.id, text: (replyToMessage.content || '').substring(0, 50) };
             replyToMessage = null;
             var previewEl = document.getElementById('replyPreview');
-            if (previewEl) previewEl.classList.add('hidden');
+            if (previewEl) { previewEl.classList.add('hidden'); previewEl.innerHTML = ''; }
         }
         
         db.collection('groups').doc(currentGroupId).collection('messages').add(msgData).then(function() {
             input.value = '';
             input.focus();
-            // إيقاف مؤشر الكتابة
             db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
+            db.collection('users').doc(currentUser.uid).update({ totalMessages: firebase.firestore.FieldValue.increment(1) });
         }).catch(function(e) {
             console.error('Send error:', e);
-            showToast('❌ فشل الإرسال', 'error');
+            showToast('❌ فشل الإرسال - تحقق من اتصالك', 'error');
         });
     };
 
     window.uploadMedia = function() {
         if (typeof cloudinary === 'undefined') {
-            showToast('⚠️ خاصية الرفع غير متاحة حالياً', 'warning');
+            showToast('⚠️ خاصية الرفع غير متاحة - تأكد من الاتصال', 'warning');
             return;
         }
         cloudinary.createUploadWidget({
-            cloudName: CLOUD_NAME,
-            uploadPreset: UPLOAD_PRESET,
-            sources: ['local', 'url', 'camera'],
-            multiple: false,
+            cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET,
+            sources: ['local', 'url', 'camera'], multiple: false,
             maxFileSize: 20000000,
             clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'mp3', 'pdf', 'doc', 'docx']
         }, function(error, result) {
@@ -1329,16 +1016,11 @@
                 else if (resource === 'video') type = 'video';
                 
                 db.collection('groups').doc(currentGroupId).collection('messages').add({
-                    senderID: currentUser.uid,
-                    senderName: currentUser.name || 'طالب',
-                    type: type,
-                    content: url,
+                    senderID: currentUser.uid, senderName: currentUser.name || 'طالب',
+                    type: type, content: url,
                     fileName: result.info.original_filename || 'ملف',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    seen: false
-                }).catch(function(e) {
-                    console.error('Media upload error:', e);
-                });
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), seen: false
+                }).catch(function(e) { console.error('Media upload error:', e); });
             }
         }).open();
     };
@@ -1347,17 +1029,89 @@
         var el = document.getElementById('msg-' + msgId);
         if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.style.background = 'rgba(255,193,7,0.2)';
-            setTimeout(function() { el.style.background = ''; }, 1500);
+            el.style.background = 'rgba(255,193,7,0.25)';
+            el.style.transition = '0.3s';
+            setTimeout(function() { el.style.background = ''; }, 2000);
         }
+    };
+
+    window.showMsgOptions = function(e, msgId, isSent) {
+        e.preventDefault();
+        var options = [];
+        if (isSent) options.push({ text: '🗑️ حذف', action: 'deleteMsg(\'' + msgId + '\')' });
+        options.push({ text: '↩️ رد', action: 'setReply(\'' + msgId + '\')' });
+        if (isSent) options.push({ text: '📌 تثبيت', action: 'pinMessage(\'' + msgId + '\')' });
+        
+        var menu = document.createElement('div');
+        menu.style.cssText = 'position:fixed; background:var(--surface); border-radius:12px; padding:6px; z-index:300; box-shadow:0 10px 30px rgba(0,0,0,0.8); min-width:150px;';
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        
+        options.forEach(function(opt) {
+            var item = document.createElement('div');
+            item.style.cssText = 'padding:10px 15px; cursor:pointer; border-radius:8px; transition:0.2s;';
+            item.textContent = opt.text;
+            item.onmouseover = function() { item.style.background = 'var(--gold)'; item.style.color = '#000'; };
+            item.onmouseout = function() { item.style.background = ''; item.style.color = '#fff'; };
+            item.onclick = function() { eval(opt.action); menu.remove(); };
+            menu.appendChild(item);
+        });
+        
+        document.body.appendChild(menu);
+        setTimeout(function() {
+            document.addEventListener('click', function closeMenu() { menu.remove(); document.removeEventListener('click', closeMenu); });
+        }, 50);
+    };
+
+    window.setReply = function(msgId) {
+        db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId).get().then(function(doc) {
+            if (doc.exists) {
+                replyToMessage = { id: doc.id, content: doc.data().content };
+                var previewEl = document.getElementById('replyPreview');
+                if (previewEl) {
+                    previewEl.innerHTML = '<div class="reply-preview">↩️ رد على: ' + (doc.data().content || '').substring(0, 30) + '... <span onclick="cancelReply()" style="cursor:pointer; color:var(--danger);">✕</span></div>';
+                    previewEl.classList.remove('hidden');
+                }
+                var input = document.getElementById('msgInput');
+                if (input) input.focus();
+            }
+        });
+    };
+
+    window.cancelReply = function() {
+        replyToMessage = null;
+        var previewEl = document.getElementById('replyPreview');
+        if (previewEl) { previewEl.classList.add('hidden'); previewEl.innerHTML = ''; }
+    };
+
+    window.deleteMsg = function(msgId) {
+        if (confirm('هل تريد حذف هذه الرسالة؟')) {
+            db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId).update({ deleted: true }).then(function() {
+                showToast('🗑️ تم حذف الرسالة', 'info');
+            });
+        }
+    };
+
+    window.pinMessage = function(msgId) {
+        db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId).update({ pinned: true }).then(function() {
+            showToast('📌 تم تثبيت الرسالة', 'success');
+        });
     };
 
     function handleTyping() {
         clearTimeout(typingTimeout);
-        var ref = db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid);
-        ref.set({ name: currentUser.name || 'طالب', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        typingTimeout = setTimeout(function() { ref.delete(); }, 3000);
+        db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).set({ 
+            name: currentUser.name || 'طالب', 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+        typingTimeout = setTimeout(function() {
+            db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
+        }, 4000);
     }
+
+    window.startVoiceRecord = function() {
+        showToast('🎤 خاصية التسجيل الصوتي قيد التطوير', 'info');
+    };
 
     // ========== معلومات المجموعة ==========
     function renderGroupInfo() {
@@ -1366,16 +1120,43 @@
         db.collection('groups').doc(currentGroupId).get().then(function(doc) {
             var g = doc.data();
             var html = '<div class="info-card scale-in">';
-            html += '<img src="' + (g.picture || 'https://via.placeholder.com/100') + '" alt="صورة المجموعة">';
+            html += '<img src="' + (g.picture || 'https://via.placeholder.com/100') + '" alt="صورة">';
             html += '<h2 style="color:var(--gold); margin:15px 0;">' + (g.name || 'مجموعة') + '</h2>';
             html += '<p style="color:var(--text2);">' + (g.description || 'لا يوجد وصف') + '</p>';
-            html += '<p style="color:var(--gold); font-size:1.2rem; margin:10px 0;">👥 ' + (g.memberCount || 0) + ' عضو</p>';
-            html += '<p>🏷️ النوع: ' + (g.type === 'open' ? 'مفتوح' : 'مقفول') + '</p>';
-            html += '<p>الحالة: ' + (g.isLocked ? '🔒 مقفول' : '🟢 مفتوح') + '</p>';
-            html += '<p style="color:var(--text2);">👤 المشرف: ' + (g.adminName || 'الأدمن') + '</p>';
+            html += '<div class="stat-row">';
+            html += '<div class="stat-item"><div class="value">' + (g.memberCount || 0) + '</div><div class="label">أعضاء</div></div>';
+            html += '<div class="stat-item"><div class="value">' + (g.type === 'open' ? 'مفتوح' : 'مقفول') + '</div><div class="label">النوع</div></div>';
+            html += '<div class="stat-item"><div class="value">' + (g.isLocked ? '🔒' : '🟢') + '</div><div class="label">الحالة</div></div>';
+            html += '</div>';
+            html += '<p style="color:var(--text2); font-size:0.85rem;">👤 المشرف: ' + (g.adminName || 'الأدمن') + '</p>';
             html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'chat\')" style="margin-top:15px;">⬅️ رجوع للمحادثة</button>';
             html += '</div>';
             content.innerHTML = html;
+        });
+    }
+
+    // ========== إحصائيات الطالب ==========
+    function renderStudentStats() {
+        var content = document.getElementById('contentArea');
+        if (!currentUser) { navigate('groups'); return; }
+        
+        db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+            var u = doc.data();
+            var html = '<h2 class="section-title">📊 إحصائياتي</h2>';
+            html += '<div class="stats-card scale-in">';
+            html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/80') + '" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);">';
+            html += '<h3 style="color:var(--gold); margin:10px 0;">' + (u.name || currentUser.name || 'طالب') + '</h3>';
+            html += '<div class="stat-grid">';
+            html += '<div class="stat-item"><div class="value">' + (u.totalMessages || 0) + '</div><div class="label">رسائل</div></div>';
+            html += '<div class="stat-item"><div class="value">' + (u.groupsJoined || 0) + '</div><div class="label">مجموعات</div></div>';
+            html += '<div class="stat-item"><div class="value">' + (u.online ? '🟢' : '○') + '</div><div class="label">الحالة</div></div>';
+            html += '</div>';
+            html += '<p style="color:var(--text2); font-size:0.8rem; margin-top:10px;">📅 تاريخ التسجيل: ' + (u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('ar-EG') : 'غير معروف') + '</p>';
+            html += '</div>';
+            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')" style="width:100%;">⬅️ رجوع</button>';
+            content.innerHTML = html;
+        }).catch(function() {
+            content.innerHTML = '<p style="color:var(--danger); text-align:center;">❌ خطأ في تحميل الإحصائيات</p>';
         });
     }
 
@@ -1389,12 +1170,14 @@
             snap.forEach(function(doc) {
                 var s = doc.data();
                 html += '<div class="story-item" onclick="viewStory(\'' + doc.id + '\')">';
-                html += '<div class="story-ring"><img src="' + (s.mediaURL || 'https://via.placeholder.com/65') + '" alt="قصة"></div>';
+                html += '<div class="story-ring"><img src="' + (s.mediaURL || 'https://via.placeholder.com/65') + '" alt="قصة" onerror="this.src=\'https://via.placeholder.com/65\'"></div>';
                 html += '<span>' + ((s.title || 'قصة').substring(0, 10)) + '</span>';
                 html += '</div>';
             });
             html += '</div>';
             document.getElementById('storiesList').innerHTML = html || '<p style="color:var(--text2); text-align:center;">لا توجد قصص حالياً</p>';
+        }).catch(function() {
+            document.getElementById('storiesList').innerHTML = '<p style="color:var(--text2);">❌ خطأ في التحميل</p>';
         });
     }
 
@@ -1403,17 +1186,15 @@
             var s = doc.data();
             var modal = document.createElement('div');
             modal.className = 'modal-overlay';
-            var modalHTML = '<div class="modal" style="text-align:center;">';
-            if (s.mediaURL) modalHTML += '<img src="' + s.mediaURL + '" style="width:100%; max-height:300px; object-fit:cover; border-radius:15px;">';
+            var modalHTML = '<div class="modal" style="text-align:center; position:relative;">';
+            modalHTML += '<span class="close-modal" onclick="this.closest(\'.modal-overlay\').remove()">✕</span>';
+            if (s.mediaURL) modalHTML += '<img src="' + s.mediaURL + '" style="width:100%; max-height:300px; object-fit:cover; border-radius:15px;" onerror="this.style.display=\'none\'">';
             if (s.title) modalHTML += '<h3 style="color:var(--gold); margin-top:15px;">' + s.title + '</h3>';
             if (s.caption) modalHTML += '<p style="color:var(--text2);">' + s.caption + '</p>';
-            modalHTML += '<button class="btn btn-outline btn-sm" style="margin-top:15px;">إغلاق</button>';
+            modalHTML += '<button class="btn btn-outline btn-sm" style="margin-top:15px;" onclick="this.closest(\'.modal-overlay\').remove()">إغلاق</button>';
             modalHTML += '</div>';
             modal.innerHTML = modalHTML;
             document.body.appendChild(modal);
-            
-            var closeBtn = modal.querySelector('button');
-            if (closeBtn) closeBtn.onclick = function() { modal.remove(); };
             modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
         });
     };
@@ -1421,7 +1202,7 @@
     // ========== المحادثات الخاصة ==========
     function renderPrivateChatsList() {
         var content = document.getElementById('contentArea');
-        content.innerHTML = '<h2 class="section-title">💬 المحادثات الخاصة</h2><input class="input-field" id="privateUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchPrivateUsers()" style="text-align:right; letter-spacing:0;"><div id="privateUsersList"></div>';
+        content.innerHTML = '<h2 class="section-title">💬 المحادثات الخاصة</h2><input class="input-field" id="privateUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchPrivateUsers()" style="text-align:right; letter-spacing:0; font-size:1rem;"><div id="privateUsersList"></div>';
         searchPrivateUsers();
     }
 
@@ -1429,26 +1210,29 @@
         var queryInput = document.getElementById('privateUserSearch');
         var query = queryInput ? queryInput.value.toLowerCase() : '';
         
-        db.collection('users').limit(30).get().then(function(snap) {
+        db.collection('users').limit(50).get().then(function(snap) {
             var html = '';
             snap.forEach(function(doc) {
                 var u = doc.data();
                 if (doc.id === currentUser.uid) return;
-                if (query && (!u.name || !u.name.toLowerCase().includes(query))) return;
+                if (query && (!u.name || !u.name.toLowerCase().includes(query)) && (!u.phone || !u.phone.toLowerCase().includes(query))) return;
                 
                 html += '<div class="user-list-item" onclick="navigate(\'private-chat\', \'' + doc.id + '\')">';
-                html += '<div style="display:flex; align-items:center; gap:10px;">';
-                html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" alt="صورة">';
-                html += '<div>';
-                html += '<strong>' + (u.name || 'مستخدم') + '</strong>';
-                html += '<br><small style="color:' + (u.online ? 'var(--online)' : 'var(--text2)') + ';">' + (u.online ? '🟢 متصل' : '○ غير متصل') + '</small>';
+                html += '<div style="display:flex; align-items:center; gap:10px; flex:1;">';
+                html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" alt="صورة" onerror="this.src=\'https://via.placeholder.com/40\'">';
+                html += '<div class="user-info">';
+                html += '<div class="user-name">' + (u.name || 'مستخدم') + '</div>';
+                html += '<div class="user-status" style="color:' + (u.online ? 'var(--online)' : 'var(--text2)') + ';">' + (u.online ? '🟢 متصل' : '○ غير متصل') + '</div>';
                 html += '</div>';
                 html += '</div>';
                 html += '<button class="btn btn-xs">💬</button>';
                 html += '</div>';
             });
             var listEl = document.getElementById('privateUsersList');
-            if (listEl) listEl.innerHTML = html || '<p style="color:var(--text2); text-align:center;">لا يوجد مستخدمين</p>';
+            if (listEl) listEl.innerHTML = html || '<p style="color:var(--text2); text-align:center; padding:20px;">لا يوجد مستخدمين</p>';
+        }).catch(function() {
+            var listEl = document.getElementById('privateUsersList');
+            if (listEl) listEl.innerHTML = '<p style="color:var(--danger);">❌ خطأ في التحميل</p>';
         });
     };
 
@@ -1458,27 +1242,29 @@
         var content = document.getElementById('contentArea');
         
         db.collection('users').doc(userId).get().then(function(doc) {
-            var u = doc.data();
+            var u = doc.data() || {};
             var chatId = [currentUser.uid, userId].sort().join('_');
             
             var html = '<div class="chat-container">';
             html += '<div class="chat-header">';
-            html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" width="40" height="40" style="border-radius:50%;">';
-            html += '<div>';
+            html += '<span class="back-btn" onclick="navigate(\'private-chats\')">⬅️</span>';
+            html += '<img src="' + (u.profilePic || 'https://via.placeholder.com/40') + '" width="40" height="40" style="border-radius:50%;" onerror="this.src=\'https://via.placeholder.com/40\'">';
+            html += '<div class="group-info">';
             html += '<div class="group-name">' + (u.name || 'مستخدم') + '</div>';
             html += '<div class="status-text">' + (u.online ? '🟢 متصل' : '○ غير متصل') + '</div>';
             html += '</div>';
-            html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'private-chats\')" style="margin-right:auto;">⬅️ رجوع</button>';
             html += '</div>';
             html += '<div class="chat-messages" id="privateChatMessages"></div>';
             html += '<div class="chat-input-area">';
-            html += '<input id="privateMsgInput" placeholder="رسالة خاصة..." onkeydown="if(event.key===\'Enter\')sendPrivateMsg()">';
+            html += '<input id="privateMsgInput" placeholder="رسالة خاصة..." onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();sendPrivateMsg();}">';
             html += '<button class="circle-btn send" onclick="sendPrivateMsg()">➤</button>';
             html += '</div>';
             html += '</div>';
             
             content.innerHTML = html;
             loadPrivateMessages(chatId);
+        }).catch(function() {
+            content.innerHTML = '<p style="color:var(--danger); text-align:center; padding:40px;">❌ خطأ في تحميل المحادثة</p>';
         });
     }
 
@@ -1488,14 +1274,14 @@
         
         var unsub = db.collection('private_chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(snap) {
             if (snap.empty) {
-                container.innerHTML = '<p style="text-align:center; color:#555; padding:30px;">💬 لا توجد رسائل خاصة</p>';
+                container.innerHTML = '<p style="text-align:center; color:#555; padding:40px;">💬 لا توجد رسائل خاصة</p>';
                 return;
             }
             container.innerHTML = '';
             snap.forEach(function(doc) {
                 var m = doc.data();
                 var isSent = (m.senderID === currentUser.uid);
-                container.innerHTML += '<div class="message ' + (isSent ? 'sent' : 'received') + '"><div class="bubble">' + (m.content || '') + '</div><div class="msg-meta">' + (m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '') + '</div></div>';
+                container.innerHTML += '<div class="message ' + (isSent ? 'sent' : 'received') + '"><div class="bubble">' + (m.content || '').replace(/\n/g, '<br>') + '</div><div class="msg-meta">' + (m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '') + '</div></div>';
             });
             container.scrollTop = container.scrollHeight;
         });
@@ -1515,16 +1301,13 @@
             lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).then(function() {
             return db.collection('private_chats').doc(chatId).collection('messages').add({
-                senderID: currentUser.uid,
-                senderName: currentUser.name || 'طالب',
-                content: content,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                senderID: currentUser.uid, senderName: currentUser.name || 'طالب',
+                content: content, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         }).then(function() {
             input.value = '';
-        }).catch(function(e) {
-            console.error('Private msg error:', e);
-        });
+            input.focus();
+        }).catch(function(e) { console.error('Private msg error:', e); });
     };
 
     // ========== الوسائط ==========
@@ -1543,9 +1326,10 @@
             var promises = [];
             
             groupsSnap.forEach(function(gDoc) {
-                var p = db.collection('groups').doc(gDoc.id).collection('messages').where('type', 'in', ['image', 'video', 'file']).orderBy('timestamp', 'desc').limit(50).get().then(function(msgSnap) {
-                    msgSnap.forEach(function(doc) { allMedia.push(doc.data()); });
-                });
+                var p = db.collection('groups').doc(gDoc.id).collection('messages')
+                    .where('type', 'in', ['image', 'video', 'file'])
+                    .orderBy('timestamp', 'desc').limit(50).get()
+                    .then(function(msgSnap) { msgSnap.forEach(function(doc) { allMedia.push(doc.data()); }); });
                 promises.push(p);
             });
             
@@ -1560,9 +1344,9 @@
             var html = '';
             allMedia.forEach(function(m) {
                 if (m.type === 'image') {
-                    html += '<div class="media-item" onclick="window.open(\'' + m.content + '\')"><img src="' + m.content + '" alt="صورة" loading="lazy"></div>';
+                    html += '<div class="media-item" onclick="viewImage(\'' + m.content + '\')"><img src="' + m.content + '" alt="صورة" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>';
                 } else if (m.type === 'video') {
-                    html += '<div class="media-item"><video src="' + m.content + '" controls preload="metadata"></video></div>';
+                    html += '<div class="media-item"><video src="' + m.content + '" controls preload="metadata" playsinline style="width:100%; height:100%;"></video></div>';
                 } else {
                     html += '<div class="media-item"><div class="file-placeholder" onclick="window.open(\'' + m.content + '\')">📄</div></div>';
                 }
@@ -1580,7 +1364,7 @@
         db.collection('config').doc('support').get().then(function(doc) {
             var s = doc.exists ? doc.data() : {};
             var html = '<div class="info-card scale-in">';
-            html += '<img src="' + (s.adminImageURL || 'https://via.placeholder.com/100') + '" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);">';
+            html += '<img src="' + (s.adminImageURL || 'https://via.placeholder.com/100') + '" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);" onerror="this.src=\'https://via.placeholder.com/100\'">';
             html += '<h2 style="color:var(--gold); margin:15px 0;">📞 الدعم الفني</h2>';
             html += '<p style="color:var(--text2);">للتواصل والاستفسارات</p>';
             html += '<div class="support-links">';
@@ -1588,12 +1372,13 @@
             if (s.facebook) html += '<a href="' + s.facebook + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png" alt="فيسبوك"><span>فيسبوك</span></a>';
             if (s.tiktok) html += '<a href="' + s.tiktok + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/tiktok--v1.png" alt="تيك توك"><span>تيك توك</span></a>';
             if (s.youtube) html += '<a href="' + s.youtube + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/youtube-play.png" alt="يوتيوب"><span>يوتيوب</span></a>';
+            if (s.instagram) html += '<a href="' + s.instagram + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/instagram-new.png" alt="انستغرام"><span>انستغرام</span></a>';
             html += '</div>';
             html += '<button class="btn btn-outline btn-sm" onclick="navigate(\'groups\')" style="margin-top:20px;">⬅️ رجوع</button>';
             html += '</div>';
             content.innerHTML = html;
-        }).catch(function(e) {
-            content.innerHTML = '<p style="color:var(--danger); text-align:center;">❌ حدث خطأ في تحميل بيانات الدعم</p>';
+        }).catch(function() {
+            content.innerHTML = '<p style="color:var(--danger); text-align:center; padding:40px;">❌ حدث خطأ في تحميل بيانات الدعم</p>';
         });
     }
 
@@ -1604,6 +1389,7 @@
             hideLoading();
             if (!loggedIn) {
                 document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('codeInput').focus();
             }
         }).catch(function() {
             hideLoading();
@@ -1611,10 +1397,18 @@
         });
     });
 
-    console.log('🚀 Web Egypt Student App v4.0 - Loaded Successfully');
-    console.log('📱 Features: Groups, Real-time Chat, Private Messages, Stories, Media Gallery, Support');
+    // منع قائمة السياق الافتراضية في الشات فقط
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('.bubble')) {
+            e.preventDefault();
+        }
+    });
+
+    console.log('🚀 Web Egypt Student App v5.0 - Loaded Successfully');
+    console.log('📱 Features: Groups, Chat, Private Messages, Stories, Media, Support, Stats, Image Viewer');
     console.log('🔒 Device Binding: Active');
-    console.log('🔗 Connected to Firebase & Cloudinary');
+    console.log('🔗 Firebase & Cloudinary Connected');
+    console.log('📝 Enhanced with: Typing Indicator, Reply, Pin, Delete, Search, Date Separators');
 </script>
 </body>
 </html>
