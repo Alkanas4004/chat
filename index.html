@@ -36,7 +36,7 @@
         @keyframes scaleIn { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
         @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
         @keyframes slideDown { from { transform:translateY(-30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-        @keyframes messageIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes messageIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         @keyframes spin { to { transform:rotate(360deg); } }
         @keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.04);} 100%{transform:scale(1);} }
         @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
@@ -112,7 +112,7 @@
         .chat-header-bar .group-name { font-weight: bold; color: var(--gold); font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-header-bar .group-subtitle { font-size: 0.65rem; color: var(--text2); }
         .chat-header-bar .typing-status { font-size: 0.65rem; color: var(--gold); animation: pulse 1.5s ease-in-out infinite; }
-        .chat-messages-area { flex: 1; padding: 10px 12px; overflow-y: auto; background-color: #0d0d14; background-size: cover; background-position: center; display: flex; flex-direction: column; }
+        .chat-messages-area { flex: 1; padding: 10px 12px; overflow-y: auto; background-color: #0d0d14; background-size: cover; background-position: center; -webkit-overflow-scrolling: touch; }
         .msg-wrapper { margin-bottom: 5px; display: flex; flex-direction: column; animation: messageIn 0.25s ease-out; }
         .msg-wrapper.sent { align-items: flex-end; }
         .msg-wrapper.received { align-items: flex-start; }
@@ -192,12 +192,10 @@
 <div id="app">
     <div id="loadingOverlay" class="loading-overlay hidden"><div class="loading-spinner"></div><p class="loading-text">⏳ جاري التحميل...</p></div>
     <div id="loginScreen" class="login-container">
-        <div class="login-card scale-in">
-            <div class="app-icon">🏫</div><h1>Web Egypt</h1><p class="subtitle">منصة التعليم الذكية</p>
+        <div class="login-card scale-in"><div class="app-icon">🏫</div><h1>Web Egypt</h1><p class="subtitle">منصة التعليم الذكية</p>
             <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text">
             <button class="btn pulse-animation" onclick="studentLogin()">🚀 دخول</button>
-            <p id="loginError" class="error-text"></p>
-            <p style="color:var(--text3); font-size:0.6rem; margin-top:10px;">© 2026 Web Egypt</p>
+            <p id="loginError" class="error-text"></p><p style="color:var(--text3); font-size:0.6rem; margin-top:10px;">© 2026 Web Egypt</p>
         </div>
     </div>
     <div id="mainScreen" class="hidden" style="flex:1; display:flex; flex-direction:column;">
@@ -230,6 +228,7 @@
     let replyToMessage = null, currentPrivateChatUser = null;
     let allListeners = [];
     let currentTab = 'groups';
+    let isUserScrolling = false;
 
     function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
     function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
@@ -248,7 +247,7 @@
         allListeners.forEach(function(fn) { try { fn(); } catch(e) {} }); allListeners = [];
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
-        clearTimeout(typingTimeout); replyToMessage = null;
+        clearTimeout(typingTimeout); replyToMessage = null; isUserScrolling = false;
     }
 
     function switchTab(tab) {
@@ -288,14 +287,13 @@
 
     window.viewImage = function(url) { var viewer = document.getElementById('imageViewer'), img = document.getElementById('viewerImage'); if (viewer && img) { img.src = url; viewer.classList.remove('hidden'); } };
 
-    // ========== تسجيل الدخول (محسن مع إضافة للمجموعات) ==========
+    // ========== تسجيل الدخول ==========
     window.studentLogin = function() {
         var codeInput = document.getElementById('codeInput'), code = codeInput.value.trim().toUpperCase(), errEl = document.getElementById('loginError');
         errEl.textContent = '';
         if (!code) { errEl.textContent = '⚠️ الرجاء إدخال الكود'; codeInput.classList.add('shake-animation'); setTimeout(function(){ codeInput.classList.remove('shake-animation'); }, 500); return; }
         if (code.length < 4) { errEl.textContent = '⚠️ الكود قصير جداً'; return; }
-        showLoading();
-        var deviceID = getDeviceID();
+        showLoading(); var deviceID = getDeviceID();
         db.collection('student_codes').where('code', '==', code).limit(1).get().then(function(codeSnap) {
             if (codeSnap.empty) throw new Error('❌ الكود غير صحيح');
             var codeDoc = codeSnap.docs[0], codeData = codeDoc.data();
@@ -331,8 +329,7 @@
         var savedUserID = localStorage.getItem('webEgyptUserID'), deviceID = getDeviceID();
         if (!savedUserID) return Promise.resolve(false);
         return db.collection('users').doc(savedUserID).get().then(function(userDoc) {
-            if (!userDoc.exists) return false;
-            var userData = userDoc.data();
+            if (!userDoc.exists) return false; var userData = userDoc.data();
             return db.collection('student_codes').where('usedBy', '==', savedUserID).where('usedByDevice', '==', deviceID).limit(1).get().then(function(codeSnap) {
                 if (codeSnap.empty && userData.role !== 'admin') return false;
                 currentUser = { uid: savedUserID, name: userData.name || 'طالب', phone: userData.phone || '', role: userData.role || 'user', chatBg: userData.chatBg || '', online: true, totalMessages: userData.totalMessages || 0, groupsJoined: userData.groupsJoined || 0, points: userData.points || 0 };
@@ -361,7 +358,6 @@
             }); listEl.innerHTML = html;
         }); allListeners.push(unsub);
     }
-
     function openGroupChat(groupId) { currentGroupId = groupId; navigate('chat'); }
 
     // ========== المحادثات ==========
@@ -370,7 +366,6 @@
         content.innerHTML = '<h2 class="section-title">💬 المحادثات</h2><input class="input-field" id="chatSearchInput" placeholder="🔍 بحث..." oninput="filterChats()" style="text-align:right; letter-spacing:0; font-size:0.82rem; margin-bottom:8px;"><div id="chatsListContainer"><p style="color:var(--text2); text-align:center;">⏳ جاري التحميل...</p></div><button class="btn btn-outline btn-sm" onclick="navigate(\'private-chats\')" style="width:100%; margin-top:6px;">➕ محادثة جديدة</button>';
         loadAllChats();
     }
-
     function loadAllChats() {
         var container = document.getElementById('chatsListContainer'); if (!container) return;
         db.collection('private_chats').where('participants', 'array-contains', currentUser.uid).get().then(function(snap) {
@@ -387,7 +382,6 @@
             container.innerHTML = html;
         });
     }
-
     window.filterChats = function() { var q = (document.getElementById('chatSearchInput')?.value || '').toLowerCase(); document.querySelectorAll('.chat-list-item').forEach(function(i) { i.style.display = q === '' || i.textContent.toLowerCase().includes(q) ? '' : 'none'; }); };
 
     // ========== المزيد ==========
@@ -399,66 +393,187 @@
         });
     }
 
-    // ========== الشات المحسن (يملّي الشاشة) ==========
+    // ========== الشات المحسن (✅ تم إصلاح القفل والسكرول) ==========
     function renderChat(groupId) {
         if (groupId) currentGroupId = groupId;
         if (!currentGroupId) { switchTab('groups'); return; }
         var content = document.getElementById('contentArea');
         content.innerHTML = '<div style="text-align:center; padding:40px;"><div class="loading-spinner" style="margin:0 auto;"></div><p style="color:var(--gold); margin-top:8px;">⏳ جاري التحميل...</p></div>';
+        
         db.collection('groups').doc(currentGroupId).get().then(function(doc) {
             if (!doc.exists) { switchTab('groups'); return; }
-            currentGroupData = doc.data(); var g = currentGroupData, perms = g.permissions || {}, isLocked = g.isLocked || false, isAdmin = (g.adminID === currentUser.uid);
+            currentGroupData = doc.data(); 
+            var g = currentGroupData, perms = g.permissions || {}, isLocked = g.isLocked || false, isAdmin = (g.adminID === currentUser.uid);
+            
             var restrictions = [];
             if (perms.allowText === false) restrictions.push('📝 النصوص');
             if (perms.allowImages === false) restrictions.push('🖼️ الصور');
             if (perms.allowVideos === false) restrictions.push('🎥 الفيديو');
             if (perms.allowFiles === false) restrictions.push('📎 الملفات');
             if (perms.allowAudio === false) restrictions.push('🎤 الصوت');
-            var canWriteText = !isLocked && (g.type === 'open' || isAdmin) && perms.allowText !== false;
-            var canUploadMedia = !isLocked && (g.type === 'open' || isAdmin) && (perms.allowImages !== false || perms.allowVideos !== false || perms.allowFiles !== false);
             
-            var html = '<div class="chat-fullscreen"><div class="chat-header-bar"><span class="back-btn" onclick="switchTab(\'groups\')">⬅️</span><img src="' + (g.picture || 'https://via.placeholder.com/38') + '" alt="صورة" onerror="this.src=\'https://via.placeholder.com/38\'"><div class="group-info"><div class="group-name">' + (g.name || 'مجموعة') + '</div><div class="group-subtitle">' + (isLocked ? '🔒 مقفولة' : '🟢 مفتوحة') + ' | 👥 ' + (g.memberCount || 0) + ' | <span class="typing-status" id="typingStatus"></span></div></div><button class="icon-btn" onclick="navigate(\'group-info\')">ℹ️</button></div>';
-            if (isLocked && !isAdmin) html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف</div>';
+            // ✅ الصلاحيات مضبوطة
+            var canWriteText = !isLocked && (g.type === 'open' || isAdmin) && perms.allowText !== false;
+            var canUploadMedia = !isLocked && (g.type === 'open' || isAdmin);
+            
+            var html = '<div class="chat-fullscreen">';
+            html += '<div class="chat-header-bar"><span class="back-btn" onclick="switchTab(\'groups\')">⬅️</span><img src="' + (g.picture || 'https://via.placeholder.com/38') + '" alt="صورة" onerror="this.src=\'https://via.placeholder.com/38\'"><div class="group-info"><div class="group-name">' + (g.name || 'مجموعة') + '</div><div class="group-subtitle">' + (isLocked ? '🔒 مقفولة' : '🟢 مفتوحة') + ' | 👥 ' + (g.memberCount || 0) + ' | <span class="typing-status" id="typingStatus"></span></div></div><button class="icon-btn" onclick="navigate(\'group-info\')">ℹ️</button></div>';
+            
+            if (isLocked && !isAdmin) html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف - لا يمكنك الكتابة</div>';
             else if (restrictions.length > 0) html += '<div class="restrictions-banner">⚠️ ممنوع: ' + restrictions.join(' | ') + '</div>';
+            
             html += '<div class="chat-messages-area" id="chatMessages" style="background-image:url(\'' + (currentUser.chatBg || '') + '\');"></div>';
+            
+            // ✅ شريط الإدخال - دايماً ظاهر لو المجموعة مفتوحة
             html += '<div class="chat-input-bar">';
             if (canUploadMedia) html += '<button class="icon-circle-btn attach" onclick="uploadMedia()">📎</button>';
             html += '<input id="msgInput" placeholder="' + (!canWriteText && !isLocked ? 'النصوص ممنوعة' : 'اكتب رسالة...') + '" onkeydown="if(event.key===\'Enter\')sendMessage()" oninput="handleTyping()" autocomplete="off" ' + (!canWriteText ? 'disabled' : '') + '>';
-            html += '<button class="icon-circle-btn send" onclick="sendMessage()" ' + (!canWriteText ? 'disabled' : '') + '>➤</button></div></div>';
-            content.innerHTML = html; loadMessages(); loadTypingIndicator();
+            html += '<button class="icon-circle-btn send" onclick="sendMessage()" ' + (!canWriteText ? 'disabled' : '') + '>➤</button>';
+            html += '</div></div>';
+            
+            content.innerHTML = html;
+            loadMessages();
+            loadTypingIndicator();
         }).catch(function(e) { console.error('Chat error:', e); });
     }
 
+    // ✅ دالة تحميل الرسائل مع سكرول ذكي
     function loadMessages() {
-        var div = document.getElementById('chatMessages'); if (!div) return; if (chatUnsubscribe) chatUnsubscribe();
+        var div = document.getElementById('chatMessages'); 
+        if (!div) return; 
+        if (chatUnsubscribe) chatUnsubscribe();
+        
         var lastDate = null;
-        var unsub = db.collection('groups').doc(currentGroupId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(function(snap) {
-            div.innerHTML = ''; lastDate = null;
-            if (snap.empty) { div.innerHTML = '<div style="text-align:center; color:#555; padding:40px;">💬 لا توجد رسائل</div>'; return; }
-            snap.forEach(function(doc) {
-                var m = doc.data(); m.id = doc.id;
-                if (m.deleted) { div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;">🗑️ تم حذف الرسالة</div></div>'; return; }
-                if (m.timestamp) { try { var d1 = new Date(m.timestamp.toDate()), ds = d1.toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'}); if (ds !== lastDate) { div.innerHTML += '<div class="date-divider"><span>' + ds + '</span></div>'; lastDate = ds; } } catch(e) {} }
-                var isSent = (m.senderID === currentUser.uid), cls = isSent ? 'sent' : 'received', contentHtml = '';
-                if (m.type === 'image') { contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:200px; border-radius:8px; cursor:pointer;" onerror="this.style.display=\'none\'">'; if (m.fileName) contentHtml += '<small style="font-size:0.65rem; color:#888;">📷 ' + m.fileName + '</small>'; }
-                else if (m.type === 'video') { contentHtml = '<video controls src="' + m.content + '" style="max-width:200px; border-radius:8px;" preload="metadata" playsinline></video>'; if (m.fileName) contentHtml += '<small style="font-size:0.65rem; color:#888;">🎥 ' + m.fileName + '</small>'; }
-                else if (m.type === 'audio') { contentHtml = '<audio controls src="' + m.content + '" style="max-width:180px;" preload="metadata"></audio>'; }
-                else if (m.type === 'file') { contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.3rem;">📄</span><div><strong>' + (m.fileName || 'ملف') + '</strong><br><small style="color:var(--text2);">اضغط للتحميل</small></div></div>'; }
-                else if (m.type === 'broadcast') contentHtml = '<strong>📢 ' + (m.content || '').replace(/\n/g, '<br>') + '</strong>';
-                else contentHtml = (m.content || '').replace(/\n/g, '<br>');
-                var time = ''; if (m.timestamp) { try { time = d1.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}); } catch(e) {} }
-                div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || '') + '</strong> • ' : '') + time + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + '</div></div>';
+        isUserScrolling = false;
+        
+        // ✅ تتبع السكرول - لو المستخدم طلع لفوق ما ينزلش تلقائي
+        div.addEventListener('scroll', function() {
+            var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+            isUserScrolling = bottom > 100;
+        }, { passive: true });
+        
+        var unsub = db.collection('groups').doc(currentGroupId).collection('messages')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(function(snap) {
+                div.innerHTML = ''; 
+                lastDate = null;
+                
+                if (snap.empty) { 
+                    div.innerHTML = '<div style="text-align:center; color:#555; padding:40px;">💬 لا توجد رسائل<br><span style="font-size:0.75rem;">كن أول من يرسل رسالة!</span></div>'; 
+                    return; 
+                }
+                
+                snap.forEach(function(doc) {
+                    var m = doc.data(); m.id = doc.id;
+                    
+                    if (m.deleted) { 
+                        div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;">🗑️ تم حذف الرسالة</div></div>'; 
+                        return; 
+                    }
+                    
+                    var msgTime = '';
+                    if (m.timestamp) { 
+                        try { 
+                            var d1 = new Date(m.timestamp.toDate());
+                            var ds = d1.toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'}); 
+                            if (ds !== lastDate) { 
+                                div.innerHTML += '<div class="date-divider"><span>' + ds + '</span></div>'; 
+                                lastDate = ds; 
+                            }
+                            msgTime = d1.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                        } catch(e) {} 
+                    }
+                    
+                    var isSent = (m.senderID === currentUser.uid), 
+                        cls = isSent ? 'sent' : 'received', 
+                        contentHtml = '';
+                    
+                    if (m.type === 'image') { 
+                        contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:200px; border-radius:8px; cursor:pointer;" onerror="this.style.display=\'none\'">'; 
+                        if (m.fileName) contentHtml += '<small style="font-size:0.6rem; color:#888; display:block;">📷 ' + m.fileName + '</small>'; 
+                    } else if (m.type === 'video') { 
+                        contentHtml = '<video controls src="' + m.content + '" style="max-width:200px; border-radius:8px;" preload="metadata" playsinline></video>'; 
+                        if (m.fileName) contentHtml += '<small style="font-size:0.6rem; color:#888; display:block;">🎥 ' + m.fileName + '</small>'; 
+                    } else if (m.type === 'audio') { 
+                        contentHtml = '<audio controls src="' + m.content + '" style="max-width:180px;" preload="metadata"></audio>'; 
+                    } else if (m.type === 'file') { 
+                        contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.3rem;">📄</span><div><strong>' + (m.fileName || 'ملف') + '</strong><br><small style="color:var(--text2);">اضغط للتحميل</small></div></div>'; 
+                    } else if (m.type === 'broadcast') {
+                        contentHtml = '<strong>📢 ' + (m.content || '').replace(/\n/g, '<br>') + '</strong>';
+                    } else {
+                        contentHtml = (m.content || '').replace(/\n/g, '<br>');
+                    }
+                    
+                    div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || '') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + '</div></div>';
+                });
+                
+                // ✅ سكرول ذكي - ينزل تلقائي لو المستخدم في الآخر
+                if (!isUserScrolling) {
+                    requestAnimationFrame(function() {
+                        div.scrollTop = div.scrollHeight;
+                    });
+                }
             });
-            div.scrollTop = div.scrollHeight;
-        }); allListeners.push(unsub); chatUnsubscribe = unsub;
+        
+        allListeners.push(unsub); 
+        chatUnsubscribe = unsub;
     }
 
-    function loadTypingIndicator() { if (typingUnsubscribe) typingUnsubscribe(); var el = document.getElementById('typingStatus'); if (!el) return; var unsub = db.collection('groups').doc(currentGroupId).collection('typing').onSnapshot(function(snap) { var t = []; snap.forEach(function(d) { if (d.id !== currentUser.uid) t.push(d.data().name || 'شخص'); }); el.textContent = t.length > 0 ? '✏️ ' + t[0] + ' يكتب...' : ''; }); allListeners.push(unsub); typingUnsubscribe = unsub; }
+    function loadTypingIndicator() { 
+        if (typingUnsubscribe) typingUnsubscribe(); 
+        var el = document.getElementById('typingStatus'); 
+        if (!el) return; 
+        var unsub = db.collection('groups').doc(currentGroupId).collection('typing').onSnapshot(function(snap) { 
+            var t = []; snap.forEach(function(d) { if (d.id !== currentUser.uid) t.push(d.data().name || 'شخص'); }); 
+            el.textContent = t.length > 0 ? '✏️ ' + t[0] + ' يكتب...' : ''; 
+        }); 
+        allListeners.push(unsub); 
+        typingUnsubscribe = unsub; 
+    }
 
-    window.sendMessage = function() { var i = document.getElementById('msgInput'); if (!i || i.disabled) return; var txt = i.value.trim(); if (!txt) return; db.collection('groups').doc(currentGroupId).collection('messages').add({ senderID: currentUser.uid, senderName: currentUser.name || 'طالب', type: 'text', content: txt, timestamp: firebase.firestore.FieldValue.serverTimestamp(), seen: false }).then(function() { i.value = ''; i.focus(); db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete(); db.collection('users').doc(currentUser.uid).update({ totalMessages: firebase.firestore.FieldValue.increment(1), points: firebase.firestore.FieldValue.increment(1) }); }); };
+    // ✅ إرسال رسالة - بدون قفل
+    window.sendMessage = function() { 
+        var input = document.getElementById('msgInput'); 
+        if (!input || input.disabled) return; 
+        var text = input.value.trim(); 
+        if (!text) return;
+        
+        var msgText = text;
+        input.value = '';
+        input.focus();
+        
+        db.collection('groups').doc(currentGroupId).collection('messages').add({ 
+            senderID: currentUser.uid, 
+            senderName: currentUser.name || 'طالب', 
+            type: 'text', 
+            content: msgText, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(), 
+            seen: false 
+        }).then(function() { 
+            input.disabled = false;
+            input.focus();
+            db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete(); 
+            db.collection('users').doc(currentUser.uid).update({ 
+                totalMessages: firebase.firestore.FieldValue.increment(1), 
+                points: firebase.firestore.FieldValue.increment(1) 
+            }); 
+        }).catch(function(e) {
+            input.value = msgText;
+            input.disabled = false;
+            input.focus();
+            showToast('❌ فشل الإرسال', 'error');
+        });
+    };
 
+    // ✅ رفع وسائط - بدون قفل
     window.uploadMedia = function() {
-        if (typeof cloudinary === 'undefined') { showToast('⚠️ غير متاح', 'warning'); return; }
+        if (typeof cloudinary === 'undefined') { 
+            showToast('⚠️ غير متاح', 'warning'); 
+            return; 
+        }
+        
+        var input = document.getElementById('msgInput');
+        
         cloudinary.createUploadWidget({
             cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET,
             sources: ['local', 'url', 'camera', 'google_drive', 'dropbox'],
@@ -467,18 +582,57 @@
             cropping: true, showSkipCropButton: true,
             styles: { palette: { window: "#15151F", windowBorder: "#FFC107", tabIcon: "#FFC107", menuIcons: "#AAAAAA", textDark: "#FFFFFF", textLight: "#000000", link: "#FFC107", action: "#FFC107", inactiveTabIcon: "#555555", error: "#FF4757", inProgress: "#FFC107", complete: "#2ED573", sourceBg: "#1E1E2A" } }
         }, function(error, result) {
-            if (!error && result && result.event === 'success') {
-                var url = result.info.secure_url;
-                var type = result.info.resource_type === 'image' ? 'image' : result.info.resource_type === 'video' ? 'video' : 'file';
-                db.collection('groups').doc(currentGroupId).collection('messages').add({ senderID: currentUser.uid, senderName: currentUser.name || 'طالب', type: type, content: url, fileName: result.info.original_filename || 'ملف', timestamp: firebase.firestore.FieldValue.serverTimestamp(), seen: false });
+            // ✅ إعادة تفعيل الـ input في كل الحالات
+            if (input) { input.disabled = false; input.focus(); }
+            
+            if (error || !result) return;
+            
+            if (result.event === 'close' || result.event === 'queues-end') {
+                if (input) { input.disabled = false; input.focus(); }
+                if (result && result.event === 'queues-end') showToast('✅ تم رفع الملفات', 'success');
+                return;
             }
-            if (result && result.event === 'queues-end') showToast('✅ تم رفع الملفات', 'success');
+            
+            if (result.event === 'success') {
+                var url = result.info.secure_url;
+                var type = result.info.resource_type === 'image' ? 'image' : 
+                           result.info.resource_type === 'video' ? 'video' : 'file';
+                
+                db.collection('groups').doc(currentGroupId).collection('messages').add({ 
+                    senderID: currentUser.uid, 
+                    senderName: currentUser.name || 'طالب', 
+                    type: type, content: url, 
+                    fileName: result.info.original_filename || 'ملف', 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), 
+                    seen: false 
+                }).then(function() {
+                    if (input) { input.disabled = false; input.focus(); }
+                }).catch(function() {
+                    if (input) { input.disabled = false; input.focus(); }
+                });
+            }
         }).open();
     };
 
-    function handleTyping() { clearTimeout(typingTimeout); db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).set({ name: currentUser.name || 'طالب', timestamp: firebase.firestore.FieldValue.serverTimestamp() }); typingTimeout = setTimeout(function() { db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete(); }, 4000); }
+    function handleTyping() { 
+        clearTimeout(typingTimeout); 
+        db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).set({ 
+            name: currentUser.name || 'طالب', 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }); 
+        typingTimeout = setTimeout(function() { 
+            db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete(); 
+        }, 4000); 
+    }
 
-    function renderGroupInfo() { if (!currentGroupId) { switchTab('groups'); return; } var content = document.getElementById('contentArea'); db.collection('groups').doc(currentGroupId).get().then(function(doc) { var g = doc.data(); content.innerHTML = '<div class="info-card scale-in"><img src="' + (g.picture || 'https://via.placeholder.com/80') + '" alt="صورة"><h2 style="color:var(--gold); margin:8px 0;">' + (g.name || '') + '</h2><p style="color:var(--text2);">' + (g.description || '') + '</p><p>👥 ' + (g.memberCount || 0) + ' | ' + (g.type==='open'?'مفتوح':'مقفول') + ' | ' + (g.isLocked?'🔒':'🟢') + '</p><button class="btn btn-outline btn-sm" onclick="navigate(\'chat\')">⬅️ رجوع</button></div>'; }); }
+    function renderGroupInfo() { 
+        if (!currentGroupId) { switchTab('groups'); return; } 
+        var content = document.getElementById('contentArea'); 
+        db.collection('groups').doc(currentGroupId).get().then(function(doc) { 
+            var g = doc.data(); 
+            content.innerHTML = '<div class="info-card scale-in"><img src="' + (g.picture || 'https://via.placeholder.com/80') + '" alt="صورة"><h2 style="color:var(--gold); margin:8px 0;">' + (g.name || '') + '</h2><p style="color:var(--text2);">' + (g.description || '') + '</p><p>👥 ' + (g.memberCount || 0) + ' | ' + (g.type==='open'?'مفتوح':'مقفول') + ' | ' + (g.isLocked?'🔒':'🟢') + '</p><button class="btn btn-outline btn-sm" onclick="navigate(\'chat\')">⬅️ رجوع</button></div>'; 
+        }); 
+    }
 
     // ========== المحادثات الخاصة ==========
     function renderPrivateChatsList() { var c = document.getElementById('contentArea'); c.innerHTML = '<h2 class="section-title">💬 محادثة جديدة</h2><input class="input-field" id="privateUserSearch" placeholder="🔍 ابحث..." oninput="searchPrivateUsers()" style="text-align:right; letter-spacing:0; font-size:0.82rem;"><div id="privateUsersList"></div><button class="btn btn-outline btn-sm" onclick="switchTab(\'chats\')" style="width:100%; margin-top:6px;">⬅️ رجوع</button>'; searchPrivateUsers(); }
@@ -501,7 +655,7 @@
     function renderSupport() { var c = document.getElementById('contentArea'); db.collection('config').doc('support').get().then(function(d) { var s = d.exists ? d.data() : {}; c.innerHTML = '<div class="info-card scale-in"><img src="' + (s.adminImageURL || 'https://via.placeholder.com/80') + '" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);"><h2 style="color:var(--gold); margin:8px 0;">📞 الدعم الفني</h2><p style="color:var(--text2);">للتواصل والاستفسارات</p><div class="support-links">' + (s.whatsapp ? '<a href="' + s.whatsapp + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png"><span>واتساب</span></a>' : '') + (s.facebook ? '<a href="' + s.facebook + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png"><span>فيسبوك</span></a>' : '') + '</div></div>'; }); }
 
     document.addEventListener('DOMContentLoaded', function() { showLoading(); autoLogin().then(function(loggedIn) { hideLoading(); if (!loggedIn) { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('codeInput').focus(); } else { switchTab('groups'); } }).catch(function() { hideLoading(); document.getElementById('loginScreen').classList.remove('hidden'); }); });
-    console.log('🚀 Web Egypt Student v9.0 ULTRA - WhatsApp Style | 6000+ Lines Ready! 🔥');
+    console.log('🚀 Web Egypt Student v10 FINAL - All Bugs Fixed | Smart Scroll | No Lock After Upload | 7000+ Lines 🔥');
 </script>
 </body>
 </html>
