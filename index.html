@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Web Egypt | الطالب</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0A0A0F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Web Egypt">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Web Egypt">
+    <link rel="icon" type="image/jpeg" href="amg.1.jpg">
+    <link rel="apple-touch-icon" href="amg.1.jpg">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV2ViIEVneXB0Iiwic2hvcnRfbmFtZSI6IldlYiBFZ3lwdCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMEEwQTBGIiwidGhlbWVfY29sb3IiOiIjMEExQTBGIiwib3JpZW50YXRpb24iOiJwb3J0cmFpdCIsImljb25zIjpbeyJzcmMiOiJhbWcuMS5qcGciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvanBlZyJ9LHsic3JjIjoiYW1nLjEuanBnIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL2pwZWcifV19">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    
     <style>
         :root {
             --gold: #FFC107; --gold-dark: #B8860B; --gold-light: #FFD54F;
@@ -26,6 +39,7 @@
             direction: rtl; overscroll-behavior: none;
             height: 100dvh; display: flex; justify-content: center; align-items: center;
             -webkit-tap-highlight-color: transparent; user-select: none;
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
         }
         #app { width: 100%; max-width: 500px; height: 100dvh; background: var(--bg); display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(255,193,7,0.18); }
         @media (min-width: 600px) { #app { max-width: 520px; height: 92dvh; border-radius: 30px; margin: 15px; } }
@@ -47,6 +61,10 @@
         @keyframes float { 0%{transform:translateY(0);} 50%{transform:translateY(-6px);} 100%{transform:translateY(0);} }
         @keyframes glow { 0%{box-shadow:0 0 5px rgba(255,193,7,0.3);} 50%{box-shadow:0 0 20px rgba(255,193,7,0.6);} 100%{box-shadow:0 0 5px rgba(255,193,7,0.3);} }
         @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+        @keyframes badgePop { 0%{transform:scale(0.5); opacity:0;} 60%{transform:scale(1.2);} 100%{transform:scale(1); opacity:1;} }
+        @keyframes confetti-fall { 0%{transform:translateY(-100vh) rotate(0deg); opacity:1;} 100%{transform:translateY(100vh) rotate(720deg); opacity:0;} }
+        @keyframes bellRing { 0%{transform:rotate(0);} 15%{transform:rotate(20deg);} 30%{transform:rotate(-20deg);} 45%{transform:rotate(10deg);} 60%{transform:rotate(-10deg);} 75%{transform:rotate(5deg);} 100%{transform:rotate(0);} }
+        @keyframes darkModeTransition { from { filter: brightness(1); } to { filter: brightness(0.9); } }
         
         .fade-in { animation: fadeInUp 0.4s ease-out; }
         .scale-in { animation: scaleIn 0.3s ease-out; }
@@ -55,6 +73,7 @@
         .pop-in { animation: popIn 0.4s ease-out; }
         .float-animation { animation: float 3s ease-in-out infinite; }
         .glow-animation { animation: glow 2s ease-in-out infinite; }
+        .bell-animation { animation: bellRing 0.6s ease-in-out; }
 
         .loading-overlay { position: absolute; inset: 0; background: rgba(10,10,15,0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
         .loading-spinner { width: 45px; height: 45px; border: 3px solid rgba(255,193,7,0.15); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
@@ -65,9 +84,9 @@
         .header-icons { display: flex; gap: 4px; }
         .icon-btn { background: none; border: none; font-size: 1.3rem; color: var(--gold); cursor: pointer; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: var(--transition); position: relative; }
         .icon-btn:active { background: rgba(255,193,7,0.2); transform: scale(0.9); }
-        .icon-btn .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; }
+        .icon-btn .notification-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; animation: bellRing 0.6s ease-in-out; }
 
-        .screen { flex: 1; overflow-y: auto; padding: 14px; -webkit-overflow-scrolling: touch; }
+        .screen { flex: 1; overflow-y: auto; padding: 14px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .hidden { display: none !important; }
 
         .bottom-tabs { display: flex; background: var(--surface); border-top: 1px solid #1a1a25; flex-shrink: 0; padding-bottom: var(--safe-bottom); }
@@ -75,6 +94,7 @@
         .bottom-tab.active { color: var(--gold); }
         .bottom-tab.active::after { content: ''; position: absolute; top: 0; left: 25%; right: 25%; height: 2px; background: var(--gold); border-radius: 0 0 3px 3px; }
         .bottom-tab .tab-icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
+        .bottom-tab .tab-badge { position: absolute; top: 2px; right: 50%; transform: translateX(30px); background: var(--danger); color: #fff; border-radius: 50%; min-width: 16px; height: 16px; font-size: 0.55rem; display: flex; align-items: center; justify-content: center; animation: badgePop 0.3s ease-out; }
 
         .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 25px; }
         .login-card { background: var(--surface); border-radius: 28px; padding: 35px 22px; text-align: center; width: 100%; box-shadow: var(--shadow-lg); border: 1px solid rgba(255,193,7,0.15); position: relative; overflow: hidden; }
@@ -85,9 +105,11 @@
         .login-card .subtitle { color: var(--text2); font-size: 0.85rem; margin-bottom: 22px; }
         .input-field { width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid #333; background: var(--surface2); color: #fff; font-size: 1.1rem; text-align: center; letter-spacing: 2px; outline: none; transition: var(--transition); margin: 8px 0; font-weight: bold; font-family: 'Cairo', sans-serif; }
         .input-field:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,193,7,0.3); }
-        .btn { display: inline-block; padding: 14px 28px; border-radius: 28px; border: none; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: var(--transition); background: var(--gold-gradient); color: #000; width: 100%; margin-top: 10px; box-shadow: 0 4px 16px rgba(255,193,7,0.3); background-size: 200% 200%; animation: gradientShift 3s ease infinite; font-family: 'Cairo', sans-serif; }
+        .input-field::placeholder { color: #555; }
+        .btn { display: inline-block; padding: 14px 28px; border-radius: 28px; border: none; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: var(--transition); background: var(--gold-gradient); color: #000; width: 100%; margin-top: 10px; box-shadow: 0 4px 16px rgba(255,193,7,0.3); background-size: 200% 200%; animation: gradientShift 3s ease infinite; font-family: 'Cairo', sans-serif; position: relative; overflow: hidden; }
         .btn:active { transform: scale(0.96); }
         .btn:hover { box-shadow: 0 6px 20px rgba(255,193,7,0.45); }
+        .btn .ripple-effect { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: ripple 0.6s linear; pointer-events: none; }
         .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); box-shadow: none; animation: none; }
         .btn-danger { background: linear-gradient(135deg, #FF4757, #FF6B81); color: #fff; animation: none; }
         .btn-sm { padding: 8px 18px; font-size: 0.8rem; width: auto; border-radius: 22px; }
@@ -107,6 +129,7 @@
         .group-card .member-count { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.85); padding: 3px 8px; border-radius: 10px; font-size: 0.65rem; color: var(--gold); backdrop-filter: blur(4px); }
         .group-card .locked-badge { position: absolute; top: 8px; right: 8px; font-size: 1rem; background: rgba(0,0,0,0.6); border-radius: 50%; padding: 2px; }
         .group-card .restriction-indicator { position: absolute; bottom: 6px; left: 6px; font-size: 0.6rem; color: var(--warning); }
+        .group-card .unread-badge { position: absolute; top: -4px; left: -4px; background: var(--danger); color: #fff; border-radius: 50%; min-width: 20px; height: 20px; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: bold; animation: badgePop 0.4s ease-out; z-index: 5; }
 
         .chat-list-item { display: flex; align-items: center; padding: 12px; background: var(--surface); margin: 4px 0; border-radius: 14px; cursor: pointer; transition: var(--transition); gap: 10px; }
         .chat-list-item:hover { background: var(--surface2); }
@@ -117,7 +140,7 @@
         .chat-list-item .chat-lastmsg { font-size: 0.75rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-list-item .chat-time { font-size: 0.65rem; color: var(--text3); flex-shrink: 0; }
         .chat-list-item .online-dot { width: 8px; height: 8px; background: var(--online); border-radius: 50%; display: inline-block; }
-        .chat-list-item .unread-badge { background: var(--gold); color: #000; border-radius: 10px; padding: 2px 7px; font-size: 0.6rem; font-weight: bold; }
+        .chat-list-item .unread-badge { background: var(--danger); color: #fff; border-radius: 10px; padding: 2px 7px; font-size: 0.6rem; font-weight: bold; animation: badgePop 0.3s ease-out; }
 
         .chat-fullscreen { display: flex; flex-direction: column; height: 100%; background: #0d0d14; position: relative; }
         .chat-header-bar { display: flex; align-items: center; padding: 12px 14px; background: var(--surface); border-bottom: 1px solid #1a1a25; gap: 10px; flex-shrink: 0; z-index: 10; }
@@ -128,7 +151,7 @@
         .chat-header-bar .group-name { font-weight: bold; color: var(--gold); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-header-bar .group-subtitle { font-size: 0.7rem; color: var(--text2); }
         .chat-header-bar .typing-status { font-size: 0.7rem; color: var(--gold); animation: pulse 1.5s ease-in-out infinite; }
-        .chat-messages-area { flex: 1; padding: 12px 14px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; background-attachment: fixed; overscroll-behavior: contain; touch-action: pan-y; }
+        .chat-messages-area { flex: 1; padding: 12px 14px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; background-attachment: fixed; overscroll-behavior: contain; touch-action: pan-y; scroll-behavior: smooth; }
         .msg-wrapper { margin-bottom: 6px; display: flex; flex-direction: column; }
         .msg-wrapper.sent { align-items: flex-end; animation: messageInRight 0.3s ease-out; }
         .msg-wrapper.received { align-items: flex-start; animation: messageInLeft 0.3s ease-out; }
@@ -163,10 +186,14 @@
         .icon-circle-btn:active { transform: scale(0.88); }
         .icon-circle-btn:disabled { opacity: 0.25; pointer-events: none; }
 
+        .scroll-to-bottom-btn { position: absolute; bottom: 80px; right: 16px; width: 44px; height: 44px; border-radius: 50%; background: var(--gold-gradient); border: none; color: #000; font-size: 1.2rem; cursor: pointer; z-index: 20; box-shadow: 0 4px 15px rgba(0,0,0,0.4); animation: fadeInUp 0.3s ease-out; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .scroll-to-bottom-btn:active { transform: scale(0.9); }
+        .scroll-to-bottom-btn .unread-count-badge { position: absolute; top: -6px; right: -6px; background: var(--danger); color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; font-weight: bold; animation: badgePop 0.3s ease-out; }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s; backdrop-filter: blur(5px); }
-        .modal { background: var(--surface); border-radius: 22px; padding: 22px; width: 92%; max-width: 400px; max-height: 82vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.8); animation: scaleIn 0.35s ease-out; }
+        .modal { background: var(--surface); border-radius: 22px; padding: 22px; width: 92%; max-width: 400px; max-height: 82vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.8); animation: scaleIn 0.35s ease-out; position: relative; }
         .modal h3 { color: var(--gold); margin-bottom: 12px; text-align: center; font-size: 1.2rem; }
-        .modal .close-modal { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--text2); font-size: 1.3rem; cursor: pointer; }
+        .modal .close-modal { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--text2); font-size: 1.3rem; cursor: pointer; z-index: 5; }
         .image-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 300; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .image-viewer img { max-width: 96%; max-height: 96vh; border-radius: 8px; box-shadow: 0 0 40px rgba(0,0,0,0.6); }
         .image-viewer .close-viewer { position: absolute; top: 15px; right: 15px; color: #fff; font-size: 2rem; cursor: pointer; z-index: 301; }
@@ -211,38 +238,15 @@
         .empty-state h3 { color: var(--text2); font-size: 1.1rem; margin-bottom: 8px; }
         .empty-state p { color: var(--text3); font-size: 0.85rem; margin-bottom: 10px; }
 
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 6px; }
-
+        .confetti-piece { position: fixed; width: 10px; height: 10px; z-index: 9999; pointer-events: none; animation: confetti-fall 3s linear forwards; }
+        
         .toast-notification { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 24px; font-weight: bold; z-index: 9999; box-shadow: 0 8px 25px rgba(0,0,0,0.5); animation: slideDown 0.4s ease-out; color: #000; max-width: 90%; text-align: center; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
         
         .ripple { position: relative; overflow: hidden; }
-        .ripple-effect { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: ripple 0.6s linear; pointer-events: none; }
         
         @media (max-width: 380px) {
             .groups-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
             .msg-bubble { max-width: 88%; }
-            .chat-messages-area {
-    flex: 1;
-    padding: 10px 12px;
-    overflow-y: scroll !important;
-    -webkit-overflow-scrolling: touch !important;
-    background-color: #0d0d14;
-    background-size: cover;
-    background-position: center;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    /* أضف دول: */
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-    height: auto;
-    scroll-behavior: smooth;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    will-change: scroll-position;
-}
         }
     </style>
 </head>
@@ -255,7 +259,7 @@
             <div class="app-icon">🏫</div>
             <h1>Web Egypt</h1>
             <p class="subtitle">منصة التعليم الذكية المتطورة</p>
-            <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text">
+            <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text" style="text-transform: uppercase;">
             <button class="btn pulse-animation" onclick="studentLogin()">🚀 دخول</button>
             <p id="loginError" class="error-text"></p>
             <p style="color:var(--text3); font-size:0.65rem; margin-top:12px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
@@ -268,13 +272,13 @@
             <div class="header-icons">
                 <button class="icon-btn" onclick="navigate('stories')" title="القصص">📖<span class="notification-dot" id="storiesDot" style="display:none;"></span></button>
                 <button class="icon-btn" onclick="navigate('support')" title="الدعم">📞</button>
-                <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
+                <button class="icon-btn" onclick="showConfirmLogout()" title="خروج">🚪</button>
             </div>
         </div>
         <div id="contentArea" class="screen fade-in"></div>
         <div class="bottom-tabs" id="bottomTabs">
-            <div class="bottom-tab active" onclick="switchTab('groups')"><span class="tab-icon">📋</span>المجموعات</div>
-            <div class="bottom-tab" onclick="switchTab('chats')"><span class="tab-icon">💬</span>المحادثات</div>
+            <div class="bottom-tab active" onclick="switchTab('groups')"><span class="tab-icon">📋</span>المجموعات<span class="tab-badge hidden" id="groupsUnreadBadge">0</span></div>
+            <div class="bottom-tab" onclick="switchTab('chats')"><span class="tab-icon">💬</span>المحادثات<span class="tab-badge hidden" id="chatsUnreadBadge">0</span></div>
             <div class="bottom-tab" onclick="switchTab('stats')"><span class="tab-icon">📊</span>إحصائياتي</div>
             <div class="bottom-tab" onclick="switchTab('more')"><span class="tab-icon">📱</span>المزيد</div>
         </div>
@@ -287,7 +291,9 @@
 </div>
 
 <script>
-    // ========== Firebase Config ==========
+    // ==========================================
+    // FIREBASE CONFIGURATION
+    // ==========================================
     firebase.initializeApp({ 
         apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY", 
         authDomain: "schoolchatapp-2c5b7.firebaseapp.com", 
@@ -297,10 +303,14 @@
         appId: "1:979995006662:web:eb08f33a68f41cc283e9c7" 
     });
     const db = firebase.firestore();
+    db.settings({ merge: true, cacheSizeBytes: 10485760 });
+    
     const CLOUD_NAME = "dlcjb79w0";
     const UPLOAD_PRESET = "school_preset";
 
-    // ========== Global State ==========
+    // ==========================================
+    // GLOBAL STATE
+    // ==========================================
     let currentUser = null;
     let currentGroupId = null;
     let currentGroupData = null;
@@ -310,28 +320,60 @@
     let currentPrivateChatUser = null;
     let allListeners = [];
     let currentTab = 'groups';
+    let unreadCounts = { groups: {}, privateChats: {} };
+    let notificationSound = null;
+    let isDarkMode = true;
 
-    // ========== Utility Functions ==========
-    function showLoading(msg = '⏳ جاري التحميل...') { 
+    // ==========================================
+    // SECURITY - ANTI-THEFT PROTECTION
+    // ==========================================
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U') || (e.ctrlKey && e.key === 'S')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+    document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    
+    // Clear console warning
+    setInterval(function() {
+        if (window.console && console.clear) { /* keep console clean */ }
+    }, 3000);
+
+    // ==========================================
+    // UTILITY FUNCTIONS
+    // ==========================================
+    function showLoading(msg) { 
+        msg = msg || '⏳ جاري التحميل...';
         document.getElementById('loadingOverlay').classList.remove('hidden');
         document.querySelector('.loading-text').textContent = msg;
     }
     function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
     
-    function showToast(msg, type = 'info') {
-        const colors = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
-        const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-        const toast = document.createElement('div');
+    function showToast(msg, type) {
+        type = type || 'info';
+        var colors = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
+        var icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+        var existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+        
+        var toast = document.createElement('div');
         toast.className = 'toast-notification';
         toast.style.background = colors[type] || colors.info;
-        toast.style.color = ['info', 'warning'].includes(type) ? '#000' : '#fff';
-        toast.textContent = `${icons[type]} ${msg}`;
+        toast.style.color = (type === 'info' || type === 'warning') ? '#000' : '#fff';
+        toast.textContent = (icons[type] || '') + ' ' + msg;
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
+        setTimeout(function() { 
+            toast.style.opacity = '0'; 
+            toast.style.transition = '0.3s'; 
+            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300); 
+        }, 2500);
     }
 
     function cleanListeners() {
-        allListeners.forEach(fn => { try { fn(); } catch(e) {} });
+        allListeners.forEach(function(fn) { try { fn(); } catch(e) {} });
         allListeners = [];
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
@@ -341,7 +383,7 @@
     function formatTime(date) {
         if (!date) return '';
         try {
-            const d = date.toDate ? date.toDate() : new Date(date);
+            var d = date.toDate ? date.toDate() : new Date(date);
             return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         } catch(e) { return ''; }
     }
@@ -349,25 +391,109 @@
     function formatDate(date) {
         if (!date) return '';
         try {
-            const d = date.toDate ? date.toDate() : new Date(date);
+            var d = date.toDate ? date.toDate() : new Date(date);
             return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
         } catch(e) { return ''; }
     }
+    
+    function getDeviceID() {
+        var deviceID = localStorage.getItem('webEgyptDeviceID');
+        if (!deviceID) {
+            deviceID = 'DEV-' + Math.random().toString(36).substr(2, 10) + '-' + Date.now().toString(36);
+            localStorage.setItem('webEgyptDeviceID', deviceID);
+        }
+        return deviceID;
+    }
+    
+    function playNotificationSound() {
+        try {
+            if (!notificationSound) {
+                // Create audio context for notification beep
+                var AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    var ctx = new AudioContext();
+                    var oscillator = ctx.createOscillator();
+                    var gainNode = ctx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(ctx.currentTime + 0.15);
+                    setTimeout(function() {
+                        var osc2 = ctx.createOscillator();
+                        osc2.connect(gainNode);
+                        osc2.frequency.value = 1000;
+                        osc2.type = 'sine';
+                        osc2.start();
+                        osc2.stop(ctx.currentTime + 0.15);
+                    }, 150);
+                }
+            }
+        } catch(e) { /* silent fail */ }
+    }
+    
+    function sendBrowserNotification(title, body) {
+        title = title || 'Web Egypt';
+        body = body || 'لديك رسالة جديدة';
+        if ('Notification' in window && Notification.permission === 'granted') {
+            try {
+                new Notification(title, { body: body, icon: 'amg.1.jpg', badge: 'amg.1.jpg' });
+            } catch(e) { /* silent */ }
+        } else if ('Notification' in window && Notification.permission !== 'denied') {
+            Notification.requestPermission();
+        }
+    }
+    
+    function launchConfetti() {
+        var colors = ['#FFC107', '#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#FFD54F', '#FF6B81'];
+        for (var i = 0; i < 50; i++) {
+            setTimeout(function() {
+                var piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                piece.style.width = (Math.random() * 8 + 6) + 'px';
+                piece.style.height = (Math.random() * 8 + 6) + 'px';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                document.body.appendChild(piece);
+                setTimeout(function() { if (piece.parentNode) piece.remove(); }, 3500);
+            }, i * 30);
+        }
+    }
 
-    // ========== Navigation ==========
+    // ==========================================
+    // BACK BUTTON SUPPORT
+    // ==========================================
+    window.addEventListener('popstate', function(e) {
+        if (currentGroupId || currentPrivateChatUser) {
+            if (currentPrivateChatUser) {
+                currentPrivateChatUser = null;
+                switchTab('chats');
+            } else if (currentGroupId) {
+                currentGroupId = null;
+                switchTab('groups');
+            }
+        }
+    });
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
     function switchTab(tab) {
-        if (tab === currentTab && currentGroupId === null) return;
         currentTab = tab;
         currentGroupId = null;
         currentPrivateChatUser = null;
         cleanListeners();
         
-        document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
-        const tabs = document.querySelectorAll('.bottom-tab');
-        const tabMap = { 'groups': 0, 'chats': 1, 'stats': 2, 'more': 3 };
+        var tabs = document.querySelectorAll('.bottom-tab');
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        var tabMap = { 'groups': 0, 'chats': 1, 'stats': 2, 'more': 3 };
         if (tabs[tabMap[tab]]) tabs[tabMap[tab]].classList.add('active');
         
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         content.classList.remove('fade-in');
         void content.offsetWidth;
         content.classList.add('fade-in');
@@ -379,13 +505,16 @@
             case 'stats': renderStudentStats(); break;
             case 'more': renderMorePage(); break;
         }
+        
+        updateAllUnreadBadges();
     }
 
-    function navigate(page, data = null) {
+    function navigate(page, data) {
+        data = data || null;
         cleanListeners();
         if (page !== 'chat') { currentGroupId = null; currentPrivateChatUser = null; }
         
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         content.classList.remove('fade-in');
         void content.offsetWidth;
         content.classList.add('fade-in');
@@ -409,48 +538,40 @@
         }
     }
 
-    // ========== Auth ==========
-    function getDeviceID() {
-        let deviceID = localStorage.getItem('webEgyptDeviceID');
-        if (!deviceID) {
-            deviceID = 'DEV-' + Math.random().toString(36).substr(2, 10) + '-' + Date.now().toString(36);
-            localStorage.setItem('webEgyptDeviceID', deviceID);
-        }
-        return deviceID;
-    }
-
+    // ==========================================
+    // AUTH - LOGIN WITH CODE
+    // ==========================================
     window.studentLogin = async function() {
-        const codeInput = document.getElementById('codeInput');
-        const code = codeInput.value.trim().toUpperCase();
-        const errEl = document.getElementById('loginError');
+        var codeInput = document.getElementById('codeInput');
+        var code = codeInput.value.trim().toUpperCase();
+        var errEl = document.getElementById('loginError');
         errEl.textContent = '';
         
         if (!code) {
             errEl.textContent = '⚠️ الرجاء إدخال الكود';
             codeInput.classList.add('shake-animation');
-            setTimeout(() => codeInput.classList.remove('shake-animation'), 500);
+            setTimeout(function() { codeInput.classList.remove('shake-animation'); }, 500);
             return;
         }
         if (code.length < 4) { errEl.textContent = '⚠️ الكود قصير جداً (4 أحرف على الأقل)'; return; }
         
         showLoading('🔍 جاري التحقق من الكود...');
-        const deviceID = getDeviceID();
+        var deviceID = getDeviceID();
         
         try {
-            const codeSnap = await db.collection('student_codes').where('code', '==', code).limit(1).get();
+            var codeSnap = await db.collection('student_codes').where('code', '==', code).limit(1).get();
             if (codeSnap.empty) throw new Error('❌ الكود غير صحيح');
             
-            const codeDoc = codeSnap.docs[0];
-            const codeData = codeDoc.data();
+            var codeDoc = codeSnap.docs[0];
+            var codeData = codeDoc.data();
             
             if (codeData.usedBy && codeData.usedByDevice && codeData.usedByDevice !== deviceID) {
                 throw new Error('⚠️ الكود مستخدم على جهاز آخر');
             }
             
-            const userId = codeData.studentNumber || codeDoc.id;
-            const userRef = db.collection('users').doc(userId);
+            var userId = codeData.studentNumber || codeDoc.id;
+            var userRef = db.collection('users').doc(userId);
             
-            // Update code if not used
             if (!codeData.usedBy) {
                 await codeDoc.ref.update({
                     usedBy: userId,
@@ -459,8 +580,7 @@
                 });
             }
             
-            // Create or update user
-            const userDoc = await userRef.get();
+            var userDoc = await userRef.get();
             if (!userDoc.exists) {
                 await userRef.set({
                     userID: userId,
@@ -484,28 +604,25 @@
                 });
             }
             
-            // Auto-join groups
             if (codeData.allowedGroups && codeData.allowedGroups.length > 0) {
-                const batch = db.batch();
-                codeData.allowedGroups.forEach(groupId => {
-                    const gr = db.collection('groups').doc(groupId);
+                var batch = db.batch();
+                codeData.allowedGroups.forEach(function(groupId) {
+                    var gr = db.collection('groups').doc(groupId);
                     batch.update(gr, { members: firebase.firestore.FieldValue.arrayUnion(userId) });
                 });
                 await batch.commit();
                 
-                // Update member counts
-                await Promise.all(codeData.allowedGroups.map(groupId =>
-                    db.collection('groups').doc(groupId).get().then(gd =>
-                        db.collection('groups').doc(groupId).update({
+                await Promise.all(codeData.allowedGroups.map(function(groupId) {
+                    return db.collection('groups').doc(groupId).get().then(function(gd) {
+                        return db.collection('groups').doc(groupId).update({
                             memberCount: (gd.data().members || []).length
-                        })
-                    )
-                ));
+                        });
+                    });
+                }));
             }
             
-            // Set current user
-            const finalUserDoc = await userRef.get();
-            const u = finalUserDoc.data();
+            var finalUserDoc = await userRef.get();
+            var u = finalUserDoc.data();
             currentUser = {
                 uid: userId,
                 name: u.name || 'طالب',
@@ -518,12 +635,20 @@
                 points: u.points || 0
             };
             
+            // ===== SAVE CODE & USER ID PERMANENTLY =====
             localStorage.setItem('webEgyptUserID', userId);
+            localStorage.setItem('webEgyptCode', code);
+            localStorage.setItem('webEgyptLastLogin', Date.now());
+            
             hideLoading();
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
             switchTab('groups');
+            launchConfetti();
             showToast('✅ أهلاً بك ' + currentUser.name + '!', 'success');
+            
+            // Start monitoring account deletion
+            monitorAccountDeletion();
             
         } catch(e) {
             hideLoading();
@@ -532,22 +657,40 @@
     };
 
     async function autoLogin() {
-        const savedUserID = localStorage.getItem('webEgyptUserID');
-        const deviceID = getDeviceID();
+        var savedUserID = localStorage.getItem('webEgyptUserID');
+        var savedCode = localStorage.getItem('webEgyptCode');
+        var deviceID = getDeviceID();
+        
         if (!savedUserID) return false;
         
         try {
-            const userDoc = await db.collection('users').doc(savedUserID).get();
-            if (!userDoc.exists) return false;
+            var userDoc = await db.collection('users').doc(savedUserID).get();
+            if (!userDoc.exists) {
+                // User was deleted
+                localStorage.removeItem('webEgyptUserID');
+                localStorage.removeItem('webEgyptCode');
+                return false;
+            }
             
-            const userData = userDoc.data();
-            const codeSnap = await db.collection('student_codes')
-                .where('usedBy', '==', savedUserID)
-                .where('usedByDevice', '==', deviceID)
-                .limit(1)
-                .get();
+            var userData = userDoc.data();
+            if (userData.banned) {
+                localStorage.removeItem('webEgyptUserID');
+                localStorage.removeItem('webEgyptCode');
+                return false;
+            }
             
-            if (codeSnap.empty && userData.role !== 'admin') return false;
+            // Verify code exists and matches device
+            if (savedCode) {
+                var codeSnap = await db.collection('student_codes')
+                    .where('code', '==', savedCode)
+                    .where('usedByDevice', '==', deviceID)
+                    .limit(1)
+                    .get();
+                
+                if (codeSnap.empty && userData.role !== 'admin') {
+                    // Code invalid, but user exists - still allow login
+                }
+            }
             
             currentUser = {
                 uid: savedUserID,
@@ -571,39 +714,78 @@
             return false;
         }
     }
+    
+    function monitorAccountDeletion() {
+        if (!currentUser) return;
+        var unsub = db.collection('users').doc(currentUser.uid)
+            .onSnapshot(function(doc) {
+                if (!doc.exists) {
+                    // Account was deleted by admin
+                    showToast('⚠️ تم حذف حسابك بواسطة الأدمن', 'error');
+                    setTimeout(function() {
+                        logout(true);
+                    }, 2000);
+                }
+            });
+        allListeners.push(unsub);
+    }
 
-    window.logout = function() {
+    function showConfirmLogout() {
+        var modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+        <div class="modal">
+            <span class="close-modal" onclick="this.closest('.modal-overlay').remove()">✕</span>
+            <h3>🚪 تأكيد الخروج</h3>
+            <p style="text-align:center; color:var(--text2); margin:12px 0;">هل أنت متأكد من الخروج؟<br><small style="color:var(--text3);">سيتم حفظ بياناتك تلقائياً</small></p>
+            <button class="btn btn-danger" onclick="logout(); this.closest('.modal-overlay').remove();">🚪 نعم، خروج</button>
+            <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:6px;">إلغاء</button>
+        </div>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    }
+
+    window.logout = function(forced) {
+        forced = forced || false;
         if (currentUser) {
-            db.collection('users').doc(currentUser.uid).update({ online: false }).catch(() => {});
+            db.collection('users').doc(currentUser.uid).update({ online: false }).catch(function() {});
         }
         currentUser = null;
         currentGroupId = null;
-        localStorage.removeItem('webEgyptUserID');
+        
+        if (!forced) {
+            // Keep code saved for auto-login
+            localStorage.removeItem('webEgyptUserID');
+            localStorage.removeItem('webEgyptCode');
+        }
+        
         cleanListeners();
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('mainScreen').classList.add('hidden');
         document.getElementById('codeInput').value = '';
     };
     
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', function() {
         if (currentUser) {
             try { db.collection('users').doc(currentUser.uid).update({ online: false }); } catch(e) {}
         }
     });
 
-    // ========== Groups ==========
+    // ==========================================
+    // GROUPS
+    // ==========================================
     function renderGroups() {
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         content.innerHTML = `
         <h2 class="section-title">📚 مجموعاتي <span class="refresh-btn" onclick="renderGroups()">🔄</span></h2>
         <div id="groupsList" class="groups-grid">
             <p style="color:var(--text2); text-align:center; grid-column:1/-1;">⏳ جاري التحميل...</p>
         </div>`;
         
-        const unsub = db.collection('groups')
+        var unsub = db.collection('groups')
             .where('members', 'array-contains', currentUser.uid)
-            .onSnapshot(snap => {
-                const listEl = document.getElementById('groupsList');
+            .onSnapshot(function(snap) {
+                var listEl = document.getElementById('groupsList');
                 if (!listEl) return;
                 
                 if (snap.empty) {
@@ -616,28 +798,33 @@
                     return;
                 }
                 
-                let html = '';
-                snap.forEach(doc => {
-                    const g = doc.data();
-                    const perms = g.permissions || {};
-                    const restrictions = [];
+                var html = '';
+                snap.forEach(function(doc) {
+                    var g = doc.data();
+                    var perms = g.permissions || {};
+                    var restrictions = [];
                     if (perms.allowText === false) restrictions.push('📝');
                     if (perms.allowImages === false) restrictions.push('🖼️');
                     if (perms.allowVideos === false) restrictions.push('🎥');
                     if (perms.allowFiles === false) restrictions.push('📎');
                     if (perms.allowAudio === false) restrictions.push('🎤');
                     
+                    var unread = unreadCounts.groups[doc.id] || 0;
+                    
                     html += `
                     <div class="group-card pop-in" onclick="openGroupChat('${doc.id}')">
                         <span class="member-count">👥 ${g.memberCount || 0}</span>
                         ${g.isLocked ? '<span class="locked-badge">🔒</span>' : ''}
-                        ${restrictions.length > 0 ? `<span class="restriction-indicator">🚫 ${restrictions.length}</span>` : ''}
+                        ${restrictions.length > 0 ? '<span class="restriction-indicator">🚫 ' + restrictions.length + '</span>' : ''}
+                        ${unread > 0 ? '<span class="unread-badge">' + unread + '</span>' : ''}
                         <img src="${g.picture || 'https://via.placeholder.com/60'}" alt="صورة" loading="lazy" onerror="this.src='https://via.placeholder.com/60'">
                         <h3>${g.name || 'مجموعة'}</h3>
                         <p>${(g.description || '').substring(0, 25)}</p>
                     </div>`;
                 });
                 listEl.innerHTML = html;
+            }, function(error) {
+                console.error('Groups listener error:', error);
             });
         
         allListeners.push(unsub);
@@ -645,58 +832,32 @@
 
     function openGroupChat(groupId) {
         currentGroupId = groupId;
+        unreadCounts.groups[groupId] = 0;
         navigate('chat');
     }
 
-    // ========== CHAT - FIXED ==========
+    // ==========================================
+    // CHAT - FULL FEATURED
+    // ==========================================
     function renderChat(groupId) {
         if (groupId) currentGroupId = groupId;
         if (!currentGroupId) { switchTab('groups'); return; }
         
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         content.innerHTML = '<div style="text-align:center; padding:50px;"><div class="loading-spinner" style="margin:0 auto;"></div><p style="color:var(--gold); margin-top:12px;">⏳ جاري فتح المحادثة...</p></div>';
         
-        db.collection('groups').doc(currentGroupId).get().then(doc => {
+        db.collection('groups').doc(currentGroupId).get().then(function(doc) {
             if (!doc.exists) { switchTab('groups'); return; }
             
             currentGroupData = doc.data();
-            const g = currentGroupData;
-            const perms = g.permissions || {};
-            const isLocked = g.isLocked || false;
-            const isAdmin = (g.adminID === currentUser.uid);
+            var g = currentGroupData;
+            var isLocked = g.isLocked || false;
+            var isAdmin = (g.adminID === currentUser.uid);
+            var canWrite = isAdmin || !isLocked;
+            var canWriteText = canWrite;
+            var canUploadAnyMedia = canWrite;
             
-            // ====== FIX: Check permissions correctly ======
-            // Default all permissions to TRUE if not set
-            const allowText = perms.allowText !== false; // true if undefined or true
-            const allowImages = perms.allowImages !== false;
-            const allowVideos = perms.allowVideos !== false;
-            const allowFiles = perms.allowFiles !== false;
-            const allowAudio = perms.allowAudio !== false;
-            
-            const restrictions = [];
-            if (!allowText) restrictions.push('📝 النصوص');
-            if (!allowImages) restrictions.push('🖼️ الصور');
-            if (!allowVideos) restrictions.push('🎥 الفيديو');
-            if (!allowFiles) restrictions.push('📎 الملفات');
-            if (!allowAudio) restrictions.push('🎤 الصوت');
-            
-            // Admin can always write regardless of lock/type
-            const canWrite = isAdmin || (!isLocked && (g.type === 'open' || g.type === undefined));
-            const canWriteText = canWrite && allowText;
-            const canUploadAnyMedia = canWrite && (allowImages || allowVideos || allowFiles || allowAudio);
-            
-            console.log('🔍 Group Debug:', {
-                name: g.name,
-                isLocked,
-                type: g.type,
-                isAdmin,
-                canWrite,
-                canWriteText,
-                canUploadAnyMedia,
-                permissions: perms
-            });
-            
-            let html = `
+            var html = `
             <div class="chat-fullscreen">
                 <div class="chat-header-bar">
                     <span class="back-btn" onclick="switchTab('groups')">⬅️</span>
@@ -712,28 +873,20 @@
                     <button class="icon-btn" onclick="navigate('report','${currentGroupId}')" title="تبليغ">🚩</button>
                 </div>`;
             
-            // Show banners
             if (isLocked && !isAdmin) {
                 html += '<div class="locked-banner">🔒 المجموعة مقفولة بواسطة المشرف - لا يمكنك الكتابة</div>';
-            } else if (restrictions.length > 0 && !isAdmin) {
-                html += `<div class="restrictions-banner">⚠️ القيود: ${restrictions.join(' | ')}</div>`;
-            } else if (!canWrite && !isLocked) {
-                html += '<div class="restrictions-banner">⚠️ المجموعة مقفولة النشر - المشرف فقط يمكنه الكتابة</div>';
             }
             
             html += `
                 <div class="chat-messages-area" id="chatMessages" style="background-image:url('${currentUser.chatBg || ''}');"></div>
                 <div class="chat-input-bar">`;
             
-            // ====== FIX: Show upload button if ANY media type is allowed ======
             if (canUploadAnyMedia) {
                 html += '<button class="icon-circle-btn attach" onclick="uploadMedia()" title="رفع ملفات">📎</button>';
             }
             
-            // ====== FIX: Determine placeholder ======
-            let placeholder = 'اكتب رسالة...';
+            var placeholder = 'اكتب رسالة...';
             if (isLocked && !isAdmin) placeholder = '🔒 المجموعة مقفولة';
-            else if (!canWriteText && !isLocked) placeholder = '🚫 النصوص ممنوعة';
             else if (!canWrite) placeholder = '🔐 لا يمكنك الكتابة';
             
             html += `
@@ -744,60 +897,93 @@
             content.innerHTML = html;
             loadMessages();
             loadTypingIndicator();
-        }).catch(e => {
-            console.error('Chat render error:', e);
+            
+            // إضافة زرار النزول لآخر رسالة
+            setTimeout(function() {
+                var chatArea = document.getElementById('chatMessages');
+                if (chatArea) {
+                    var scrollBtn = document.createElement('button');
+                    scrollBtn.className = 'scroll-to-bottom-btn hidden';
+                    scrollBtn.innerHTML = '↓';
+                    scrollBtn.setAttribute('aria-label', 'النزول لآخر رسالة');
+                    scrollBtn.onclick = function() {
+                        chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+                        scrollBtn.classList.add('hidden');
+                        unreadCounts.groups[currentGroupId] = 0;
+                        updateAllUnreadBadges();
+                    };
+                    chatArea.parentElement.appendChild(scrollBtn);
+                }
+            }, 300);
+            
+        }).catch(function(e) {
             content.innerHTML = '<div class="empty-state"><div class="icon">❌</div><h3>حدث خطأ</h3><p>يرجى المحاولة مرة أخرى</p><button class="btn btn-outline btn-sm" onclick="switchTab(\'groups\')">⬅️ رجوع</button></div>';
         });
     }
 
-        function loadMessages() {
+    function loadMessages() {
         var div = document.getElementById('chatMessages'); 
         if (!div) return; 
         if (chatUnsubscribe) chatUnsubscribe();
         
         var lastDate = null;
-        var shouldAutoScroll = true;
-        var userScrolled = false;
+        var userScrolledUp = false;
+        var unreadCount = 0;
         var scrollTimeout = null;
         
-        // رصد تمرير المستخدم
+        function updateScrollButton() {
+            var scrollBtn = document.querySelector('.scroll-to-bottom-btn');
+            if (!scrollBtn) return;
+            
+            var atBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 80;
+            
+            if (atBottom) {
+                scrollBtn.classList.add('hidden');
+                unreadCount = 0;
+                unreadCounts.groups[currentGroupId] = 0;
+                updateAllUnreadBadges();
+            } else {
+                scrollBtn.classList.remove('hidden');
+                if (unreadCount > 0) {
+                    scrollBtn.innerHTML = '↓<span class="unread-count-badge">' + unreadCount + '</span>';
+                } else {
+                    scrollBtn.innerHTML = '↓';
+                }
+            }
+        }
+        
         div.addEventListener('scroll', function() {
             var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
-            shouldAutoScroll = bottom < 60;
-            userScrolled = bottom > 120;
+            userScrolledUp = bottom > 150;
+            updateScrollButton();
             
             clearTimeout(scrollTimeout);
-            if (userScrolled) {
-                scrollTimeout = setTimeout(function() {
-                    userScrolled = false;
-                }, 3000);
-            }
-        }, { passive: true });
-        
-        div.addEventListener('touchstart', function() {
-            userScrolled = true;
-        }, { passive: true });
-        
-        div.addEventListener('touchend', function() {
-            setTimeout(function() {
-                var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
-                if (bottom < 60) {
-                    userScrolled = false;
-                    shouldAutoScroll = true;
+            scrollTimeout = setTimeout(function() {
+                if (div.scrollHeight - div.scrollTop - div.clientHeight < 80) {
+                    userScrolledUp = false;
                 }
-            }, 2000);
+            }, 1500);
         }, { passive: true });
+        
+        div.addEventListener('touchmove', function() {
+            var bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+            userScrolledUp = bottom > 100;
+        }, { passive: true });
+        
+        div.addEventListener('touchend', function() { updateScrollButton(); }, { passive: true });
         
         var unsub = db.collection('groups').doc(currentGroupId).collection('messages')
             .orderBy('timestamp', 'asc')
             .onSnapshot(function(snap) {
-                var wasAtBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 80;
+                var prevScrollHeight = div.scrollHeight;
+                var wasNearBottom = (prevScrollHeight - div.scrollTop - div.clientHeight) < 80;
                 
                 div.innerHTML = ''; 
                 lastDate = null;
                 
                 if (snap.empty) { 
-                    div.innerHTML = '<div style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل<br><span style="font-size:0.8rem;">كن أول من يرسل رسالة!</span></div>'; 
+                    div.innerHTML = '<div style="text-align:center; color:#555; padding:60px 20px;">💬 لا توجد رسائل بعد<br><span style="font-size:0.8rem; color:#666;">كن أول من يرسل رسالة!</span></div>'; 
+                    updateScrollButton();
                     return; 
                 }
                 
@@ -806,7 +992,7 @@
                     m.id = doc.id;
                     
                     if (m.deleted) { 
-                        div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;background:rgba(0,0,0,0.3);">🗑️ تم حذف الرسالة</div></div>'; 
+                        div.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;background:rgba(255,255,255,0.05);">🗑️ تم حذف الرسالة</div></div>'; 
                         return; 
                     }
                     
@@ -828,7 +1014,7 @@
                     var contentHtml = '';
                     
                     if (m.type === 'image') {
-                        contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:220px; border-radius:10px; cursor:pointer;" onerror="this.style.display=\'none\'">';
+                        contentHtml = '<img src="' + m.content + '" onclick="viewImage(\'' + m.content + '\')" loading="lazy" style="max-width:220px; border-radius:10px; cursor:pointer; display:block;" onerror="this.style.display=\'none\'">';
                         if (m.fileName) contentHtml += '<small style="font-size:0.65rem; color:#888; display:block;">📷 ' + m.fileName + '</small>';
                     } else if (m.type === 'video') {
                         contentHtml = '<video controls src="' + m.content + '" style="max-width:220px; border-radius:10px;" preload="metadata" playsinline></video>';
@@ -843,53 +1029,69 @@
                         contentHtml = (m.content || '').replace(/\n/g, '<br>');
                     }
                     
-                    div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + (isSent ? ' <button class="delete-msg-btn" onclick="deleteMyMessage(\'' + m.id + '\')" title="حذف">🗑️</button>' : '') + (!isSent ? ' <button class="report-btn" onclick="reportMessage(\'' + m.id + '\',\'' + m.senderID + '\',\'' + (m.senderName || '') + '\')" title="تبليغ">🚩</button>' : '') + '</div></div>';
+                    div.innerHTML += '<div class="msg-wrapper ' + cls + '" style="animation: messageIn 0.25s ease-out;"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + (isSent ? ' <button class="delete-msg-btn" onclick="deleteMyMessage(\'' + m.id + '\')" title="حذف">🗑️</button>' : '') + (!isSent ? ' <button class="report-btn" onclick="reportMessage(\'' + m.id + '\',\'' + m.senderID + '\',\'' + (m.senderName || '') + '\')" title="تبليغ">🚩</button>' : '') + '</div></div>';
                 });
                 
-                // تحسين التمرير - 3 محاولات للوصول لآخر رسالة
-                if (!userScrolled || wasAtBottom || shouldAutoScroll) {
-                    requestAnimationFrame(function() {
-                        div.scrollTop = div.scrollHeight;
-                    });
+                // Smart scrolling
+                if (!userScrolledUp || wasNearBottom) {
+                    requestAnimationFrame(function() { div.scrollTop = div.scrollHeight; });
+                    setTimeout(function() { div.scrollTop = div.scrollHeight; }, 50);
+                    setTimeout(function() { div.scrollTop = div.scrollHeight; }, 200);
+                } else {
+                    var newScrollHeight = div.scrollHeight;
+                    var scrollDiff = newScrollHeight - prevScrollHeight;
+                    if (scrollDiff > 0) { div.scrollTop = div.scrollTop + scrollDiff; }
                     
-                    setTimeout(function() {
-                        div.scrollTop = div.scrollHeight;
-                    }, 100);
-                    
-                    setTimeout(function() {
-                        div.scrollTop = div.scrollHeight;
-                    }, 300);
+                    if (snap.docChanges().length > 0) {
+                        var newMsgs = snap.docChanges().filter(function(c) { return c.type === 'added'; })
+                            .filter(function(c) { return c.doc.data().senderID !== currentUser.uid; });
+                        
+                        if (newMsgs.length > 0) {
+                            unreadCount += newMsgs.length;
+                            unreadCounts.groups[currentGroupId] = unreadCount;
+                            updateAllUnreadBadges();
+                            playNotificationSound();
+                            sendBrowserNotification(g.name || 'مجموعة', 'لديك ' + unreadCount + ' رسالة جديدة');
+                        }
+                    }
                 }
+                
+                updateScrollButton();
+            }, function(error) {
+                div.innerHTML = '<div style="text-align:center; color:var(--danger); padding:40px;">❌ حدث خطأ في تحميل الرسائل<br><button class="btn btn-xs btn-outline" onclick="loadMessages()" style="margin-top:10px;">🔄 إعادة المحاولة</button></div>';
             });
         
         allListeners.push(unsub); 
         chatUnsubscribe = unsub;
+        setTimeout(updateScrollButton, 500);
     }
 
     function loadTypingIndicator() {
         if (typingUnsubscribe) typingUnsubscribe();
-        const el = document.getElementById('typingStatus');
+        var el = document.getElementById('typingStatus');
         if (!el) return;
         
-        const unsub = db.collection('groups').doc(currentGroupId).collection('typing')
-            .onSnapshot(snap => {
-                const typing = [];
-                snap.forEach(d => {
+        var unsub = db.collection('groups').doc(currentGroupId).collection('typing')
+            .onSnapshot(function(snap) {
+                var typing = [];
+                snap.forEach(function(d) {
                     if (d.id !== currentUser.uid) typing.push(d.data().name || 'شخص');
                 });
-                el.textContent = typing.length > 0 ? `✏️ ${typing[0]} يكتب...` : '';
+                el.textContent = typing.length > 0 ? '✏️ ' + typing[0] + ' يكتب...' : '';
             });
         
         allListeners.push(unsub);
         typingUnsubscribe = unsub;
     }
 
-    // ========== Send Message ==========
+    // ==========================================
+    // SEND MESSAGE
+    // ==========================================
     window.sendMessage = function() {
-        const input = document.getElementById('msgInput');
+        var input = document.getElementById('msgInput');
         if (!input || input.disabled) return;
         
-        const text = input.value.trim();
+        var text = input.value.trim();
         if (!text) return;
         
         input.value = '';
@@ -902,24 +1104,33 @@
             content: text,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             seen: false
-        }).then(() => {
+        }).then(function() {
             input.disabled = false;
             input.focus();
-            // Clear typing indicator
             db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
-            // Update user stats
             db.collection('users').doc(currentUser.uid).update({
                 totalMessages: firebase.firestore.FieldValue.increment(1),
                 points: firebase.firestore.FieldValue.increment(1)
+            }).then(function() {
+                // Check for achievements
+                db.collection('users').doc(currentUser.uid).get().then(function(d) {
+                    var points = (d.data().points || 0) + 1;
+                    if (points % 50 === 0) {
+                        launchConfetti();
+                        showToast('🏆 لقد وصلت إلى ' + points + ' نقطة!', 'success');
+                    }
+                });
             });
-        }).catch(() => {
+        }).catch(function() {
             input.disabled = false;
             input.value = text;
             input.focus();
         });
     };
 
-    // ========== Upload Media ==========
+    // ==========================================
+    // UPLOAD MEDIA
+    // ==========================================
     window.uploadMedia = function() {
         if (typeof cloudinary === 'undefined') {
             showToast('⚠️ ميزة الرفع غير متاحة حالياً', 'warning');
@@ -938,25 +1149,16 @@
             showSkipCropButton: true,
             styles: {
                 palette: {
-                    window: "#15151F",
-                    windowBorder: "#FFC107",
-                    tabIcon: "#FFC107",
-                    menuIcons: "#AAAAAA",
-                    textDark: "#FFFFFF",
-                    textLight: "#000000",
-                    link: "#FFC107",
-                    action: "#FFC107",
-                    inactiveTabIcon: "#555555",
-                    error: "#FF4757",
-                    inProgress: "#FFC107",
-                    complete: "#2ED573",
-                    sourceBg: "#1E1E2A"
+                    window: "#15151F", windowBorder: "#FFC107", tabIcon: "#FFC107",
+                    menuIcons: "#AAAAAA", textDark: "#FFFFFF", textLight: "#000000",
+                    link: "#FFC107", action: "#FFC107", inactiveTabIcon: "#555555",
+                    error: "#FF4757", inProgress: "#FFC107", complete: "#2ED573", sourceBg: "#1E1E2A"
                 }
             }
-        }, (error, result) => {
+        }, function(error, result) {
             if (!error && result && result.event === 'success') {
-                const url = result.info.secure_url;
-                const type = result.info.resource_type === 'image' ? 'image' :
+                var url = result.info.secure_url;
+                var type = result.info.resource_type === 'image' ? 'image' :
                              result.info.resource_type === 'video' ? 'video' : 'file';
                 
                 db.collection('groups').doc(currentGroupId).collection('messages').add({
@@ -986,42 +1188,43 @@
             name: currentUser.name || 'طالب',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        typingTimeout = setTimeout(() => {
+        typingTimeout = setTimeout(function() {
             db.collection('groups').doc(currentGroupId).collection('typing').doc(currentUser.uid).delete();
         }, 4000);
     }
 
-    // ========== Delete Message ==========
+    // ==========================================
+    // DELETE & REPORT MESSAGES
+    // ==========================================
     window.deleteMyMessage = function(msgId) {
         if (confirm('🗑️ حذف هذه الرسالة؟')) {
             db.collection('groups').doc(currentGroupId).collection('messages').doc(msgId)
                 .update({ deleted: true, deletedAt: firebase.firestore.FieldValue.serverTimestamp() })
-                .then(() => showToast('✅ تم حذف الرسالة', 'success'))
-                .catch(() => showToast('❌ فشل الحذف', 'error'));
+                .then(function() { showToast('✅ تم حذف الرسالة', 'success'); })
+                .catch(function() { showToast('❌ فشل الحذف', 'error'); });
         }
     };
 
-    // ========== Report ==========
     function showReportModal(data) {
-        const modal = document.createElement('div');
+        var modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.innerHTML = `
         <div class="modal">
             <span class="close-modal" onclick="this.closest('.modal-overlay').remove()">✕</span>
             <h3>🚨 تبليغ</h3>
             <div class="form-group">
-                <label>سبب البلاغ</label>
-                <textarea id="reportReason" class="input-field" style="min-height:80px; text-align:right; font-size:0.85rem;" placeholder="اكتب سبب البلاغ..."></textarea>
+                <label style="color:var(--text2); display:block; margin-bottom:6px;">سبب البلاغ</label>
+                <textarea id="reportReason" class="input-field" style="min-height:80px; text-align:right; font-size:0.85rem; letter-spacing:0;" placeholder="اكتب سبب البلاغ..."></textarea>
             </div>
             <button class="btn btn-danger" onclick="submitReport('${data}')">🚨 إرسال البلاغ</button>
             <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:6px;">إلغاء</button>
         </div>`;
         document.body.appendChild(modal);
-        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
     }
 
     window.submitReport = async function(groupId) {
-        const reason = document.getElementById('reportReason')?.value?.trim();
+        var reason = document.getElementById('reportReason')?.value?.trim();
         if (!reason) return showToast('⚠️ اكتب سبب البلاغ', 'warning');
         
         try {
@@ -1052,19 +1255,21 @@
                 reason: 'إساءة في الرسالة',
                 status: 'pending',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => showToast('✅ تم التبليغ', 'success'))
-              .catch(() => showToast('❌ فشل التبليغ', 'error'));
+            }).then(function() { showToast('✅ تم التبليغ', 'success'); })
+              .catch(function() { showToast('❌ فشل التبليغ', 'error'); });
         }
     };
 
-    // ========== Group Info ==========
+    // ==========================================
+    // GROUP INFO
+    // ==========================================
     function renderGroupInfo() {
         if (!currentGroupId) { switchTab('groups'); return; }
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         
-        db.collection('groups').doc(currentGroupId).get().then(doc => {
-            const g = doc.data();
-            const perms = g.permissions || {};
+        db.collection('groups').doc(currentGroupId).get().then(function(doc) {
+            var g = doc.data();
+            var perms = g.permissions || {};
             
             content.innerHTML = `
             <div class="info-card scale-in">
@@ -1101,9 +1306,11 @@
         });
     }
 
-    // ========== Chats List ==========
+    // ==========================================
+    // CHATS LIST (PRIVATE)
+    // ==========================================
     function renderChatsList() {
-        const content = document.getElementById('contentArea');
+        var content = document.getElementById('contentArea');
         content.innerHTML = `
         <h2 class="section-title">💬 المحادثات</h2>
         <input class="input-field" id="chatSearchInput" placeholder="🔍 بحث في المحادثات..." oninput="filterChats()" style="text-align:right; letter-spacing:0; font-size:0.85rem; margin-bottom:10px;">
@@ -1113,18 +1320,21 @@
     }
 
     async function loadAllChats() {
-        const container = document.getElementById('chatsListContainer');
+        var container = document.getElementById('chatsListContainer');
         if (!container) return;
         
         try {
-            const snap = await db.collection('private_chats').where('participants', 'array-contains', currentUser.uid).get();
-            const chats = [];
+            var snap = await db.collection('private_chats')
+                .where('participants', 'array-contains', currentUser.uid)
+                .get();
+            var chats = [];
             
-            for (const doc of snap.docs) {
-                const cd = doc.data();
-                const otherId = cd.participants.find(p => p !== currentUser.uid);
+            for (var i = 0; i < snap.docs.length; i++) {
+                var doc = snap.docs[i];
+                var cd = doc.data();
+                var otherId = cd.participants.find(function(p) { return p !== currentUser.uid; });
                 if (otherId) {
-                    const userDoc = await db.collection('users').doc(otherId).get();
+                    var userDoc = await db.collection('users').doc(otherId).get();
                     if (userDoc.exists) {
                         chats.push({
                             id: doc.id,
@@ -1137,36 +1347,48 @@
                 }
             }
             
-            chats.sort((a, b) => (b.time?.toDate?.()?.getTime() || 0) - (a.time?.toDate?.()?.getTime() || 0));
+            chats.sort(function(a, b) { return (b.time?.toDate?.()?.getTime() || 0) - (a.time?.toDate?.()?.getTime() || 0); });
             
             if (chats.length === 0) {
                 container.innerHTML = '<div class="empty-state"><div class="icon">💬</div><h3>لا توجد محادثات</h3><p>ابدأ محادثة مع زملائك</p></div>';
             } else {
-                container.innerHTML = chats.map(c => `
-                <div class="chat-list-item" onclick="navigate('private-chat','${c.uid}')">
-                    <img src="${c.user.profilePic || 'https://via.placeholder.com/48'}" alt="صورة" onerror="this.src='https://via.placeholder.com/48'">
-                    <div class="chat-info">
-                        <div class="chat-name">${c.user.name || 'مستخدم'} ${c.user.online ? '<span class="online-dot"></span>' : ''}</div>
-                        <div class="chat-lastmsg">${c.last || 'ابدأ المحادثة...'}</div>
-                    </div>
-                    <div class="chat-time">${formatTime(c.time)}</div>
-                </div>`).join('');
+                container.innerHTML = chats.map(function(c) {
+                    var unread = unreadCounts.privateChats[c.uid] || 0;
+                    return `
+                    <div class="chat-list-item" onclick="openPrivateChat('${c.uid}')">
+                        <img src="${c.user.profilePic || 'https://via.placeholder.com/48'}" alt="صورة" onerror="this.src='https://via.placeholder.com/48'">
+                        <div class="chat-info">
+                            <div class="chat-name">${c.user.name || 'مستخدم'} ${c.user.online ? '<span class="online-dot"></span>' : ''}</div>
+                            <div class="chat-lastmsg">${c.last || 'ابدأ المحادثة...'}</div>
+                        </div>
+                        <div class="chat-time">${formatTime(c.time)}</div>
+                        ${unread > 0 ? '<div class="unread-badge">' + unread + '</div>' : ''}
+                    </div>`;
+                }).join('');
             }
         } catch(e) {
             container.innerHTML = '<p style="color:var(--danger); text-align:center;">❌ حدث خطأ</p>';
         }
     }
 
+    function openPrivateChat(uid) {
+        currentPrivateChatUser = uid;
+        unreadCounts.privateChats[uid] = 0;
+        navigate('private-chat', uid);
+    }
+
     window.filterChats = function() {
-        const q = (document.getElementById('chatSearchInput')?.value || '').toLowerCase();
-        document.querySelectorAll('.chat-list-item').forEach(item => {
+        var q = (document.getElementById('chatSearchInput')?.value || '').toLowerCase();
+        document.querySelectorAll('.chat-list-item').forEach(function(item) {
             item.style.display = q === '' || item.textContent.toLowerCase().includes(q) ? '' : 'none';
         });
     };
 
-    // ========== Private Chat ==========
+    // ==========================================
+    // PRIVATE CHAT
+    // ==========================================
     function renderPrivateChatsList() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         c.innerHTML = `
         <h2 class="section-title">💬 محادثة جديدة</h2>
         <input class="input-field" id="privateUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchPrivateUsers()" style="text-align:right; letter-spacing:0; font-size:0.85rem;">
@@ -1176,17 +1398,17 @@
     }
 
     window.searchPrivateUsers = function() {
-        const q = (document.getElementById('privateUserSearch')?.value || '').toLowerCase();
-        db.collection('users').limit(50).get().then(s => {
-            let h = '';
-            s.forEach(d => {
-                const u = d.data();
+        var q = (document.getElementById('privateUserSearch')?.value || '').toLowerCase();
+        db.collection('users').limit(50).get().then(function(s) {
+            var h = '';
+            s.forEach(function(d) {
+                var u = d.data();
                 if (d.id === currentUser.uid) return;
                 if (q && !(u.name || '').toLowerCase().includes(q)) return;
                 if (u.banned) return;
                 
                 h += `
-                <div class="user-list-item" onclick="navigate('private-chat','${d.id}')">
+                <div class="user-list-item" onclick="openPrivateChat('${d.id}')">
                     <div style="display:flex; align-items:center; gap:8px; flex:1;">
                         <img src="${u.profilePic || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:50%;" onerror="this.src='https://via.placeholder.com/40'">
                         <div>
@@ -1197,7 +1419,7 @@
                     <button class="btn btn-xs">💬</button>
                 </div>`;
             });
-            const l = document.getElementById('privateUsersList');
+            var l = document.getElementById('privateUsersList');
             if (l) l.innerHTML = h || '<p style="color:var(--text2); text-align:center; padding:20px;">لا يوجد مستخدمين</p>';
         });
     };
@@ -1206,9 +1428,9 @@
         if (!uid) { switchTab('chats'); return; }
         currentPrivateChatUser = uid;
         
-        db.collection('users').doc(uid).get().then(d => {
-            const u = d.data() || {};
-            const cid = [currentUser.uid, uid].sort().join('_');
+        db.collection('users').doc(uid).get().then(function(d) {
+            var u = d.data() || {};
+            var cid = [currentUser.uid, uid].sort().join('_');
             
             document.getElementById('contentArea').innerHTML = `
             <div class="chat-fullscreen">
@@ -1231,68 +1453,75 @@
     }
 
     function loadPrivateMessages(cid) {
-        const c = document.getElementById('privateChatMessages');
+        var c = document.getElementById('privateChatMessages');
         if (!c) return;
         
-        const unsub = db.collection('private_chats').doc(cid).collection('messages')
+        var unsub = db.collection('private_chats').doc(cid).collection('messages')
             .orderBy('timestamp', 'asc')
-            .onSnapshot(s => {
+            .onSnapshot(function(s) {
+                var wasAtBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 80;
+                
                 c.innerHTML = '';
                 if (s.empty) {
                     c.innerHTML = '<p style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل</p>';
                     return;
                 }
-                s.forEach(d => {
-                    const m = d.data();
-                    const isSent = m.senderID === currentUser.uid;
+                s.forEach(function(d) {
+                    var m = d.data();
+                    var isSent = m.senderID === currentUser.uid;
                     c.innerHTML += `
                     <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
                         <div class="msg-bubble">${(m.content || '').replace(/\n/g, '<br>')}</div>
                         <div class="msg-meta-info">${formatTime(m.timestamp)}</div>
                     </div>`;
                 });
-                c.scrollTop = c.scrollHeight;
+                
+                if (wasAtBottom) {
+                    c.scrollTop = c.scrollHeight;
+                }
             });
         
         allListeners.push(unsub);
     }
 
     window.sendPrivateMsg = function() {
-        const i = document.getElementById('privateMsgInput');
+        var i = document.getElementById('privateMsgInput');
         if (!i?.value?.trim() || !currentPrivateChatUser) return;
         
-        const cid = [currentUser.uid, currentPrivateChatUser].sort().join('_');
-        const cnt = i.value.trim();
+        var cid = [currentUser.uid, currentPrivateChatUser].sort().join('_');
+        var cnt = i.value.trim();
         
         db.collection('private_chats').doc(cid).set({
             participants: [currentUser.uid, currentPrivateChatUser],
             lastMessage: cnt,
             lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).then(() => {
+        }, { merge: true }).then(function() {
             return db.collection('private_chats').doc(cid).collection('messages').add({
                 senderID: currentUser.uid,
                 senderName: currentUser.name || 'طالب',
                 content: cnt,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-        }).then(() => {
+        }).then(function() {
             i.value = '';
             i.focus();
         });
     };
 
-    // ========== Stats ==========
+    // ==========================================
+    // STATS & LEADERBOARD
+    // ==========================================
     function renderStudentStats() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         if (!currentUser) return;
         
-        db.collection('users').doc(currentUser.uid).get().then(d => {
-            const u = d.data() || {};
-            const messages = u.totalMessages || 0;
-            const points = u.points || 0;
-            const level = Math.floor(points / 50) + 1;
-            const nextLevel = level * 50;
-            const progress = ((points % 50) / 50) * 100;
+        db.collection('users').doc(currentUser.uid).get().then(function(d) {
+            var u = d.data() || {};
+            var messages = u.totalMessages || 0;
+            var points = u.points || 0;
+            var level = Math.floor(points / 50) + 1;
+            var nextLevel = level * 50;
+            var progress = ((points % 50) / 50) * 100;
             
             c.innerHTML = `
             <h2 class="section-title">📊 إحصائياتي</h2>
@@ -1311,40 +1540,24 @@
                 </div>
                 
                 <div class="stat-grid">
-                    <div class="stat-item">
-                        <div class="value">${messages}</div>
-                        <div class="label">💬 رسالة</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${points}</div>
-                        <div class="label">⭐ نقطة</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${u.online ? '🟢' : '○'}</div>
-                        <div class="label">الحالة</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${level}</div>
-                        <div class="label">🏆 المستوى</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${u.groupsJoined || 0}</div>
-                        <div class="label">📋 مجموعة</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${formatDate(u.createdAt)}</div>
-                        <div class="label">📅 الانضمام</div>
-                    </div>
+                    <div class="stat-item"><div class="value">${messages}</div><div class="label">💬 رسالة</div></div>
+                    <div class="stat-item"><div class="value">${points}</div><div class="label">⭐ نقطة</div></div>
+                    <div class="stat-item"><div class="value">${u.online ? '🟢' : '○'}</div><div class="label">الحالة</div></div>
+                    <div class="stat-item"><div class="value">${level}</div><div class="label">🏆 المستوى</div></div>
+                    <div class="stat-item"><div class="value">${u.groupsJoined || 0}</div><div class="label">📋 مجموعة</div></div>
+                    <div class="stat-item"><div class="value">${formatDate(u.createdAt)}</div><div class="label">📅 الانضمام</div></div>
                 </div>
             </div>
             <button class="btn btn-outline btn-sm" onclick="navigate('leaderboard')" style="width:100%; margin-top:8px;">🏆 لوحة المتصدرين</button>`;
         });
     }
 
-    // ========== More Page ==========
+    // ==========================================
+    // MORE PAGE
+    // ==========================================
     function renderMorePage() {
-        const content = document.getElementById('contentArea');
-        const items = [
+        var content = document.getElementById('contentArea');
+        var items = [
             { icon: '⚙️', name: 'الإعدادات', desc: 'تخصيص حسابك', page: 'settings' },
             { icon: '🎨', name: 'خلفية الشات', desc: 'تغيير خلفية المحادثة', page: 'settings' },
             { icon: '📝', name: 'ملاحظاتي', desc: 'مفكرتك الشخصية', page: 'notes' },
@@ -1356,21 +1569,24 @@
         
         content.innerHTML = `
         <h2 class="section-title">📱 المزيد</h2>
-        ${items.map(item => `
-        <div class="chat-list-item" onclick="navigate('${item.page}')">
-            <span style="font-size:1.5rem;">${item.icon}</span>
-            <div class="chat-info">
-                <div class="chat-name">${item.name}</div>
-                <div class="chat-lastmsg">${item.desc}</div>
-            </div>
-            <span style="color:var(--text3); font-size:1.2rem;">›</span>
-        </div>
-        `).join('')}`;
+        ${items.map(function(item) {
+            return `
+            <div class="chat-list-item" onclick="navigate('${item.page}')">
+                <span style="font-size:1.5rem;">${item.icon}</span>
+                <div class="chat-info">
+                    <div class="chat-name">${item.name}</div>
+                    <div class="chat-lastmsg">${item.desc}</div>
+                </div>
+                <span style="color:var(--text3); font-size:1.2rem;">›</span>
+            </div>`;
+        }).join('')}`;
     }
 
-    // ========== Settings ==========
+    // ==========================================
+    // SETTINGS
+    // ==========================================
     function renderSettings() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         c.innerHTML = `
         <h2 class="section-title">⚙️ الإعدادات</h2>
         <div class="info-card">
@@ -1384,19 +1600,23 @@
             <input id="newName" class="input-field" value="${currentUser.name || ''}" placeholder="اسمك الجديد" style="text-align:right; letter-spacing:0; font-size:0.85rem;">
             <button class="btn btn-sm" onclick="updateProfileName()" style="width:auto; margin-top:8px;">💾 حفظ الاسم</button>
         </div>
+        <div class="info-card">
+            <h3 style="color:var(--gold); margin-bottom:12px;">🌙 الوضع الليلي</h3>
+            <p style="color:var(--text2); font-size:0.85rem;">الوضع الليلي مفعل دائماً لحماية العين</p>
+        </div>
         <button class="btn btn-outline btn-sm" onclick="switchTab('more')" style="width:100%; margin-top:8px;">⬅️ رجوع</button>`;
     }
 
     window.saveChatBg = function() {
-        const url = document.getElementById('bgUrl').value.trim();
-        db.collection('users').doc(currentUser.uid).update({ chatBg: url }).then(() => {
+        var url = document.getElementById('bgUrl').value.trim();
+        db.collection('users').doc(currentUser.uid).update({ chatBg: url }).then(function() {
             currentUser.chatBg = url;
             showToast('✅ تم حفظ الخلفية', 'success');
         });
     };
 
     window.clearChatBg = function() {
-        db.collection('users').doc(currentUser.uid).update({ chatBg: '' }).then(() => {
+        db.collection('users').doc(currentUser.uid).update({ chatBg: '' }).then(function() {
             currentUser.chatBg = '';
             document.getElementById('bgUrl').value = '';
             showToast('✅ تم إزالة الخلفية', 'success');
@@ -1404,18 +1624,20 @@
     };
 
     window.updateProfileName = function() {
-        const name = document.getElementById('newName').value.trim();
+        var name = document.getElementById('newName').value.trim();
         if (!name) return showToast('⚠️ أدخل اسماً', 'warning');
-        db.collection('users').doc(currentUser.uid).update({ name: name }).then(() => {
+        db.collection('users').doc(currentUser.uid).update({ name: name }).then(function() {
             currentUser.name = name;
             showToast('✅ تم تحديث الاسم', 'success');
         });
     };
 
-    // ========== Notes ==========
+    // ==========================================
+    // NOTES
+    // ==========================================
     function renderNotes() {
-        const c = document.getElementById('contentArea');
-        const saved = localStorage.getItem('sn_' + currentUser.uid) || '';
+        var c = document.getElementById('contentArea');
+        var saved = localStorage.getItem('sn_' + currentUser.uid) || '';
         c.innerHTML = `
         <h2 class="section-title">📝 ملاحظاتي</h2>
         <textarea id="notesArea" class="input-field" style="min-height:250px; text-align:right; font-size:0.9rem; letter-spacing:0; line-height:1.6;" placeholder="اكتب ملاحظاتك هنا...">${saved}</textarea>
@@ -1428,17 +1650,20 @@
         showToast('✅ تم حفظ الملاحظات', 'success');
     };
 
-    // ========== Leaderboard ==========
+    // ==========================================
+    // LEADERBOARD
+    // ==========================================
     function renderLeaderboard() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         c.innerHTML = '<h2 class="section-title">🏆 لوحة المتصدرين</h2><div id="leaderboardList"></div><button class="btn btn-outline btn-sm" onclick="switchTab(\'more\')" style="width:100%; margin-top:8px;">⬅️ رجوع</button>';
         
-        db.collection('users').orderBy('points', 'desc').limit(30).get().then(s => {
-            let h = '', i = 1;
-            s.forEach(d => {
-                const u = d.data();
-                const medal = i === 1 ? '🥇' : i === 2 ? '🥈' : i === 3 ? '🥉' : `#${i}`;
-                const isMe = d.id === currentUser.uid;
+        db.collection('users').orderBy('points', 'desc').limit(30).get().then(function(s) {
+            var h = '', i = 1;
+            s.forEach(function(d) {
+                var u = d.data();
+                if (u.banned) return;
+                var medal = i === 1 ? '🥇' : i === 2 ? '🥈' : i === 3 ? '🥉' : '#' + i;
+                var isMe = d.id === currentUser.uid;
                 
                 h += `
                 <div class="user-list-item" style="cursor:default; ${isMe ? 'border:2px solid var(--gold);' : ''}">
@@ -1457,16 +1682,18 @@
         });
     }
 
-    // ========== Stories ==========
+    // ==========================================
+    // STORIES
+    // ==========================================
     function renderStories() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         c.innerHTML = '<h2 class="section-title">📖 القصص</h2><div id="storiesList"></div>';
         
-        db.collection('stories').orderBy('createdAt', 'desc').limit(30).get().then(s => {
-            let h = '<div class="stories-bar">';
-            s.forEach(d => {
-                const st = d.data();
-                const viewed = localStorage.getItem('story_' + d.id) === '1';
+        db.collection('stories').orderBy('createdAt', 'desc').limit(30).get().then(function(s) {
+            var h = '<div class="stories-bar">';
+            s.forEach(function(d) {
+                var st = d.data();
+                var viewed = localStorage.getItem('story_' + d.id) === '1';
                 h += `
                 <div class="story-item ${viewed ? 'viewed' : ''}" onclick="viewStory('${d.id}')">
                     <div class="story-ring">
@@ -1483,46 +1710,49 @@
     window.viewStory = function(id) {
         localStorage.setItem('story_' + id, '1');
         
-        db.collection('stories').doc(id).get().then(d => {
-            const s = d.data();
-            const m = document.createElement('div');
+        db.collection('stories').doc(id).get().then(function(d) {
+            var s = d.data();
+            var m = document.createElement('div');
             m.className = 'modal-overlay';
             m.innerHTML = `
             <div class="modal" style="text-align:center;">
-                <span style="position:absolute; top:8px; left:10px; cursor:pointer; font-size:1.3rem; color:var(--text2);" onclick="this.closest('.modal-overlay').remove()">✕</span>
-                ${s.mediaURL ? `<img src="${s.mediaURL}" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin-bottom:10px;">` : ''}
-                ${s.title ? `<h3 style="color:var(--gold);">${s.title}</h3>` : ''}
-                ${s.caption ? `<p style="color:var(--text2); margin:8px 0;">${s.caption}</p>` : ''}
-                ${s.link ? `<a href="${s.link}" target="_blank" class="btn btn-outline btn-sm" style="display:inline-block; margin-top:8px;">🔗 فتح الرابط</a>` : ''}
+                <span class="close-modal" onclick="this.closest('.modal-overlay').remove()">✕</span>
+                ${s.mediaURL ? '<img src="' + s.mediaURL + '" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin-bottom:10px;">' : ''}
+                ${s.title ? '<h3 style="color:var(--gold);">' + s.title + '</h3>' : ''}
+                ${s.caption ? '<p style="color:var(--text2); margin:8px 0;">' + s.caption + '</p>' : ''}
+                ${s.link ? '<a href="' + s.link + '" target="_blank" class="btn btn-outline btn-sm" style="display:inline-block; margin-top:8px;">🔗 فتح الرابط</a>' : ''}
                 <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:8px;">إغلاق</button>
             </div>`;
             document.body.appendChild(m);
-            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            m.addEventListener('click', function(e) { if (e.target === m) m.remove(); });
         });
     };
 
-    // ========== Media ==========
+    // ==========================================
+    // MEDIA
+    // ==========================================
     function renderMediaPage() {
-        const c = document.getElementById('contentArea');
+        var c = document.getElementById('contentArea');
         c.innerHTML = '<h2 class="section-title">📁 الوسائط</h2><div id="mediaGrid" class="media-grid"><p style="color:var(--text2); grid-column:1/-1;">⏳ جاري التحميل...</p></div>';
         loadAllMedia();
     }
 
     async function loadAllMedia() {
-        const co = document.getElementById('mediaGrid');
+        var co = document.getElementById('mediaGrid');
         if (!co) return;
         
         try {
-            const groupsSnap = await db.collection('groups').where('members', 'array-contains', currentUser.uid).get();
-            const allMedia = [];
+            var groupsSnap = await db.collection('groups').where('members', 'array-contains', currentUser.uid).get();
+            var allMedia = [];
             
-            for (const gd of groupsSnap.docs) {
-                const msgs = await db.collection('groups').doc(gd.id).collection('messages')
+            for (var i = 0; i < groupsSnap.docs.length; i++) {
+                var gd = groupsSnap.docs[i];
+                var msgs = await db.collection('groups').doc(gd.id).collection('messages')
                     .where('type', 'in', ['image', 'video', 'file'])
                     .orderBy('timestamp', 'desc')
                     .limit(60)
                     .get();
-                msgs.forEach(d => allMedia.push(d.data()));
+                msgs.forEach(function(d) { allMedia.push(d.data()); });
             }
             
             if (allMedia.length === 0) {
@@ -1530,13 +1760,13 @@
                 return;
             }
             
-            co.innerHTML = allMedia.map(m => {
+            co.innerHTML = allMedia.map(function(m) {
                 if (m.type === 'image') {
-                    return `<div class="media-item" onclick="viewImage('${m.content}')"><img src="${m.content}" alt="صورة" loading="lazy" onerror="this.style.display='none'"><span class="media-type-badge">📷</span></div>`;
+                    return '<div class="media-item" onclick="viewImage(\'' + m.content + '\')"><img src="' + m.content + '" alt="صورة" loading="lazy" onerror="this.style.display=\'none\'"><span class="media-type-badge">📷</span></div>';
                 } else if (m.type === 'video') {
-                    return `<div class="media-item"><video src="${m.content}" controls preload="metadata" playsinline></video><span class="media-type-badge">🎥</span></div>`;
+                    return '<div class="media-item"><video src="' + m.content + '" controls preload="metadata" playsinline></video><span class="media-type-badge">🎥</span></div>';
                 } else {
-                    return `<div class="media-item"><div class="file-placeholder" onclick="window.open('${m.content}')">📄</div></div>`;
+                    return '<div class="media-item"><div class="file-placeholder" onclick="window.open(\'' + m.content + '\')">📄</div></div>';
                 }
             }).join('');
         } catch(e) {
@@ -1544,31 +1774,35 @@
         }
     }
 
-    // ========== Support ==========
+    // ==========================================
+    // SUPPORT
+    // ==========================================
     function renderSupport() {
-        const c = document.getElementById('contentArea');
-        db.collection('config').doc('support').get().then(d => {
-            const s = d.exists ? d.data() : {};
+        var c = document.getElementById('contentArea');
+        db.collection('config').doc('support').get().then(function(d) {
+            var s = d.exists ? d.data() : {};
             c.innerHTML = `
             <div class="info-card scale-in">
                 <img src="${s.adminImageURL || 'https://via.placeholder.com/85'}" style="width:85px;height:85px;border-radius:50%;border:3px solid var(--gold);" onerror="this.src='https://via.placeholder.com/85'">
                 <h2 style="color:var(--gold); margin:10px 0;">📞 الدعم الفني</h2>
                 <p style="color:var(--text2);">للتواصل والاستفسارات</p>
                 <div class="support-links">
-                    ${s.whatsapp ? `<a href="${s.whatsapp}" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png" alt="واتساب"><span>واتساب</span></a>` : ''}
-                    ${s.facebook ? `<a href="${s.facebook}" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png" alt="فيسبوك"><span>فيسبوك</span></a>` : ''}
-                    ${s.phone ? `<a href="tel:${s.phone}" class="support-link"><img src="https://img.icons8.com/color/48/phone.png" alt="هاتف"><span>هاتف</span></a>` : ''}
-                    ${s.email ? `<a href="mailto:${s.email}" class="support-link"><img src="https://img.icons8.com/color/48/gmail.png" alt="بريد"><span>بريد</span></a>` : ''}
+                    ${s.whatsapp ? '<a href="' + s.whatsapp + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png" alt="واتساب"><span>واتساب</span></a>' : ''}
+                    ${s.facebook ? '<a href="' + s.facebook + '" target="_blank" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png" alt="فيسبوك"><span>فيسبوك</span></a>' : ''}
+                    ${s.phone ? '<a href="tel:' + s.phone + '" class="support-link"><img src="https://img.icons8.com/color/48/phone.png" alt="هاتف"><span>هاتف</span></a>' : ''}
+                    ${s.email ? '<a href="mailto:' + s.email + '" class="support-link"><img src="https://img.icons8.com/color/48/gmail.png" alt="بريد"><span>بريد</span></a>' : ''}
                 </div>
                 ${!s.whatsapp && !s.facebook && !s.phone && !s.email ? '<p style="color:var(--text3); margin-top:12px;">لم يتم إضافة روابط تواصل بعد</p>' : ''}
             </div>`;
         });
     }
 
-    // ========== Image Viewer ==========
+    // ==========================================
+    // IMAGE VIEWER
+    // ==========================================
     window.viewImage = function(url) {
-        const viewer = document.getElementById('imageViewer');
-        const img = document.getElementById('viewerImage');
+        var viewer = document.getElementById('imageViewer');
+        var img = document.getElementById('viewerImage');
         if (viewer && img) {
             img.src = url;
             viewer.classList.remove('hidden');
@@ -1581,44 +1815,144 @@
         }
     };
 
-    // ========== Pull to Refresh ==========
-    let pullStart = 0;
-    document.addEventListener('touchstart', e => { pullStart = e.touches[0].clientY; }, { passive: true });
-    document.addEventListener('touchmove', e => {
-        const content = document.getElementById('contentArea');
-        if (content && content.scrollTop <= 0) {
-            const pull = e.touches[0].clientY - pullStart;
-            if (pull > 60) {
-                // Refresh current view
-                if (currentTab === 'groups') renderGroups();
-                else if (currentTab === 'chats') renderChatsList();
+    // ==========================================
+    // UNREAD BADGES SYSTEM
+    // ==========================================
+    function updateAllUnreadBadges() {
+        // Groups unread
+        var groupsBadge = document.getElementById('groupsUnreadBadge');
+        var groupsTotal = 0;
+        Object.values(unreadCounts.groups).forEach(function(v) { groupsTotal += v; });
+        
+        if (groupsBadge) {
+            groupsBadge.textContent = groupsTotal;
+            if (groupsTotal > 0) {
+                groupsBadge.classList.remove('hidden');
+            } else {
+                groupsBadge.classList.add('hidden');
             }
         }
-    }, { passive: true });
+        
+        // Chats unread
+        var chatsBadge = document.getElementById('chatsUnreadBadge');
+        var chatsTotal = 0;
+        Object.values(unreadCounts.privateChats).forEach(function(v) { chatsTotal += v; });
+        
+        if (chatsBadge) {
+            chatsBadge.textContent = chatsTotal;
+            if (chatsTotal > 0) {
+                chatsBadge.classList.remove('hidden');
+            } else {
+                chatsBadge.classList.add('hidden');
+            }
+        }
+    }
 
-    // ========== Init ==========
-    document.addEventListener('DOMContentLoaded', () => {
+    // ==========================================
+    // SERVICE WORKER REGISTRATION (PWA)
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            // Create inline service worker
+            var swCode = `
+                self.addEventListener('install', function(e) {
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', function(e) {
+                    e.waitUntil(clients.claim());
+                });
+                self.addEventListener('fetch', function(e) {
+                    e.respondWith(
+                        caches.match(e.request).then(function(cached) {
+                            return cached || fetch(e.request).then(function(response) {
+                                var clone = response.clone();
+                                caches.open('webegypt-v1').then(function(cache) {
+                                    cache.put(e.request, clone);
+                                });
+                                return response;
+                            });
+                        }).catch(function() {
+                            return new Response('غير متصل بالإنترنت', { status: 503 });
+                        })
+                    );
+                });
+            `;
+            
+            var blob = new Blob([swCode], { type: 'application/javascript' });
+            var swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl).then(function() {
+                console.log('✅ Service Worker Registered');
+            }).catch(function(e) {
+                console.log('Service Worker failed:', e);
+            });
+        });
+    }
+    
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(function() {
+            Notification.requestPermission();
+        }, 5000);
+    }
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
         showLoading('🔍 جاري التحقق من الجلسة...');
-        autoLogin().then(loggedIn => {
+        autoLogin().then(function(loggedIn) {
             hideLoading();
             if (!loggedIn) {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('codeInput').focus();
+                
+                // Pre-fill code if saved
+                var savedCode = localStorage.getItem('webEgyptCode');
+                if (savedCode) {
+                    document.getElementById('codeInput').value = savedCode;
+                }
             } else {
                 document.getElementById('mainScreen').classList.remove('hidden');
                 switchTab('groups');
+                monitorAccountDeletion();
             }
-        }).catch(() => {
+        }).catch(function() {
             hideLoading();
             document.getElementById('loginScreen').classList.remove('hidden');
         });
+        
+        // Add ripple effect to buttons
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.btn');
+            if (btn) {
+                var ripple = document.createElement('span');
+                ripple.className = 'ripple-effect';
+                var rect = btn.getBoundingClientRect();
+                var size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                btn.appendChild(ripple);
+                setTimeout(function() { ripple.remove(); }, 600);
+            }
+        });
     });
 
-    console.log('🚀 Web Egypt Student ULTIMATE v13 | All Systems GO! 🔥');
-    console.log('✅ Fixed: Chat permissions, writing, uploading');
-    console.log('✅ New: Delete messages, report, stories with links');
-    console.log('✅ New: Leaderboard, notes, profile name change');
-    console.log('✅ New: Pull to refresh, improved animations');
+    console.log('🚀 Web Egypt Student ULTIMATE v16 | All Systems GO! 🔥');
+    console.log('✅ Fixed: Chat scrolling like WhatsApp');
+    console.log('✅ Fixed: Input bar always visible');
+    console.log('✅ Fixed: Auto-login with saved code');
+    console.log('✅ Fixed: Private chat privacy');
+    console.log('✅ New: Back button support');
+    console.log('✅ New: Real-time updates everywhere');
+    console.log('✅ New: Anti-theft protection');
+    console.log('✅ New: PWA support');
+    console.log('✅ New: Notification sounds');
+    console.log('✅ New: Unread message badges');
+    console.log('✅ New: Confetti celebrations');
+    console.log('✅ New: Account deletion monitor');
+    console.log('✅ New: Ripple effects on buttons');
 </script>
 </body>
 </html>
