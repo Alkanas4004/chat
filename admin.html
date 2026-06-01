@@ -4,29 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>لوحة الأدمن | Web Egypt</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#0A0A0F">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Web Egypt Admin">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/jpeg" href="amg.1.jpg">
-    <link rel="apple-touch-icon" href="amg.1.jpg">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV2ViIEVneXB0IEFkbWluIiwic2hvcnRfbmFtZSI6IkFkbWluIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwQTBBMEYiLCJ0aGVtZV9jb2xvciI6IiMwQTBBMEYiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0IiwiaWNvbnMiOlt7InNyYyI6ImFtZy4xLmpwZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9qcGVnIn1dfQ">
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <!-- QR Code Generator -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <!-- jsPDF for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
         :root {
             --gold: #FFC107; --gold-dark: #B8860B; --gold-light: #FFD54F;
@@ -34,7 +17,6 @@
             --bg: #0A0A0F; --surface: #14141D; --surface2: #1C1C28;
             --surface3: #242432; --text: #FFFFFF; --text2: #AAAAAA; --text3: #777777;
             --danger: #FF4757; --success: #2ED573; --info: #1E90FF; --warning: #FFA502;
-            --purple: #A855F7; --pink: #EC4899;
             --radius: 16px; --radius-sm: 10px; --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow: 0 4px 15px rgba(0,0,0,0.4); --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -45,7 +27,6 @@
             font-family: 'Cairo', 'Segoe UI', sans-serif;
             direction: rtl; height: 100dvh; display: flex; justify-content: center; align-items: center;
             -webkit-tap-highlight-color: transparent; user-select: none;
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
         }
         #app { width: 100%; max-width: 100%; height: 100dvh; background: var(--bg); display: flex; position: relative; overflow: hidden; }
         @media (min-width: 1024px) { #app { max-width: 1300px; height: 94dvh; border-radius: 24px; margin: 15px; box-shadow: 0 0 60px rgba(255,193,7,0.15); } }
@@ -62,17 +43,12 @@
         @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
         @keyframes messageIn { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
         @keyframes notificationBell { 0%{transform:rotate(0);} 10%{transform:rotate(15deg);} 20%{transform:rotate(-15deg);} 30%{transform:rotate(10deg);} 40%{transform:rotate(-10deg);} 50%{transform:rotate(0);} 100%{transform:rotate(0);} }
-        @keyframes badgePop { 0%{transform:scale(0.5); opacity:0;} 60%{transform:scale(1.2);} 100%{transform:scale(1); opacity:1;} }
-        @keyframes liveDot { 0%{opacity:1;} 50%{opacity:0.3;} 100%{opacity:1;} }
-        @keyframes notificationSlide { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
-        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
         
         .fade-in { animation: fadeInUp 0.4s ease-out; }
         .scale-in { animation: scaleIn 0.3s ease-out; }
         .pulse-animation { animation: pulse 2s ease-in-out infinite; }
         .gradient-animation { background-size: 200% 200%; animation: gradientShift 3s ease infinite; }
         .shake-animation { animation: shake 0.5s ease-in-out; }
-        .badge-pop { animation: badgePop 0.4s ease-out; }
 
         .login-screen { position: absolute; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; }
         .login-box { background: var(--surface); border-radius: 24px; padding: 40px 28px; width: 420px; max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(255,193,7,0.25); border: 1px solid rgba(255,193,7,0.15); position: relative; overflow: hidden; }
@@ -85,10 +61,9 @@
         .input-field:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,193,7,0.25); }
         textarea.input-field { resize: vertical; min-height: 80px; }
         select.input-field { cursor: pointer; }
-        .btn { display: inline-block; padding: 12px 24px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: var(--transition); background: var(--gold-gradient); color: #000; margin: 4px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(255,193,7,0.25); background-size: 200% 200%; animation: gradientShift 3s ease infinite; font-family: 'Cairo', sans-serif; position: relative; overflow: hidden; }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: var(--transition); background: var(--gold-gradient); color: #000; margin: 4px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(255,193,7,0.25); background-size: 200% 200%; animation: gradientShift 3s ease infinite; font-family: 'Cairo', sans-serif; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,193,7,0.35); }
         .btn:active { transform: scale(0.96); }
-        .btn .ripple-effect { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: ripple 0.6s linear; pointer-events: none; }
         .btn-danger { background: linear-gradient(135deg, #FF4757, #FF6B81); color: #fff; animation: none; }
         .btn-danger:hover { box-shadow: 0 6px 18px rgba(255,71,87,0.4); }
         .btn-success { background: linear-gradient(135deg, #2ED573, #7BED9F); color: #000; animation: none; }
@@ -96,8 +71,6 @@
         .btn-info { background: linear-gradient(135deg, #1E90FF, #70A1FF); color: #fff; animation: none; }
         .btn-info:hover { box-shadow: 0 6px 18px rgba(30,144,255,0.4); }
         .btn-warning { background: linear-gradient(135deg, #FFA502, #FFBE76); color: #000; animation: none; }
-        .btn-purple { background: linear-gradient(135deg, #A855F7, #C084FC); color: #fff; animation: none; }
-        .btn-pink { background: linear-gradient(135deg, #EC4899, #F472B6); color: #fff; animation: none; }
         .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); box-shadow: none; animation: none; }
         .btn-outline:hover { background: rgba(255,193,7,0.1); }
         .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
@@ -112,8 +85,6 @@
         .sidebar-header h2 { color: var(--gold); font-size: 1.3rem; margin: 6px 0; }
         .sidebar-header .role-badge { display: inline-block; padding: 4px 14px; border-radius: 15px; background: rgba(255,193,7,0.15); color: var(--gold); font-size: 0.7rem; margin-top: 3px; }
         .sidebar-header .admin-email { color: var(--text2); font-size: 0.7rem; margin-top: 4px; }
-        .sidebar-header .live-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; color: var(--success); margin-top: 6px; }
-        .sidebar-header .live-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: liveDot 1.5s ease-in-out infinite; }
         .nav-links { flex: 1; padding: 8px 0; }
         .nav-section { padding: 8px 20px; color: var(--text3); font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
         .nav-item { display: flex; align-items: center; padding: 12px 20px; color: var(--text2); cursor: pointer; margin: 2px 10px; border-radius: 12px; transition: var(--transition); font-size: 0.9rem; gap: 10px; position: relative; }
@@ -122,11 +93,10 @@
         .nav-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
         .nav-item .badge-count { background: var(--danger); color: #fff; border-radius: 10px; padding: 2px 8px; font-size: 0.65rem; margin-right: auto; min-width: 20px; text-align: center; }
         .nav-item .badge-count.pulse { animation: pulse 1.5s ease-in-out infinite; }
-        .nav-item .badge-count.badge-pop { animation: badgePop 0.4s ease-out; }
         .sidebar-footer { padding: 15px; border-top: 1px solid #1a1a25; }
         .logout-btn { background: rgba(255,71,87,0.1); border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px; border-radius: 20px; cursor: pointer; width: 100%; font-weight: bold; font-size: 0.85rem; transition: var(--transition); }
         .logout-btn:hover { background: rgba(255,71,87,0.2); }
-        .main-content { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg); scroll-behavior: smooth; }
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg); }
         .page-header { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #1a1a25; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .page-header h1 { color: var(--gold); font-size: 1.7rem; display: flex; align-items: center; gap: 8px; }
         .page-header .breadcrumb { font-size: 0.75rem; color: var(--text3); }
@@ -179,7 +149,7 @@
         .chat-header-bar .group-info { flex: 1; min-width: 0; }
         .chat-header-bar .group-name { font-weight: bold; color: var(--gold); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-header-bar .group-subtitle { font-size: 0.7rem; color: var(--text2); }
-        .chat-messages-area { flex: 1; padding: 12px 15px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; overscroll-behavior: contain; touch-action: pan-y; scroll-behavior: smooth; }
+        .chat-messages-area { flex: 1; padding: 12px 15px; overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; background-color: #0d0d14; background-size: cover; background-position: center; overscroll-behavior: contain; touch-action: pan-y; }
         .msg-wrapper { margin-bottom: 6px; display: flex; flex-direction: column; animation: messageIn 0.3s ease-out; }
         .msg-wrapper.sent { align-items: flex-end; }
         .msg-wrapper.received { align-items: flex-start; }
@@ -209,9 +179,9 @@
         .date-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #222; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.25s; backdrop-filter: blur(4px); }
-        .modal { background: var(--surface); border-radius: 20px; padding: 25px; width: 90%; max-width: 650px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: scaleIn 0.3s ease-out; position: relative; }
+        .modal { background: var(--surface); border-radius: 20px; padding: 25px; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: scaleIn 0.3s ease-out; }
         .modal h2 { color: var(--gold); margin-bottom: 15px; text-align: center; }
-        .modal .close-btn { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--text2); font-size: 1.2rem; cursor: pointer; z-index: 5; }
+        .modal .close-btn { position: absolute; top: 10px; left: 10px; background: none; border: none; color: var(--text2); font-size: 1.2rem; cursor: pointer; }
         .menu-toggle { display: none; position: fixed; top: 15px; right: 15px; z-index: 150; background: var(--gold); border: none; font-size: 1.6rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99; }
         .sidebar-overlay.show { display: block; }
@@ -237,40 +207,6 @@
         .tag.active { background: var(--gold); color: #000; }
         .code-display { background: var(--surface2); padding: 12px 20px; border-radius: 10px; font-family: monospace; font-size: 1.3rem; color: var(--gold); text-align: center; letter-spacing: 3px; margin: 10px 0; border: 1px dashed var(--gold); }
 
-        /* Notification Center */
-        .notification-center { position: fixed; top: 0; left: 0; width: 380px; max-width: 90%; height: 100vh; background: var(--surface); z-index: 600; transform: translateX(-100%); transition: transform 0.35s ease; box-shadow: 5px 0 30px rgba(0,0,0,0.5); overflow-y: auto; }
-        .notification-center.open { transform: translateX(0); }
-        .notification-center .nc-header { padding: 20px; border-bottom: 1px solid #1a1a25; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); z-index: 2; }
-        .notification-item { padding: 14px 20px; border-bottom: 1px solid #1a1a25; cursor: pointer; transition: var(--transition); display: flex; gap: 10px; align-items: start; }
-        .notification-item:hover { background: var(--surface2); }
-        .notification-item.unread { border-right: 3px solid var(--gold); }
-        .notification-item .notif-icon { font-size: 1.3rem; flex-shrink: 0; }
-        .notification-item .notif-content { flex: 1; }
-        .notification-item .notif-title { font-weight: bold; font-size: 0.85rem; color: var(--gold); }
-        .notification-item .notif-body { font-size: 0.75rem; color: var(--text2); }
-        .notification-item .notif-time { font-size: 0.6rem; color: var(--text3); margin-top: 3px; }
-        .notification-fab { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; border-radius: 50%; background: var(--gold-gradient); border: none; cursor: pointer; z-index: 550; box-shadow: 0 8px 25px rgba(0,0,0,0.5); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-        .notification-fab:hover { transform: scale(1.1); }
-        .notification-fab .fab-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: #fff; border-radius: 50%; min-width: 22px; height: 22px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold; animation: badgePop 0.4s ease-out; }
-
-        /* ID Card */
-        .id-card-preview { background: linear-gradient(135deg, #1a1a30, #0d0d20); border-radius: 16px; padding: 20px; text-align: center; border: 2px solid var(--gold); max-width: 350px; margin: 15px auto; position: relative; overflow: hidden; }
-        .id-card-preview::before { content: 'Web Egypt'; position: absolute; top: 10px; left: 10px; color: rgba(255,193,7,0.1); font-size: 3rem; font-weight: bold; }
-        .id-card-preview .qr-container { display: inline-block; padding: 10px; background: #fff; border-radius: 10px; margin: 10px 0; }
-        .id-card-preview .student-info { margin-top: 8px; }
-        .id-card-preview .student-info h4 { color: var(--gold); font-size: 1.1rem; }
-        .id-card-preview .student-info p { font-size: 0.75rem; color: var(--text2); }
-        
-        .scheduled-msg-card { background: var(--surface2); padding: 12px; border-radius: 10px; margin: 6px 0; border-right: 3px solid var(--info); }
-        .scheduled-msg-card.sent { border-right-color: var(--success); opacity: 0.7; }
-        .scheduled-msg-card .schedule-time { font-size: 0.7rem; color: var(--text3); }
-        
-        .theme-option { display: inline-block; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin: 4px; border: 2px solid transparent; transition: var(--transition); }
-        .theme-option:hover { border-color: #fff; transform: scale(1.15); }
-        .theme-option.active { border-color: var(--gold); box-shadow: 0 0 12px rgba(255,193,7,0.5); }
-
-        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 14px 24px; border-radius: 25px; font-weight: bold; z-index: 9999; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideUp 0.35s ease-out; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; max-width: 90%; }
-
         @media (max-width: 768px) {
             .sidebar { position: fixed; top: 0; right: 0; bottom: 0; transform: translateX(100%); width: 85%; z-index: 200; padding-bottom: var(--safe-bottom); }
             .sidebar.open { transform: translateX(0); }
@@ -286,8 +222,6 @@
             .chat-input-bar { padding: 8px 10px; }
             .msg-bubble { max-width: 88%; }
             .form-row > * { min-width: 100%; }
-            .notification-center { width: 100%; max-width: 100%; }
-            .notification-fab { bottom: 20px; right: 15px; width: 50px; height: 50px; font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -316,26 +250,21 @@
                 <h2 id="adminNameDisplay">أدمن</h2>
                 <span class="admin-email" id="adminEmailDisplay"></span>
                 <span class="role-badge">🟢 مدير النظام</span>
-                <div class="live-indicator"><span class="live-dot"></span> متصل ومباشر</div>
             </div>
             <div class="nav-links">
                 <div class="nav-section">📊 الرئيسية</div>
                 <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">📊</span> الإحصائيات</div>
                 <div class="nav-item" onclick="switchPage('analytics')"><span class="icon">📈</span> التحليلات</div>
-                <div class="nav-item" onclick="switchPage('notifications')"><span class="icon">🔔</span> الإشعارات <span class="badge-count" id="notifCountBadge">0</span></div>
                 
                 <div class="nav-section">👥 الإدارة</div>
                 <div class="nav-item" onclick="switchPage('users')"><span class="icon">👥</span> المستخدمين <span class="badge-count" id="userCountBadge">0</span></div>
                 <div class="nav-item" onclick="switchPage('groups')"><span class="icon">📋</span> المجموعات <span class="badge-count" id="groupCountBadge">0</span></div>
                 <div class="nav-item" onclick="switchPage('create-group')"><span class="icon">➕</span> إنشاء مجموعة</div>
                 <div class="nav-item" onclick="switchPage('codes')"><span class="icon">🔑</span> أكواد الطلاب</div>
-                <div class="nav-item" onclick="switchPage('id-cards')"><span class="icon">🪪</span> بطاقات الهوية</div>
                 
                 <div class="nav-section">💬 التواصل</div>
                 <div class="nav-item" onclick="switchPage('chats-list')"><span class="icon">💬</span> المحادثات</div>
                 <div class="nav-item" onclick="switchPage('broadcast')"><span class="icon">📢</span> البث الجماعي</div>
-                <div class="nav-item" onclick="switchPage('scheduled')"><span class="icon">⏰</span> رسائل مجدولة</div>
-                <div class="nav-item" onclick="switchPage('auto-reply')"><span class="icon">🤖</span> الردود التلقائية</div>
                 
                 <div class="nav-section">📱 المحتوى</div>
                 <div class="nav-item" onclick="switchPage('stories')"><span class="icon">📖</span> القصص</div>
@@ -345,43 +274,22 @@
                 <div class="nav-section">🛡️ الأمان</div>
                 <div class="nav-item" onclick="switchPage('reports')"><span class="icon">🚨</span> البلاغات <span class="badge-count" id="reportCountBadge">0</span></div>
                 <div class="nav-item" onclick="switchPage('banned')"><span class="icon">🚫</span> المحظورين</div>
-                <div class="nav-item" onclick="switchPage('word-filter')"><span class="icon">🚷</span> فلترة الكلمات</div>
                 <div class="nav-item" onclick="switchPage('backup')"><span class="icon">💾</span> النسخ الاحتياطي</div>
                 
                 <div class="nav-section">⚙️ النظام</div>
                 <div class="nav-item" onclick="switchPage('settings')"><span class="icon">⚙️</span> الإعدادات</div>
-                <div class="nav-item" onclick="switchPage('theme')"><span class="icon">🎨</span> تخصيص المظهر</div>
                 <div class="nav-item" onclick="switchPage('logs')"><span class="icon">📜</span> سجل النشاطات</div>
-                <div class="nav-item" onclick="switchPage('student-preview')"><span class="icon">👁️</span> معاينة الطالب</div>
             </div>
             <div class="sidebar-footer">
-                <button class="logout-btn" onclick="confirmLogout()">🚪 تسجيل الخروج</button>
+                <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
             </div>
         </div>
         <div class="main-content" id="mainContent"></div>
     </div>
-    
-    <!-- Floating Notification Button -->
-    <button class="notification-fab hidden" id="notificationFab" onclick="toggleNotificationCenter()" title="الإشعارات">
-        🔔<span class="fab-badge hidden" id="fabBadge">0</span>
-    </button>
-    
-    <!-- Notification Center Panel -->
-    <div class="notification-center" id="notificationCenter">
-        <div class="nc-header">
-            <h3 style="color:var(--gold);">🔔 مركز الإشعارات</h3>
-            <button class="btn btn-xs btn-outline" onclick="markAllNotifsRead()">✅ قراءة الكل</button>
-        </div>
-        <div id="notificationsList">
-            <p style="text-align:center; color:var(--text3); padding:30px;">لا توجد إشعارات</p>
-        </div>
-    </div>
 </div>
 
 <script>
-    // ==========================================
-    // FIREBASE INIT
-    // ==========================================
+    // ========== Firebase Init ==========
     firebase.initializeApp({ 
         apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY", 
         authDomain: "schoolchatapp-2c5b7.firebaseapp.com", 
@@ -392,8 +300,6 @@
     });
     const auth = firebase.auth();
     const db = firebase.firestore();
-    db.settings({ merge: true, cacheSizeBytes: 10485760 });
-    
     const CLOUD_NAME = "dlcjb79w0";
     const UPLOAD_PRESET = "school_preset";
     
@@ -404,60 +310,8 @@
     let privateChatUnsub = null;
     let realtimeListeners = [];
     let charts = {};
-    let notifications = [];
-    let bannedWords = [];
-    let autoReplies = [];
-    let scheduledMessages = [];
-    let notificationUnsub = null;
 
-    // ==========================================
-    // SECURITY - ANTI-THEFT PROTECTION
-    // ==========================================
-    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
-            (e.ctrlKey && e.key === 'U') || 
-            (e.ctrlKey && e.key === 'S') ||
-            (e.ctrlKey && e.shiftKey && e.key === 'I')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
-    document.addEventListener('dragstart', function(e) { e.preventDefault(); });
-    
-    // Clear console periodically
-    setInterval(function() {
-        if (window.console && console.clear) { /* keep clean */ }
-    }, 5000);
-
-    // ==========================================
-    // BACK BUTTON SUPPORT (MOBILE)
-    // ==========================================
-    window.addEventListener('popstate', function(e) {
-        if (currentChatGroupId) {
-            currentChatGroupId = null;
-            switchPage('groups');
-        } else if (currentPrivateChatUser) {
-            currentPrivateChatUser = null;
-            switchPage('chats-list');
-        } else if (document.getElementById('notificationCenter').classList.contains('open')) {
-            toggleNotificationCenter();
-        } else {
-            // Push state again to prevent exiting
-            history.pushState(null, '', window.location.href);
-        }
-    });
-    
-    // Push initial state
-    if (window.history && window.history.pushState) {
-        history.pushState(null, '', window.location.href);
-    }
-
-    // ==========================================
-    // HELPER FUNCTIONS
-    // ==========================================
+    // ========== Helper Functions ==========
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -474,13 +328,8 @@
         t = t || 'info';
         const c = { success: '#2ED573', error: '#FF4757', info: '#FFC107', warning: '#FFA502' };
         const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-        const existing = document.querySelector('.toast-notification');
-        if (existing) existing.remove();
-        
         const toast = document.createElement('div');
-        toast.className = 'toast-notification';
-        toast.style.background = (c[t] || c.info);
-        toast.style.color = (t === 'info' || t === 'warning') ? '#000' : '#fff';
+        toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:' + (c[t] || c.info) + '; color:' + (t==='info'||t==='warning'?'#000':'#fff') + '; padding:14px 24px; border-radius:25px; font-weight:bold; z-index:9999; box-shadow:0 8px 30px rgba(0,0,0,0.5); animation:slideUp 0.35s ease-out; font-size:0.85rem; display:flex; align-items:center; gap:8px; max-width:90%;';
         toast.innerHTML = '<span>' + (icons[t] || '') + '</span> ' + m;
         document.body.appendChild(toast);
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); }, 3000);
@@ -522,9 +371,9 @@
     function cleanListeners() {
         if (chatUnsub) { chatUnsub(); chatUnsub = null; }
         if (privateChatUnsub) { privateChatUnsub(); privateChatUnsub = null; }
-        if (notificationUnsub) { notificationUnsub(); notificationUnsub = null; }
         realtimeListeners.forEach(fn => { try { fn(); } catch(e) {} });
         realtimeListeners = [];
+        // Destroy charts
         Object.keys(charts).forEach(key => { if (charts[key]) { charts[key].destroy(); delete charts[key]; } });
     }
 
@@ -540,9 +389,7 @@
             'chats-list': 'المحادثات', 'broadcast': 'البث الجماعي', 'stories': 'القصص',
             'media': 'الوسائط', 'stickers': 'الملصقات', 'reports': 'البلاغات',
             'banned': 'المحظورين', 'backup': 'النسخ الاحتياطي', 'settings': 'الإعدادات',
-            'logs': 'سجل النشاطات', 'notifications': 'الإشعارات', 'id-cards': 'بطاقات الهوية',
-            'scheduled': 'رسائل مجدولة', 'auto-reply': 'الردود', 'word-filter': 'فلترة',
-            'theme': 'المظهر', 'student-preview': 'معاينة'
+            'logs': 'سجل النشاطات'
         };
         
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -551,11 +398,6 @@
         
         const main = document.getElementById('mainContent');
         showLoading(main);
-        
-        // Update history for back button
-        if (window.history && window.history.pushState) {
-            history.pushState({ page: page, data: data }, '', window.location.href);
-        }
         
         setTimeout(() => {
             switch(page) {
@@ -579,148 +421,32 @@
                 case 'logs': renderLogs(); break;
                 case 'chat': renderChat(data); break;
                 case 'members': renderMembers(data); break;
-                case 'notifications': renderNotificationsPage(); break;
-                case 'id-cards': renderIDCards(); break;
-                case 'scheduled': renderScheduledMessages(); break;
-                case 'auto-reply': renderAutoReply(); break;
-                case 'word-filter': renderWordFilter(); break;
-                case 'theme': renderThemeSettings(); break;
-                case 'student-preview': renderStudentPreview(); break;
                 default: renderDashboard();
             }
         }, 80);
     }
 
-    // ==========================================
-    // NOTIFICATION SYSTEM
-    // ==========================================
-    function addNotification(type, title, body, link, linkData) {
-        const notif = {
-            id: Date.now().toString(),
-            type: type || 'info',
-            title: title || '',
-            body: body || '',
-            link: link || '',
-            linkData: linkData || null,
-            read: false,
-            timestamp: new Date().toISOString()
-        };
-        notifications.unshift(notif);
-        // Save to Firestore
-        if (currentAdmin) {
-            db.collection('admin_notifications').add({
-                adminID: currentAdmin.uid,
-                ...notif,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(() => {});
-        }
-        updateNotificationBadge();
-        showToast('🔔 ' + title, 'info');
-        
-        // Play sound
+    async function updateSidebarCounts() {
+        if (!currentAdmin) return;
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.value = 900;
-            gain.gain.value = 0.15;
-            osc.start();
-            osc.stop(ctx.currentTime + 0.12);
-        } catch(e) {}
-    }
-    
-    function updateNotificationBadge() {
-        const unread = notifications.filter(n => !n.read).length;
-        const badge = document.getElementById('notifCountBadge');
-        const fabBadge = document.getElementById('fabBadge');
-        const fab = document.getElementById('notificationFab');
-        
-        if (badge) {
-            badge.textContent = unread;
-            if (unread > 0) { badge.classList.add('badge-pop'); badge.style.display = ''; }
-            else { badge.style.display = 'none'; }
-        }
-        if (fabBadge) {
-            fabBadge.textContent = unread;
-            if (unread > 0) { fabBadge.classList.remove('hidden'); fabBadge.classList.add('badge-pop'); }
-            else { fabBadge.classList.add('hidden'); }
-        }
-        if (fab) {
-            if (unread > 0) fab.classList.remove('hidden');
-        }
-    }
-    
-    function toggleNotificationCenter() {
-        const nc = document.getElementById('notificationCenter');
-        nc.classList.toggle('open');
-        if (nc.classList.contains('open')) {
-            renderNotificationList();
-        }
-    }
-    
-    function markAllNotifsRead() {
-        notifications.forEach(n => n.read = true);
-        updateNotificationBadge();
-        renderNotificationList();
-        showToast('✅ تم تعليم الكل كمقروء', 'success');
-    }
-    
-    function renderNotificationList() {
-        const list = document.getElementById('notificationsList');
-        if (!list) return;
-        
-        if (notifications.length === 0) {
-            list.innerHTML = '<p style="text-align:center; color:var(--text3); padding:30px;">لا توجد إشعارات</p>';
-            return;
-        }
-        
-        list.innerHTML = notifications.map(n => `
-        <div class="notification-item ${n.read ? '' : 'unread'}" onclick="${n.link ? "switchPage('" + n.link + "','" + (n.linkData || '') + "'); toggleNotificationCenter();" : ''}">
-            <span class="notif-icon">${n.type === 'new_user' ? '👤' : n.type === 'report' ? '🚨' : n.type === 'message' ? '💬' : n.type === 'backup' ? '💾' : '🔔'}</span>
-            <div class="notif-content">
-                <div class="notif-title">${n.title}</div>
-                <div class="notif-body">${n.body}</div>
-                <div class="notif-time">${timeAgo(n.timestamp)}</div>
-            </div>
-        </div>
-        `).join('');
-    }
-    
-    function startNotificationListener() {
-        if (notificationUnsub) notificationUnsub();
-        
-        // Listen for new users
-        const usersUnsub = db.collection('users').onSnapshot(snap => {
-            snap.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    const u = change.doc.data();
-                    if (u.role !== 'admin') {
-                        addNotification('new_user', '👤 طالب جديد', u.name + ' انضم للتطبيق', 'users');
-                    }
-                }
-            });
-        });
-        realtimeListeners.push(usersUnsub);
-        
-        // Listen for new reports
-        const reportsUnsub = db.collection('reports').where('status', '==', 'pending').onSnapshot(snap => {
-            snap.docChanges().forEach(change => {
-                if (change.type === 'added') {
-                    addNotification('report', '🚨 بلاغ جديد', change.doc.data().reason || 'بلاغ', 'reports');
-                }
-            });
-        });
-        realtimeListeners.push(reportsUnsub);
-        
-        // Update notification count periodically
-        updateNotificationBadge();
+            const [usersSnap, groupsSnap, reportsSnap] = await Promise.all([
+                db.collection('users').get(),
+                db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
+                db.collection('reports').where('status', '==', 'pending').get()
+            ]);
+            document.getElementById('userCountBadge').textContent = usersSnap.size;
+            document.getElementById('groupCountBadge').textContent = groupsSnap.size;
+            const reportBadge = document.getElementById('reportCountBadge');
+            reportBadge.textContent = reportsSnap.size;
+            if (reportsSnap.size > 0) {
+                reportBadge.classList.add('pulse');
+            } else {
+                reportBadge.classList.remove('pulse');
+            }
+        } catch(e) { console.error('Error updating counts:', e); }
     }
 
-    // ==========================================
-    // AUTH
-    // ==========================================
+    // ========== Auth ==========
     window.adminLogin = async function() {
         const email = document.getElementById('adminEmail').value.trim();
         const pass = document.getElementById('adminPassword').value.trim();
@@ -736,6 +462,7 @@
             const userDoc = await db.collection('users').doc(cred.user.uid).get();
             
             if (!userDoc.exists) {
+                // ⚠️ لا تنشئ أدمن جديد من هنا! هذا للتصحيح فقط
                 await db.collection('users').doc(cred.user.uid).set({
                     userID: cred.user.uid,
                     name: email.split('@')[0],
@@ -754,45 +481,20 @@
                 currentAdmin = { uid: cred.user.uid, name: userData.name, email: userData.email, role: 'admin' };
             }
             
-            // Save to localStorage for auto-login
-            localStorage.setItem('adminEmail', email);
-            
             spinner.style.display = 'none';
             document.getElementById('adminNameDisplay').textContent = currentAdmin.name;
             document.getElementById('adminEmailDisplay').textContent = currentAdmin.email || '';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appLayout').style.display = 'flex';
-            document.getElementById('notificationFab').classList.remove('hidden');
-            
             showToast('✅ مرحباً ' + currentAdmin.name, 'success');
             switchPage('dashboard');
             updateSidebarCounts();
-            startNotificationListener();
-            startAutoBackup();
-            loadBannedWords();
-            loadAutoReplies();
-            loadScheduledMessages();
             
         } catch(err) {
             spinner.style.display = 'none';
             errEl.textContent = '❌ ' + (err.message || 'فشل تسجيل الدخول');
         }
     };
-    
-    function confirmLogout() {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-        <div class="modal">
-            <span class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</span>
-            <h2>🚪 تأكيد الخروج</h2>
-            <p style="text-align:center; color:var(--text2);">هل أنت متأكد من تسجيل الخروج؟</p>
-            <button class="btn btn-danger" onclick="logout(); this.closest('.modal-overlay').remove();">🚪 خروج</button>
-            <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:6px;">إلغاء</button>
-        </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-    }
     
     window.logout = function() {
         if (currentAdmin) {
@@ -801,8 +503,6 @@
         auth.signOut().then(() => {
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appLayout').style.display = 'none';
-            document.getElementById('notificationFab').classList.add('hidden');
-            document.getElementById('notificationCenter').classList.remove('open');
             currentAdmin = null;
             cleanListeners();
         });
@@ -818,25 +518,13 @@
                     document.getElementById('adminEmailDisplay').textContent = currentAdmin.email || '';
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('appLayout').style.display = 'flex';
-                    document.getElementById('notificationFab').classList.remove('hidden');
                     switchPage('dashboard');
                     updateSidebarCounts();
-                    startNotificationListener();
-                    startAutoBackup();
-                    loadBannedWords();
-                    loadAutoReplies();
-                    loadScheduledMessages();
                 } else {
                     await auth.signOut();
                 }
             } catch(e) {
                 await auth.signOut();
-            }
-        } else {
-            // Check for saved email
-            const savedEmail = localStorage.getItem('adminEmail');
-            if (savedEmail) {
-                document.getElementById('adminEmail').value = savedEmail;
             }
         }
     });
@@ -870,18 +558,20 @@
         showLoading(main);
         
         try {
-            const [usersSnap, groupsSnap, codesSnap, reportsSnap] = await Promise.all([
+            const [usersSnap, groupsSnap, codesSnap, reportsSnap, messagesSnap] = await Promise.all([
                 db.collection('users').get(),
                 db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
                 db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get(),
-                db.collection('reports').get()
+                db.collection('reports').get(),
+                db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(async (gs) => {
+                    let total = 0;
+                    for (const gd of gs.docs) {
+                        const ms = await db.collection('groups').doc(gd.id).collection('messages').get();
+                        total += ms.size;
+                    }
+                    return total;
+                })
             ]);
-            
-            let totalMessages = 0;
-            for (const gd of groupsSnap.docs) {
-                const ms = await db.collection('groups').doc(gd.id).collection('messages').get();
-                totalMessages += ms.size;
-            }
             
             const totalUsers = usersSnap.size;
             const totalGroups = groupsSnap.size;
@@ -889,6 +579,7 @@
             const usedCodes = codesSnap.docs.filter(d => d.data().usedBy).length;
             const pendingReports = reportsSnap.docs.filter(d => d.data().status === 'pending').length;
             const onlineUsers = usersSnap.docs.filter(d => d.data().online).length;
+            const totalMessages = messagesSnap;
             
             let html = `
             <div class="page-header">
@@ -899,7 +590,6 @@
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <button class="btn btn-sm" onclick="switchPage('dashboard')">🔄 تحديث</button>
                     <button class="btn btn-sm btn-outline" onclick="exportAllData()">📤 تصدير Excel</button>
-                    <button class="btn btn-sm btn-purple" onclick="exportPDF()">📄 تصدير PDF</button>
                 </div>
             </div>
             
@@ -939,13 +629,12 @@
                     <button class="btn btn-sm btn-info" onclick="switchPage('create-group')">➕ مجموعة جديدة</button>
                     <button class="btn btn-sm btn-warning" onclick="switchPage('codes')">🔑 توليد أكواد</button>
                     <button class="btn btn-sm btn-success" onclick="switchPage('chats-list')">💬 المحادثات</button>
-                    <button class="btn btn-sm btn-purple" onclick="switchPage('scheduled')">⏰ جدولة رسالة</button>
-                    <button class="btn btn-sm btn-pink" onclick="switchPage('auto-reply')">🤖 رد تلقائي</button>
                     <button class="btn btn-sm btn-outline" onclick="switchPage('backup')">💾 نسخ احتياطي</button>
                 </div>
             </div>
             `;
             
+            // Recent activity
             const recentUsers = usersSnap.docs
                 .sort((a, b) => (b.data().createdAt?.toDate?.()?.getTime() || 0) - (a.data().createdAt?.toDate?.()?.getTime() || 0))
                 .slice(0, 5);
@@ -984,46 +673,6 @@
         }
     }
 
-    // ========== PDF Export ==========
-    window.exportPDF = async function() {
-        try {
-            showToast('⏳ جاري تجهيز التقرير...', 'info');
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            
-            // Title
-            doc.setFontSize(22);
-            doc.setTextColor(184, 134, 11);
-            doc.text('Web Egypt - تقرير الأدمن', 150, 20, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.setTextColor(100, 100, 100);
-            doc.text('تاريخ التصدير: ' + new Date().toLocaleDateString('ar-EG'), 150, 30, { align: 'center' });
-            
-            // Users table
-            const usersSnap = await db.collection('users').get();
-            const usersData = usersSnap.docs.map(d => {
-                const u = d.data();
-                return [u.name || '-', u.email || '-', u.role || 'user', u.banned ? 'محظور' : 'نشط', formatDate(u.createdAt)];
-            });
-            
-            doc.autoTable({
-                head: [['الاسم', 'البريد', 'الدور', 'الحالة', 'تاريخ التسجيل']],
-                body: usersData,
-                startY: 40,
-                styles: { font: 'helvetica', halign: 'center' },
-                headStyles: { fillColor: [184, 134, 11], textColor: [0, 0, 0] },
-                alternateRowStyles: { fillColor: [240, 240, 240] }
-            });
-            
-            doc.save('WebEgypt_Report_' + new Date().toISOString().split('T')[0] + '.pdf');
-            showToast('✅ تم تصدير PDF بنجاح', 'success');
-        } catch(e) {
-            showToast('❌ خطأ: ' + e.message, 'error');
-        }
-    };
-
-    // ========== Analytics ==========
     async function renderAnalytics() {
         const main = document.getElementById('mainContent');
         showLoading(main);
@@ -1031,6 +680,7 @@
         try {
             const groupsSnap = await db.collection('groups').where('adminID', '==', currentAdmin.uid).get();
             let groupData = [];
+            let messageData = [];
             let userActivityData = {};
             
             for (const gd of groupsSnap.docs) {
@@ -1093,6 +743,7 @@
             
             main.innerHTML = html;
             
+            // Render charts
             setTimeout(() => {
                 const groupsCtx = document.getElementById('groupsChart');
                 const dailyCtx = document.getElementById('dailyChart');
@@ -1103,17 +754,26 @@
                         data: {
                             labels: groupData.map(g => g.name),
                             datasets: [{
-                                label: 'الرسائل', data: groupData.map(g => g.messages),
-                                backgroundColor: 'rgba(255,193,7,0.6)', borderColor: '#FFC107', borderWidth: 1
+                                label: 'الرسائل',
+                                data: groupData.map(g => g.messages),
+                                backgroundColor: 'rgba(255,193,7,0.6)',
+                                borderColor: '#FFC107',
+                                borderWidth: 1
                             }, {
-                                label: 'الأعضاء', data: groupData.map(g => g.members),
-                                backgroundColor: 'rgba(30,144,255,0.4)', borderColor: '#1E90FF', borderWidth: 1
+                                label: 'الأعضاء',
+                                data: groupData.map(g => g.members),
+                                backgroundColor: 'rgba(30,144,255,0.4)',
+                                borderColor: '#1E90FF',
+                                borderWidth: 1
                             }]
                         },
                         options: {
                             responsive: true,
                             plugins: { legend: { labels: { color: '#AAA' } } },
-                            scales: { x: { ticks: { color: '#AAA' } }, y: { ticks: { color: '#AAA' }, beginAtZero: true } }
+                            scales: {
+                                x: { ticks: { color: '#AAA' } },
+                                y: { ticks: { color: '#AAA' }, beginAtZero: true }
+                            }
                         }
                     });
                 }
@@ -1125,14 +785,21 @@
                         data: {
                             labels: sorted.map(([k]) => k),
                             datasets: [{
-                                label: 'الرسائل', data: sorted.map(([, v]) => v),
-                                borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', fill: true, tension: 0.3
+                                label: 'الرسائل',
+                                data: sorted.map(([, v]) => v),
+                                borderColor: '#FFC107',
+                                backgroundColor: 'rgba(255,193,7,0.1)',
+                                fill: true,
+                                tension: 0.3
                             }]
                         },
                         options: {
                             responsive: true,
                             plugins: { legend: { labels: { color: '#AAA' } } },
-                            scales: { x: { ticks: { color: '#AAA' } }, y: { ticks: { color: '#AAA' }, beginAtZero: true } }
+                            scales: {
+                                x: { ticks: { color: '#AAA' } },
+                                y: { ticks: { color: '#AAA' }, beginAtZero: true }
+                            }
                         }
                     });
                 }
@@ -1143,9 +810,7 @@
         }
     }
 
-    // ==========================================
-    // USERS (WITH DELETE -> FORCE LOGOUT)
-    // ==========================================
+    // ========== Users ==========
     async function renderUsers() {
         const main = document.getElementById('mainContent');
         showLoading(main);
@@ -1177,15 +842,26 @@
                     <table class="data-table" id="userTable">
                         <thead>
                             <tr>
-                                <th>المستخدم</th><th>البريد</th><th>الهاتف</th>
-                                <th>الدور</th><th>الحالة</th><th>آخر ظهور</th><th>إجراءات</th>
+                                <th>المستخدم</th>
+                                <th>البريد</th>
+                                <th>الهاتف</th>
+                                <th>الدور</th>
+                                <th>الحالة</th>
+                                <th>آخر ظهور</th>
+                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${users.map(u => `
                                 <tr data-role="${u.role || 'user'}">
-                                    <td><div style="display:flex; align-items:center; gap:8px;"><img src="${u.profilePic || 'https://via.placeholder.com/30'}" style="width:30px;height:30px;border-radius:50%;"><strong>${u.name || '-'}</strong></div></td>
-                                    <td>${u.email || '-'}</td><td>${u.phone || '-'}</td>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <img src="${u.profilePic || 'https://via.placeholder.com/30'}" style="width:30px;height:30px;border-radius:50%;">
+                                            <strong>${u.name || '-'}</strong>
+                                        </div>
+                                    </td>
+                                    <td>${u.email || '-'}</td>
+                                    <td>${u.phone || '-'}</td>
                                     <td><span class="badge badge-${u.role || 'user'}">${u.role || 'user'}</span></td>
                                     <td>${u.online ? '🟢 متصل' : '○ غير متصل'}</td>
                                     <td>${timeAgo(u.lastSeen)}</td>
@@ -1193,8 +869,7 @@
                                         <button class="btn btn-xs" onclick="viewUserDetails('${u.id}')">👁️</button>
                                         <button class="btn btn-xs btn-info" onclick="changeUserRole('${u.id}','${u.role || 'user'}')">🔄</button>
                                         <button class="btn btn-xs btn-warning" onclick="toggleUserBan('${u.id}',${!!u.banned})">${u.banned ? '🔓' : '🚫'}</button>
-                                        <button class="btn btn-xs btn-purple" onclick="loginAsUser('${u.id}')">👻</button>
-                                        <button class="btn btn-xs btn-danger" onclick="deleteUserFull('${u.id}','${u.name || ''}')">🗑️</button>
+                                        <button class="btn btn-xs btn-danger" onclick="deleteUser('${u.id}')">🗑️</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1213,649 +888,1951 @@
         }
     }
 
-    // ===== DELETE USER + FORCE LOGOUT =====
-    window.deleteUserFull = async function(uid, name) {
-        if (!confirm('⚠️ هل أنت متأكد من حذف المستخدم "' + (name || uid) + '"؟\n\nسيتم حذف حسابه بالكامل وسيخرج من التطبيق فوراً!')) return;
-        
+    window.filterTable = function(inputId, tableId) {
+        const filter = (document.getElementById(inputId)?.value || '').toUpperCase();
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const rows = table.getElementsByTagName('tr');
+        for (let i = 1; i < rows.length; i++) {
+            const td = rows[i].getElementsByTagName('td')[0];
+            if (td) {
+                rows[i].style.display = (td.textContent || '').toUpperCase().indexOf(filter) > -1 ? '' : 'none';
+            }
+        }
+    };
+
+    window.filterByRole = function() {
+        const role = document.getElementById('roleFilter')?.value || 'all';
+        const rows = document.querySelectorAll('#userTable tbody tr');
+        rows.forEach(row => {
+            if (role === 'all') {
+                row.style.display = '';
+            } else {
+                row.style.display = row.dataset.role === role ? '' : 'none';
+            }
+        });
+    };
+
+    window.viewUserDetails = async function(uid) {
         try {
-            // 1. Delete user document (this triggers onSnapshot in student app -> auto logout)
-            await db.collection('users').doc(uid).delete();
+            const doc = await db.collection('users').doc(uid).get();
+            if (!doc.exists) return showToast('❌ المستخدم غير موجود', 'error');
+            const u = doc.data();
             
-            // 2. Delete user's codes
-            const codesSnap = await db.collection('student_codes').where('usedBy', '==', uid).get();
-            const batch = db.batch();
-            codesSnap.forEach(d => batch.delete(d.ref));
-            
-            // 3. Remove from all groups
+            // Get user's groups
             const groupsSnap = await db.collection('groups').where('members', 'array-contains', uid).get();
-            groupsSnap.forEach(gd => {
-                batch.update(gd.ref, {
-                    members: firebase.firestore.FieldValue.arrayRemove(uid),
-                    memberCount: firebase.firestore.FieldValue.increment(-1)
-                });
-            });
+            const groups = groupsSnap.docs.map(d => d.data().name).join('، ') || 'لا يوجد';
             
-            await batch.commit();
-            
-            // 4. Log the action
-            await db.collection('activity_logs').add({
-                adminID: currentAdmin.uid,
-                adminName: currentAdmin.name,
-                action: '🗑️ حذف المستخدم: ' + (name || uid),
-                targetUserID: uid,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            addNotification('info', '🗑️ تم حذف مستخدم', (name || uid) + ' تم حذفه من النظام');
-            showToast('✅ تم حذف المستخدم وسيخرج من التطبيق فوراً', 'success');
-            renderUsers();
-            updateSidebarCounts();
-            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+            <div class="modal">
+                <span class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</span>
+                <h2>👤 تفاصيل المستخدم</h2>
+                <div style="text-align:center; margin-bottom:15px;">
+                    <img src="${u.profilePic || 'https://via.placeholder.com/80'}" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);">
+                    <h3 style="color:var(--gold); margin:8px 0;">${u.name || '-'}</h3>
+                    <span class="badge badge-${u.role || 'user'}">${u.role || 'user'}</span>
+                    ${u.banned ? '<span class="badge badge-locked">🚫 محظور</span>' : ''}
+                </div>
+                <table class="data-table" style="width:100%;">
+                    <tr><td><strong>📧 البريد</strong></td><td>${u.email || '-'}</td></tr>
+                    <tr><td><strong>📱 الهاتف</strong></td><td>${u.phone || '-'}</td></tr>
+                    <tr><td><strong>💬 الرسائل</strong></td><td>${u.totalMessages || 0}</td></tr>
+                    <tr><td><strong>⭐ النقاط</strong></td><td>${u.points || 0}</td></tr>
+                    <tr><td><strong>📋 المجموعات</strong></td><td>${groups}</td></tr>
+                    <tr><td><strong>🔑 الجهاز</strong></td><td>${u.deviceID || '-'}</td></tr>
+                    <tr><td><strong>📅 التسجيل</strong></td><td>${formatDate(u.createdAt)}</td></tr>
+                    <tr><td><strong>🕐 آخر ظهور</strong></td><td>${timeAgo(u.lastSeen)}</td></tr>
+                </table>
+                <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:15px;">إغلاق</button>
+            </div>
+            `;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
         } catch(e) {
             showToast('❌ خطأ: ' + e.message, 'error');
         }
     };
 
-    // ===== LOGIN AS USER (STEALTH MODE) =====
-    window.loginAsUser = function(uid) {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-        <div class="modal">
-            <span class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</span>
-            <h2>👻 معاينة كـ (Login As)</h2>
-            <p style="text-align:center; color:var(--text2);">معاينة التطبيق كما يراه المستخدم: <strong>${uid}</strong></p>
-            <p style="text-align:center; color:var(--warning); font-size:0.8rem;">⚠️ هذا للعرض فقط، لن تتمكن من إرسال رسائل</p>
-            <div style="border:1px solid #333; border-radius:12px; overflow:hidden; margin:12px 0;">
-                <iframe src="about:blank" id="previewFrame" style="width:100%; height:500px; border:none; background:#0d0d14;" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
-            </div>
-            <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%;">إغلاق</button>
-        </div>`;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    window.changeUserRole = async function(uid, currentRole) {
+        const roles = ['user', 'moderator', 'admin'];
+        const currentIndex = roles.indexOf(currentRole);
+        const nextRole = roles[(currentIndex + 1) % roles.length];
         
-        // Generate preview URL with user ID
-        const previewUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html') + '?preview=' + uid;
-        setTimeout(() => {
-            const frame = document.getElementById('previewFrame');
-            if (frame) frame.src = previewUrl;
-        }, 500);
+        if (confirm(`تغيير دور المستخدم إلى "${nextRole}"؟`)) {
+            try {
+                await db.collection('users').doc(uid).update({ role: nextRole });
+                showToast('✅ تم تغيير الدور إلى ' + nextRole, 'success');
+                renderUsers();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
     };
 
-    // ==========================================
-    // ID CARDS
-    // ==========================================
-    async function renderIDCards() {
+    window.toggleUserBan = async function(uid, currentlyBanned) {
+        const action = currentlyBanned ? 'رفع الحظر' : 'حظر';
+        if (confirm(`${action} هذا المستخدم؟`)) {
+            try {
+                await db.collection('users').doc(uid).update({ 
+                    banned: !currentlyBanned,
+                    bannedAt: currentlyBanned ? firebase.firestore.FieldValue.delete() : firebase.firestore.FieldValue.serverTimestamp(),
+                    bannedBy: currentlyBanned ? firebase.firestore.FieldValue.delete() : currentAdmin.uid
+                });
+                showToast(`✅ تم ${action}`, 'success');
+                renderUsers();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
+    };
+
+    window.deleteUser = async function(uid) {
+        if (confirm('⚠️ هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع!')) {
+            try {
+                await db.collection('users').doc(uid).delete();
+                showToast('✅ تم الحذف', 'success');
+                renderUsers();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
+    };
+
+    // ========== Groups ==========
+    async function renderGroups() {
         const main = document.getElementById('mainContent');
         showLoading(main);
         
         try {
-            const usersSnap = await db.collection('users').where('role', '!=', 'admin').get();
-            const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const snap = await db.collection('groups').where('adminID', '==', currentAdmin.uid).get();
+            const groups = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.createdAt?.toDate?.()?.getTime() || 0) - (a.createdAt?.toDate?.()?.getTime() || 0));
             
             let html = `
             <div class="page-header">
-                <h1>🪪 بطاقات هوية الطلاب</h1>
-                <span class="breadcrumb">الإدارة / بطاقات الهوية</span>
-            </div>
-            
-            <div class="grid-2">
-                ${users.map(u => `
-                <div class="card">
-                    <div class="id-card-preview">
-                        <div class="qr-container" id="qr_${u.id}"></div>
-                        <div class="student-info">
-                            <h4>${u.name || 'طالب'}</h4>
-                            <p>🆔 ${u.id}</p>
-                            <p>📱 ${u.phone || '-'}</p>
-                            <p>⭐ ${u.points || 0} نقطة</p>
-                            <span class="badge badge-${u.role || 'user'}">${u.role || 'user'}</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-xs" onclick="printIDCard('${u.id}')" style="width:100%; margin-top:8px;">🖨️ طباعة</button>
-                </div>
-                `).join('')}
-                ${users.length === 0 ? '<div class="empty-state"><div class="icon">🪪</div><h3>لا يوجد طلاب</h3></div>' : ''}
+                <h1>📋 إدارة المجموعات</h1>
+                <button class="btn btn-sm" onclick="switchPage('create-group')">➕ مجموعة جديدة</button>
             </div>
             `;
             
-            main.innerHTML = html;
-            
-            // Generate QR codes
-            setTimeout(() => {
-                users.forEach(u => {
-                    const qrContainer = document.getElementById('qr_' + u.id);
-                    if (qrContainer && typeof QRCode !== 'undefined') {
-                        new QRCode(qrContainer, {
-                            text: u.id,
-                            width: 80,
-                            height: 80,
-                            colorDark: '#000000',
-                            colorLight: '#ffffff'
-                        });
-                    }
+            if (groups.length === 0) {
+                html += `
+                <div class="empty-state">
+                    <div class="icon">📭</div>
+                    <h3>لا توجد مجموعات بعد</h3>
+                    <p>أنشئ مجموعتك الأولى للتواصل مع الطلاب</p>
+                    <button class="btn" onclick="switchPage('create-group')">➕ إنشاء مجموعة</button>
+                </div>
+                `;
+            } else {
+                groups.forEach(g => {
+                    const perms = g.permissions || {};
+                    const restrictions = [];
+                    if (perms.allowText === false) restrictions.push('📝');
+                    if (perms.allowImages === false) restrictions.push('🖼️');
+                    if (perms.allowVideos === false) restrictions.push('🎥');
+                    if (perms.allowFiles === false) restrictions.push('📎');
+                    if (perms.allowAudio === false) restrictions.push('🎤');
+                    
+                    html += `
+                    <div class="card fade-in">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <img src="${g.picture || 'https://via.placeholder.com/50'}" style="width:55px;height:55px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;" onerror="this.src='https://via.placeholder.com/50'">
+                                <div>
+                                    <h3 style="color:var(--gold); display:flex; align-items:center; gap:6px;">
+                                        ${g.name || 'مجموعة'}
+                                        ${g.isLocked ? '<span title="مقفولة">🔒</span>' : '<span title="مفتوحة">🟢</span>'}
+                                        ${restrictions.length > 0 ? '<span style="font-size:0.7rem; color:var(--warning);">⚠️ قيود</span>' : ''}
+                                    </h3>
+                                    <p style="font-size:0.8rem; color:var(--text2);">
+                                        👥 ${g.memberCount || 0} عضو | 
+                                        ${g.type === 'open' ? '🌐 مفتوح' : '🔐 مقفول'} |
+                                        ${restrictions.length > 0 ? '🚫 ممنوع: ' + restrictions.join(' ') : '✅ الكل مسموح'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                <button class="btn btn-xs" onclick="openAdminChat('${g.id}')" title="فتح الشات">💬</button>
+                                <button class="btn btn-xs btn-info" onclick="switchPage('members','${g.id}')" title="إدارة الأعضاء">👤</button>
+                                <button class="btn btn-xs ${g.isLocked ? 'btn-success' : 'btn-warning'}" onclick="toggleGroupLock('${g.id}',${!g.isLocked})" title="${g.isLocked ? 'فتح' : 'قفل'}">${g.isLocked ? '🔓' : '🔒'}</button>
+                                <button class="btn btn-xs btn-outline" onclick="switchPage('edit-group','${g.id}')" title="تعديل">✏️</button>
+                                <button class="btn btn-xs btn-danger" onclick="deleteGroup('${g.id}')" title="حذف">🗑️</button>
+                            </div>
+                        </div>
+                        ${restrictions.length > 0 ? `
+                        <div style="margin-top:8px; padding:8px 12px; background:rgba(255,165,2,0.1); border-radius:8px; font-size:0.75rem; color:var(--warning);">
+                            ⚠️ الصلاحيات المقيدة: ${restrictions.join(' ')}
+                        </div>
+                        ` : ''}
+                    </div>
+                    `;
                 });
-            }, 300);
+            }
+            
+            main.innerHTML = html;
+            updateSidebarCounts();
             
         } catch(e) {
             main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
         }
     }
-    
-    window.printIDCard = function(uid) {
-        const card = document.querySelector(`#qr_${uid}`)?.closest('.id-card-preview');
-        if (!card) return;
-        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-        <html dir="rtl">
-        <head><title>بطاقة هوية</title>
-        <style>
-            body { font-family: 'Cairo', sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; background:#fff; }
-            ${card.outerHTML}
-            .id-card-preview { border:3px solid #B8860B; border-radius:20px; padding:30px; max-width:400px; }
-            .qr-container img { width:100px; height:100px; }
-        </style>
-        </head>
-        <body>${card.outerHTML}</body>
-        </html>
-        `);
-        printWindow.document.close();
-        setTimeout(() => printWindow.print(), 500);
+
+    window.toggleGroupLock = async function(gid, lock) {
+        try {
+            await db.collection('groups').doc(gid).update({ 
+                isLocked: lock,
+                lockedAt: lock ? firebase.firestore.FieldValue.serverTimestamp() : firebase.firestore.FieldValue.delete(),
+                lockedBy: lock ? currentAdmin.uid : firebase.firestore.FieldValue.delete()
+            });
+            showToast(lock ? '🔒 تم قفل المجموعة' : '🔓 تم فتح المجموعة', 'success');
+            renderGroups();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
     };
 
-    // ==========================================
-    // SCHEDULED MESSAGES
-    // ==========================================
-    function renderScheduledMessages() {
+    window.deleteGroup = async function(gid) {
+        if (confirm('⚠️ هل أنت متأكد من حذف هذه المجموعة؟ سيتم حذف جميع الرسائل!')) {
+            try {
+                // Delete all messages first
+                const msgs = await db.collection('groups').doc(gid).collection('messages').get();
+                const batch = db.batch();
+                msgs.forEach(d => batch.delete(d.ref));
+                batch.delete(db.collection('groups').doc(gid));
+                await batch.commit();
+                showToast('✅ تم حذف المجموعة', 'success');
+                renderGroups();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
+    };
+
+    window.openAdminChat = function(gid) {
+        currentChatGroupId = gid;
+        switchPage('chat', gid);
+    };
+
+    function renderMembers(gid) {
         const main = document.getElementById('mainContent');
+        showLoading(main);
         
-        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(groupsSnap => {
-            const groupsOptions = groupsSnap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('');
+        db.collection('groups').doc(gid).get().then(doc => {
+            if (!doc.exists) { switchPage('groups'); return; }
+            const g = doc.data();
+            const members = g.members || [];
             
             let html = `
             <div class="page-header">
-                <h1>⏰ رسائل مجدولة</h1>
-                <span class="breadcrumb">التواصل / رسائل مجدولة</span>
+                <h1>👤 إدارة الأعضاء - ${g.name || 'المجموعة'}</h1>
+                <button class="btn btn-sm btn-outline" onclick="switchPage('groups')">⬅️ رجوع</button>
             </div>
             
             <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">➕ جدولة رسالة جديدة</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>📋 المجموعة</label>
-                        <select id="schedGroup" class="input-field">${groupsOptions}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>📅 تاريخ الإرسال</label>
-                        <input type="datetime-local" id="schedDate" class="input-field">
-                    </div>
+                <h3 style="color:var(--gold); margin-bottom:12px;">➕ إضافة عضو</h3>
+                <div style="display:flex; gap:8px;">
+                    <input class="input-field" id="newMemberId" placeholder="معرف المستخدم (UID)">
+                    <button class="btn btn-sm" onclick="addMemberToGroup('${gid}')">➕ إضافة</button>
                 </div>
-                <div class="form-group">
-                    <label>📝 نص الرسالة</label>
-                    <textarea id="schedMsg" class="input-field" style="min-height:100px;" placeholder="اكتب الرسالة..."></textarea>
-                </div>
-                <button class="btn" onclick="scheduleMessage()">⏰ جدولة</button>
             </div>
             
             <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:15px;">📋 الرسائل المجدولة</h3>
-                <div id="scheduledList"></div>
+                <h3 style="color:var(--gold); margin-bottom:12px;">👥 الأعضاء (${members.length})</h3>
+                <div id="membersList"></div>
             </div>
             `;
             
             main.innerHTML = html;
             
-            // Load scheduled messages
-            db.collection('scheduled_messages')
-                .where('adminID', '==', currentAdmin.uid)
-                .orderBy('scheduledFor', 'asc')
-                .get()
-                .then(snap => {
-                    const list = document.getElementById('scheduledList');
-                    if (snap.empty) {
-                        list.innerHTML = '<p style="color:var(--text3); text-align:center;">لا توجد رسائل مجدولة</p>';
-                        return;
-                    }
-                    
-                    list.innerHTML = snap.docs.map(d => {
-                        const s = d.data();
-                        const sent = s.sent || false;
+            // Load member details
+            if (members.length > 0) {
+                Promise.all(members.map(uid => db.collection('users').doc(uid).get())).then(users => {
+                    const listHtml = users.map((u, i) => {
+                        const ud = u.exists ? u.data() : {};
                         return `
-                        <div class="scheduled-msg-card ${sent ? 'sent' : ''}">
-                            <strong>📝 ${(s.message || '').substring(0, 50)}...</strong>
-                            <div class="schedule-time">📅 ${formatDate(s.scheduledFor)} ${formatTime(s.scheduledFor)}</div>
-                            <small style="color:${sent ? 'var(--success)' : 'var(--info)'};">${sent ? '✅ تم الإرسال' : '⏳ في الانتظار'}</small>
-                            ${!sent ? `<button class="btn btn-xs btn-danger" onclick="deleteScheduledMsg('${d.id}')">🗑️</button>` : ''}
-                        </div>`;
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--surface2); margin:4px 0; border-radius:10px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${ud.profilePic || 'https://via.placeholder.com/32'}" style="width:32px;height:32px;border-radius:50%;">
+                                <div>
+                                    <strong>${ud.name || 'مستخدم'}</strong>
+                                    <small style="color:var(--text2); display:block;">${members[i]}</small>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                ${members[i] === g.adminID ? '<span class="badge badge-admin">مالك</span>' : ''}
+                                <button class="btn btn-xs btn-danger" onclick="removeMemberFromGroup('${gid}','${members[i]}')">❌ إزالة</button>
+                            </div>
+                        </div>
+                        `;
                     }).join('');
+                    document.getElementById('membersList').innerHTML = listHtml || '<p style="color:var(--text3);">لا يوجد أعضاء</p>';
                 });
+            } else {
+                document.getElementById('membersList').innerHTML = '<p style="color:var(--text3); text-align:center;">لا يوجد أعضاء</p>';
+            }
         });
     }
-    
-    window.scheduleMessage = async function() {
-        const groupId = document.getElementById('schedGroup')?.value;
-        const dateStr = document.getElementById('schedDate')?.value;
-        const msg = document.getElementById('schedMsg')?.value?.trim();
-        
-        if (!groupId || !dateStr || !msg) return showToast('⚠️ أكمل جميع الحقول', 'warning');
+
+    window.addMemberToGroup = async function(gid) {
+        const uid = document.getElementById('newMemberId')?.value?.trim();
+        if (!uid) return showToast('⚠️ أدخل معرف المستخدم', 'warning');
         
         try {
-            await db.collection('scheduled_messages').add({
-                adminID: currentAdmin.uid,
-                groupID: groupId,
-                message: msg,
-                scheduledFor: new Date(dateStr),
-                sent: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            const userDoc = await db.collection('users').doc(uid).get();
+            if (!userDoc.exists) return showToast('❌ المستخدم غير موجود', 'error');
+            
+            await db.collection('groups').doc(gid).update({
+                members: firebase.firestore.FieldValue.arrayUnion(uid),
+                memberCount: firebase.firestore.FieldValue.increment(1)
             });
-            showToast('✅ تمت الجدولة', 'success');
-            renderScheduledMessages();
-            addNotification('info', '⏰ رسالة مجدولة', 'تمت جدولة رسالة للإرسال في ' + formatDate(new Date(dateStr)));
+            showToast('✅ تم إضافة العضو', 'success');
+            renderMembers(gid);
         } catch(e) {
             showToast('❌ خطأ: ' + e.message, 'error');
         }
     };
-    
-    window.deleteScheduledMsg = async function(id) {
-        if (confirm('حذف هذه الرسالة المجدولة؟')) {
-            await db.collection('scheduled_messages').doc(id).delete();
-            showToast('✅ تم الحذف', 'success');
-            renderScheduledMessages();
+
+    window.removeMemberFromGroup = async function(gid, uid) {
+        if (confirm('إزالة هذا العضو من المجموعة؟')) {
+            try {
+                await db.collection('groups').doc(gid).update({
+                    members: firebase.firestore.FieldValue.arrayRemove(uid),
+                    memberCount: firebase.firestore.FieldValue.increment(-1)
+                });
+                showToast('✅ تم الإزالة', 'success');
+                renderMembers(gid);
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
         }
     };
-    
-    async function loadScheduledMessages() {
-        // Check for due messages every minute
-        setInterval(async () => {
-            if (!currentAdmin) return;
-            try {
-                const now = new Date();
-                const snap = await db.collection('scheduled_messages')
-                    .where('adminID', '==', currentAdmin.uid)
-                    .where('sent', '==', false)
-                    .get();
-                
-                snap.forEach(async d => {
-                    const s = d.data();
-                    const scheduledDate = s.scheduledFor?.toDate?.() || new Date(s.scheduledFor);
-                    if (scheduledDate <= now) {
-                        // Send the message
-                        await db.collection('groups').doc(s.groupID).collection('messages').add({
-                            senderID: currentAdmin.uid,
-                            senderName: currentAdmin.name,
-                            type: 'broadcast',
-                            content: s.message,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        await d.ref.update({ sent: true, sentAt: firebase.firestore.FieldValue.serverTimestamp() });
-                        addNotification('info', '📨 رسالة مجدولة', 'تم إرسال رسالة مجدولة');
-                    }
-                });
-            } catch(e) {}
-        }, 60000);
-    }
 
-    // ==========================================
-    // AUTO REPLY
-    // ==========================================
-    function renderAutoReply() {
+    // ========== Create/Edit Group ==========
+    function renderCreateGroup() {
         const main = document.getElementById('mainContent');
-        
         main.innerHTML = `
         <div class="page-header">
-            <h1>🤖 الردود التلقائية</h1>
-            <span class="breadcrumb">التواصل / الردود التلقائية</span>
+            <h1>➕ إنشاء مجموعة جديدة</h1>
+            <span class="breadcrumb">المجموعات / إنشاء</span>
         </div>
         
         <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">➕ إضافة رد تلقائي</h3>
             <div class="form-row">
                 <div class="form-group">
-                    <label>🔍 الكلمة المفتاحية</label>
-                    <input id="replyKeyword" class="input-field" placeholder="الكلمة التي يبحث عنها البوت">
+                    <label>📝 اسم المجموعة *</label>
+                    <input id="gName" class="input-field" placeholder="أدخل اسم المجموعة">
                 </div>
                 <div class="form-group">
-                    <label>📋 المجموعة (اختياري)</label>
-                    <select id="replyGroup" class="input-field">
-                        <option value="">كل المجموعات</option>
+                    <label>🏷️ نوع المجموعة</label>
+                    <select id="gType" class="input-field">
+                        <option value="open">🌐 مفتوحة - يمكن للأعضاء الكتابة</option>
+                        <option value="closed">🔐 مقفولة - المشرف فقط يكتب</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🖼️ رابط الصورة</label>
+                    <input id="gPic" class="input-field" value="https://via.placeholder.com/150" placeholder="رابط صورة المجموعة">
+                </div>
+                <div class="form-group">
+                    <label>🎨 لون المجموعة</label>
+                    <input id="gColor" type="color" class="input-field" value="#FFC107" style="height:42px; padding:4px;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>📄 وصف المجموعة</label>
+                <textarea id="gDesc" class="input-field" placeholder="اكتب وصفاً للمجموعة..." style="min-height:100px;"></textarea>
+            </div>
+            
+            <h3 style="color:var(--gold); margin:20px 0 12px;">⚙️ صلاحيات المجموعة</h3>
+            <div class="grid-2">
+                <div class="permission-card">
+                    <span class="perm-icon">📝</span>
+                    <div class="perm-info"><div class="perm-name">النصوص</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permText" checked></div>
+                </div>
+                <div class="permission-card">
+                    <span class="perm-icon">🖼️</span>
+                    <div class="perm-info"><div class="perm-name">الصور</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permImages" checked></div>
+                </div>
+                <div class="permission-card">
+                    <span class="perm-icon">🎥</span>
+                    <div class="perm-info"><div class="perm-name">الفيديو</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permVideos" checked></div>
+                </div>
+                <div class="permission-card">
+                    <span class="perm-icon">📎</span>
+                    <div class="perm-info"><div class="perm-name">الملفات</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permFiles" checked></div>
+                </div>
+                <div class="permission-card">
+                    <span class="perm-icon">🎤</span>
+                    <div class="perm-info"><div class="perm-name">الصوت</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permAudio" checked></div>
+                </div>
+                <div class="permission-card">
+                    <span class="perm-icon">🔗</span>
+                    <div class="perm-info"><div class="perm-name">الروابط</div></div>
+                    <div class="toggle-switch"><input type="checkbox" id="permLinks" checked></div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="createGroup()" style="width:100%; margin-top:20px; font-size:1rem;">🚀 إنشاء المجموعة</button>
+        </div>
+        `;
+    }
+
+    window.createGroup = async function() {
+        const name = document.getElementById('gName')?.value?.trim();
+        if (!name) return showToast('⚠️ اسم المجموعة مطلوب', 'warning');
+        
+        try {
+            const groupData = {
+                name: name,
+                type: document.getElementById('gType').value,
+                picture: document.getElementById('gPic').value,
+                color: document.getElementById('gColor').value,
+                description: document.getElementById('gDesc').value,
+                adminID: currentAdmin.uid,
+                adminName: currentAdmin.name,
+                members: [currentAdmin.uid],
+                memberCount: 1,
+                permissions: {
+                    allowText: document.getElementById('permText').checked,
+                    allowImages: document.getElementById('permImages').checked,
+                    allowVideos: document.getElementById('permVideos').checked,
+                    allowFiles: document.getElementById('permFiles').checked,
+                    allowAudio: document.getElementById('permAudio').checked,
+                    allowLinks: document.getElementById('permLinks').checked
+                },
+                isLocked: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await db.collection('groups').add(groupData);
+            showToast('✅ تم إنشاء المجموعة بنجاح!', 'success');
+            switchPage('groups');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    function renderEditGroup(groupId) {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        db.collection('groups').doc(groupId).get().then(doc => {
+            if (!doc.exists) { switchPage('groups'); return; }
+            const g = doc.data();
+            const perms = g.permissions || {};
+            
+            main.innerHTML = `
+            <div class="page-header">
+                <h1>✏️ تعديل: ${g.name || 'المجموعة'}</h1>
+                <button class="btn btn-sm btn-outline" onclick="switchPage('groups')">⬅️ رجوع</button>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold);">📝 المعلومات الأساسية</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>اسم المجموعة *</label>
+                        <input id="eName" class="input-field" value="${g.name || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>النوع</label>
+                        <select id="eType" class="input-field">
+                            <option value="open" ${g.type === 'open' ? 'selected' : ''}>🌐 مفتوحة</option>
+                            <option value="closed" ${g.type === 'closed' ? 'selected' : ''}>🔐 مقفولة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🖼️ الصورة</label>
+                        <input id="ePic" class="input-field" value="${g.picture || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>🎨 اللون</label>
+                        <input id="eColor" type="color" class="input-field" value="${g.color || '#FFC107'}" style="height:42px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>📄 الوصف</label>
+                    <textarea id="eDesc" class="input-field" style="min-height:80px;">${g.description || ''}</textarea>
+                </div>
+                
+                <h3 style="color:var(--gold); margin:20px 0 12px;">🔒 حالة المجموعة</h3>
+                <div class="form-group">
+                    <select id="eLocked" class="input-field" onchange="togglePermSectionEdit()">
+                        <option value="false" ${!g.isLocked ? 'selected' : ''}>🟢 مفتوحة - الأعضاء يمكنهم الكتابة</option>
+                        <option value="true" ${g.isLocked ? 'selected' : ''}>🔒 مقفولة - المشرف فقط يكتب</option>
+                    </select>
+                </div>
+                
+                <h3 style="color:var(--gold); margin:20px 0 12px;">⚙️ صلاحيات الوسائط</h3>
+                <div id="permSectionEdit" style="${g.isLocked ? 'opacity:0.5; pointer-events:none;' : ''}">
+                    <p class="helper-text" style="color:var(--warning); margin-bottom:10px;">⚠️ هذه الصلاحيات تطبق فقط عندما تكون المجموعة مفتوحة</p>
+                    <div class="grid-2">
+                        <div class="permission-card">
+                            <span class="perm-icon">📝</span>
+                            <div class="perm-info"><div class="perm-name">النصوص</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eText" ${perms.allowText !== false ? 'checked' : ''}></div>
+                        </div>
+                        <div class="permission-card">
+                            <span class="perm-icon">🖼️</span>
+                            <div class="perm-info"><div class="perm-name">الصور</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eImg" ${perms.allowImages !== false ? 'checked' : ''}></div>
+                        </div>
+                        <div class="permission-card">
+                            <span class="perm-icon">🎥</span>
+                            <div class="perm-info"><div class="perm-name">الفيديو</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eVid" ${perms.allowVideos !== false ? 'checked' : ''}></div>
+                        </div>
+                        <div class="permission-card">
+                            <span class="perm-icon">📎</span>
+                            <div class="perm-info"><div class="perm-name">الملفات</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eFile" ${perms.allowFiles !== false ? 'checked' : ''}></div>
+                        </div>
+                        <div class="permission-card">
+                            <span class="perm-icon">🎤</span>
+                            <div class="perm-info"><div class="perm-name">الصوت</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eAudio" ${perms.allowAudio !== false ? 'checked' : ''}></div>
+                        </div>
+                        <div class="permission-card">
+                            <span class="perm-icon">🔗</span>
+                            <div class="perm-info"><div class="perm-name">الروابط</div></div>
+                            <div class="toggle-switch"><input type="checkbox" id="eLink" ${perms.allowLinks !== false ? 'checked' : ''}></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-top:25px;">
+                    <button class="btn" onclick="saveGroupEdit('${groupId}')" style="flex:1;">💾 حفظ التعديلات</button>
+                    <button class="btn btn-outline" onclick="switchPage('groups')">إلغاء</button>
+                </div>
+            </div>
+            `;
+        });
+    }
+
+    window.togglePermSectionEdit = function() {
+        const section = document.getElementById('permSectionEdit');
+        const locked = document.getElementById('eLocked').value === 'true';
+        if (section) {
+            section.style.opacity = locked ? '0.5' : '1';
+            section.style.pointerEvents = locked ? 'none' : 'auto';
+        }
+    };
+
+    window.saveGroupEdit = async function(groupId) {
+        const isLocked = document.getElementById('eLocked').value === 'true';
+        
+        const updateData = {
+            name: document.getElementById('eName').value.trim(),
+            type: document.getElementById('eType').value,
+            picture: document.getElementById('ePic').value,
+            color: document.getElementById('eColor').value,
+            description: document.getElementById('eDesc').value,
+            isLocked: isLocked,
+            permissions: {
+                allowText: document.getElementById('eText').checked,
+                allowImages: document.getElementById('eImg').checked,
+                allowVideos: document.getElementById('eVid').checked,
+                allowFiles: document.getElementById('eFile').checked,
+                allowAudio: document.getElementById('eAudio').checked,
+                allowLinks: document.getElementById('eLink').checked
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (isLocked) {
+            updateData.lockedBy = currentAdmin.uid;
+            updateData.lockedAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        
+        try {
+            await db.collection('groups').doc(groupId).update(updateData);
+            showToast('✅ تم حفظ التعديلات' + (isLocked ? ' 🔒 المجموعة مقفولة الآن' : ' 🔓 المجموعة مفتوحة'), 'success');
+            switchPage('groups');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    // ========== Codes ==========
+    async function renderCodes() {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        try {
+            const [codesSnap, groupsSnap] = await Promise.all([
+                db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get(),
+                db.collection('groups').where('adminID', '==', currentAdmin.uid).get()
+            ]);
+            
+            const codes = codesSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.createdAt?.toDate?.()?.getTime() || 0) - (a.createdAt?.toDate?.()?.getTime() || 0));
+            
+            const available = codes.filter(c => !c.usedBy).length;
+            const used = codes.filter(c => c.usedBy).length;
+            
+            const groupsOptions = groupsSnap.docs.map(g => 
+                `<option value="${g.id}">${g.data().name || 'مجموعة'}</option>`
+            ).join('');
+            
+            let html = `
+            <div class="page-header">
+                <h1>🔑 إدارة أكواد الطلاب</h1>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-sm btn-warning" onclick="generateBulkCodesModal()">📦 توليد批量</button>
+                    <button class="btn btn-sm" onclick="exportCodes()">📤 تصدير</button>
+                </div>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card stat-card">
+                    <div class="stat-icon">🔑</div>
+                    <div class="stat-value" style="font-size:1.8rem;">${codes.length}</div>
+                    <div class="stat-label">إجمالي الأكواد</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" style="font-size:1.8rem; color:var(--success);">${available}</div>
+                    <div class="stat-label">متاحة</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-icon">🔒</div>
+                    <div class="stat-value" style="font-size:1.8rem; color:var(--danger);">${used}</div>
+                    <div class="stat-label">مستخدمة</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">🎫 توليد كود جديد</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>👤 اسم الطالب *</label>
+                        <input id="stuName" class="input-field" placeholder="الاسم الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label>📱 رقم الطالب</label>
+                        <input id="stuNumber" class="input-field" placeholder="رقم الهاتف أو المعرف">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📚 الصف الدراسي</label>
+                        <input id="stuClass" class="input-field" placeholder="مثال: الصف الثالث الثانوي">
+                    </div>
+                    <div class="form-group">
+                        <label>👤 النوع</label>
+                        <select id="stuType" class="input-field">
+                            <option>طالب</option>
+                            <option>طالبة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>📋 ربط بمجموعات (اختياري)</label>
+                    <select id="stuGroups" class="input-field" multiple style="min-height:120px;">
+                        ${groupsOptions}
+                    </select>
+                    <span class="helper-text" style="color:var(--warning);">⚠️ اختر المجموعات التي سينضم إليها الطالب تلقائياً عند استخدام الكود. إذا لم تختر أي مجموعة، لن يرى الطالب شيئاً!</span>
+                </div>
+                <button class="btn" onclick="generateSingleCode()" style="width:100%;">🎫 توليد الكود</button>
+                <div id="newCodeDisplay" style="margin-top:12px;"></div>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">📋 قائمة الأكواد</h3>
+                <div class="search-box" style="margin-bottom:10px;">
+                    <span class="search-icon">🔍</span>
+                    <input class="input-field" id="codeSearch" placeholder="بحث عن كود أو طالب..." oninput="filterTable('codeSearch','codeTable')" style="padding-left:35px;">
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="codeTable">
+                        <thead>
+                            <tr>
+                                <th>الطالب</th>
+                                <th>الكود</th>
+                                <th>الصف</th>
+                                <th>النوع</th>
+                                <th>المجموعات</th>
+                                <th>الحالة</th>
+                                <th>تاريخ الإنشاء</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${codes.map(c => `
+                                <tr>
+                                    <td><strong>${c.studentName || '-'}</strong></td>
+                                    <td><span class="code-display" style="padding:4px 10px; font-size:0.9rem;">${c.code}</span></td>
+                                    <td>${c.studentClass || '-'}</td>
+                                    <td>${c.type || '-'}</td>
+                                    <td>${(c.allowedGroups || []).length} مجموعة</td>
+                                    <td>${c.usedBy 
+                                        ? `<span class="badge badge-locked">🔒 مستخدم</span><br><small>${c.usedBy}</small>` 
+                                        : '<span class="badge badge-open">✅ متاح</span>'}
+                                    </td>
+                                    <td>${formatDate(c.createdAt)}</td>
+                                    <td>
+                                        <button class="btn btn-xs" onclick="copyCode('${c.code}')">📋</button>
+                                        <button class="btn btn-xs btn-info" onclick="viewCodeDetails('${c.id}')">👁️</button>
+                                        <button class="btn btn-xs btn-danger" onclick="deleteCode('${c.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                            ${codes.length === 0 ? '<tr><td colspan="8" style="text-align:center;">لا توجد أكواد</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `;
+            
+            main.innerHTML = html;
+            
+        } catch(e) {
+            main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
+        }
+    }
+
+    window.generateSingleCode = async function() {
+        const name = document.getElementById('stuName')?.value?.trim();
+        if (!name) return showToast('⚠️ اسم الطالب مطلوب', 'warning');
+        
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const selectedGroups = [];
+        const sel = document.getElementById('stuGroups');
+        if (sel) {
+            for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].selected) selectedGroups.push(sel.options[i].value);
+            }
+        }
+        
+        try {
+            await db.collection('student_codes').add({
+                adminID: currentAdmin.uid,
+                code: code,
+                studentName: name,
+                studentNumber: document.getElementById('stuNumber')?.value || '',
+                studentClass: document.getElementById('stuClass')?.value || '',
+                type: document.getElementById('stuType')?.value || 'طالب',
+                allowedGroups: selectedGroups,
+                usedBy: null,
+                usedByDevice: null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            const display = document.getElementById('newCodeDisplay');
+            if (display) {
+                display.innerHTML = `
+                <div style="background:var(--surface2); padding:15px; border-radius:12px; text-align:center; border:2px dashed var(--gold);">
+                    <p style="color:var(--success); font-weight:bold;">✅ تم إنشاء الكود بنجاح!</p>
+                    <div class="code-display" style="font-size:1.5rem; margin:10px 0;">${code}</div>
+                    <button class="btn btn-xs" onclick="copyCode('${code}')">📋 نسخ</button>
+                    ${selectedGroups.length === 0 ? '<p style="color:var(--warning); margin-top:8px; font-size:0.8rem;">⚠️ لم تختر مجموعات! الطالب لن يرى شيئاً عند استخدام الكود.</p>' : ''}
+                </div>
+                `;
+            }
+            
+            // Auto-join groups if code is for existing user
+            if (selectedGroups.length > 0) {
+                showToast('✅ تم إنشاء الكود وربطه بـ ' + selectedGroups.length + ' مجموعة', 'success');
+            } else {
+                showToast('✅ تم إنشاء الكود', 'success');
+            }
+            
+            renderCodes();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.generateBulkCodesModal = function() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+        <div class="modal">
+            <span class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</span>
+            <h2>📦 توليد أكواد批量</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>عدد الأكواد</label>
+                    <input id="bulkCount" type="number" class="input-field" value="10" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label>النوع</label>
+                    <select id="bulkType" class="input-field">
+                        <option>طالب</option>
+                        <option>طالبة</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
-                <label>💬 الرد</label>
-                <textarea id="replyText" class="input-field" style="min-height:80px;" placeholder="نص الرد التلقائي..."></textarea>
+                <label>📚 الصف (اختياري)</label>
+                <input id="bulkClass" class="input-field" placeholder="نفس الصف لجميع الأكواد">
             </div>
-            <button class="btn" onclick="addAutoReply()">➕ إضافة</button>
-        </div>
-        
-        <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">📋 الردود الحالية</h3>
-            <div id="autoRepliesList"></div>
+            <button class="btn" onclick="generateBulkCodes()" style="width:100%;">🚀 توليد</button>
+            <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:8px;">إلغاء</button>
         </div>
         `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    };
+
+    window.generateBulkCodes = async function() {
+        const count = parseInt(document.getElementById('bulkCount')?.value) || 10;
+        const type = document.getElementById('bulkType')?.value || 'طالب';
+        const className = document.getElementById('bulkClass')?.value || '';
         
-        // Load groups for dropdown
-        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(snap => {
-            const sel = document.getElementById('replyGroup');
-            if (sel) {
-                snap.forEach(d => {
-                    sel.innerHTML += `<option value="${d.id}">${d.data().name}</option>`;
-                });
-            }
-        });
-        
-        // Load existing auto replies
-        db.collection('auto_replies').where('adminID', '==', currentAdmin.uid).get().then(snap => {
-            const list = document.getElementById('autoRepliesList');
-            if (snap.empty) {
-                list.innerHTML = '<p style="color:var(--text3); text-align:center;">لا توجد ردود تلقائية</p>';
-                return;
-            }
-            
-            list.innerHTML = snap.docs.map(d => {
-                const a = d.data();
-                return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--surface2); margin:4px 0; border-radius:10px;">
-                    <div>
-                        <strong>🔍 "${a.keyword}"</strong> → <span style="color:var(--gold);">${(a.reply || '').substring(0, 40)}...</span>
-                    </div>
-                    <button class="btn btn-xs btn-danger" onclick="deleteAutoReply('${d.id}')">🗑️</button>
-                </div>`;
-            }).join('');
-        });
-    }
-    
-    window.addAutoReply = async function() {
-        const keyword = document.getElementById('replyKeyword')?.value?.trim();
-        const reply = document.getElementById('replyText')?.value?.trim();
-        const groupId = document.getElementById('replyGroup')?.value || '';
-        
-        if (!keyword || !reply) return showToast('⚠️ أكمل جميع الحقول', 'warning');
-        
-        try {
-            await db.collection('auto_replies').add({
+        const batch = db.batch();
+        for (let i = 0; i < count; i++) {
+            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+            batch.set(db.collection('student_codes').doc(), {
                 adminID: currentAdmin.uid,
-                keyword: keyword.toLowerCase(),
-                reply: reply,
-                groupID: groupId,
+                code: code,
+                studentName: `${type} ${i + 1}`,
+                type: type,
+                studentClass: className,
+                allowedGroups: [],
+                usedBy: null,
+                usedByDevice: null,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showToast('✅ تم إضافة الرد التلقائي', 'success');
-            renderAutoReply();
+        }
+        
+        try {
+            await batch.commit();
+            document.querySelector('.modal-overlay')?.remove();
+            showToast(`✅ تم إنشاء ${count} كود بنجاح`, 'success');
+            renderCodes();
         } catch(e) {
             showToast('❌ خطأ: ' + e.message, 'error');
         }
     };
-    
-    window.deleteAutoReply = async function(id) {
-        if (confirm('حذف هذا الرد التلقائي؟')) {
-            await db.collection('auto_replies').doc(id).delete();
-            showToast('✅ تم الحذف', 'success');
-            renderAutoReply();
-        }
-    };
-    
-    async function loadAutoReplies() {
-        if (!currentAdmin) return;
-        const snap = await db.collection('auto_replies').where('adminID', '==', currentAdmin.uid).get();
-        autoReplies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
 
-    // ==========================================
-    // WORD FILTER
-    // ==========================================
-    function renderWordFilter() {
-        const main = document.getElementById('mainContent');
-        
-        main.innerHTML = `
-        <div class="page-header">
-            <h1>🚷 فلترة الكلمات</h1>
-            <span class="breadcrumb">الأمان / فلترة الكلمات</span>
-        </div>
-        
-        <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">➕ إضافة كلمة ممنوعة</h3>
-            <div style="display:flex; gap:8px;">
-                <input id="bannedWord" class="input-field" placeholder="أدخل الكلمة الممنوعة">
-                <button class="btn btn-sm" onclick="addBannedWord()">➕ إضافة</button>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">📋 الكلمات الممنوعة</h3>
-            <div id="bannedWordsList"></div>
-        </div>
-        `;
-        
-        db.collection('banned_words').where('adminID', '==', currentAdmin.uid).get().then(snap => {
-            const list = document.getElementById('bannedWordsList');
-            if (snap.empty) {
-                list.innerHTML = '<p style="color:var(--text3); text-align:center;">لا توجد كلمات ممنوعة</p>';
-                return;
-            }
-            
-            list.innerHTML = snap.docs.map(d => `
-            <div class="tag" style="display:inline-flex; align-items:center; gap:6px; margin:4px;">
-                🚫 ${d.data().word}
-                <span style="cursor:pointer; color:var(--danger);" onclick="deleteBannedWord('${d.id}')">✕</span>
-            </div>
-            `).join('');
-        });
-    }
-    
-    window.addBannedWord = async function() {
-        const word = document.getElementById('bannedWord')?.value?.trim();
-        if (!word) return showToast('⚠️ أدخل كلمة', 'warning');
-        
-        try {
-            await db.collection('banned_words').add({
-                adminID: currentAdmin.uid,
-                word: word.toLowerCase(),
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            bannedWords.push(word.toLowerCase());
-            showToast('✅ تمت الإضافة', 'success');
-            renderWordFilter();
-        } catch(e) {
-            showToast('❌ خطأ: ' + e.message, 'error');
-        }
-    };
-    
-    window.deleteBannedWord = async function(id) {
-        await db.collection('banned_words').doc(id).delete();
-        showToast('✅ تم الحذف', 'success');
-        renderWordFilter();
-    };
-    
-    async function loadBannedWords() {
-        if (!currentAdmin) return;
-        const snap = await db.collection('banned_words').where('adminID', '==', currentAdmin.uid).get();
-        bannedWords = snap.docs.map(d => d.data().word.toLowerCase());
-    }
-
-    // ==========================================
-    // AUTO BACKUP
-    // ==========================================
-    function startAutoBackup() {
-        // Run backup every 24 hours
-        setInterval(async () => {
-            if (!currentAdmin) return;
+    window.deleteCode = async function(id) {
+        if (confirm('حذف هذا الكود؟')) {
             try {
-                await db.collection('backups').add({
-                    adminID: currentAdmin.uid,
-                    adminName: currentAdmin.name,
-                    type: 'auto',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                addNotification('backup', '💾 نسخ احتياطي تلقائي', 'تم إنشاء نسخة احتياطية تلقائية');
-            } catch(e) {}
-        }, 86400000); // 24 hours
-        
-        // Auto clean old notifications (older than 7 days)
-        setInterval(async () => {
-            if (!currentAdmin) return;
-            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-            notifications = notifications.filter(n => new Date(n.timestamp) > weekAgo);
-            updateNotificationBadge();
-        }, 3600000); // Every hour
-    }
-
-    // ==========================================
-    // THEME SETTINGS
-    // ==========================================
-    function renderThemeSettings() {
-        const main = document.getElementById('mainContent');
-        
-        main.innerHTML = `
-        <div class="page-header">
-            <h1>🎨 تخصيص المظهر</h1>
-            <span class="breadcrumb">النظام / المظهر</span>
-        </div>
-        
-        <div class="card">
-            <h3 style="color:var(--gold); margin-bottom:15px;">🎨 اختر الثيم</h3>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-                <div class="theme-option active" style="background:linear-gradient(135deg, #FFC107, #B8860B);" onclick="applyTheme('gold')" title="ذهبي (افتراضي)"></div>
-                <div class="theme-option" style="background:linear-gradient(135deg, #1E90FF, #4169E1);" onclick="applyTheme('blue')" title="أزرق"></div>
-                <div class="theme-option" style="background:linear-gradient(135deg, #2ED573, #20B2AA);" onclick="applyTheme('green')" title="أخضر"></div>
-                <div class="theme-option" style="background:linear-gradient(135deg, #A855F7, #7C3AED);" onclick="applyTheme('purple')" title="بنفسجي"></div>
-                <div class="theme-option" style="background:linear-gradient(135deg, #EC4899, #BE185D);" onclick="applyTheme('pink')" title="وردي"></div>
-            </div>
-            <p style="color:var(--text2); text-align:center; margin-top:12px; font-size:0.8rem;">اختر اللون الرئيسي للوحة التحكم</p>
-        </div>
-        `;
-    }
-    
-    window.applyTheme = function(theme) {
-        const themes = {
-            'gold': { primary: '#FFC107', dark: '#B8860B', light: '#FFD54F' },
-            'blue': { primary: '#1E90FF', dark: '#1565C0', light: '#64B5F6' },
-            'green': { primary: '#2ED573', dark: '#1B8A3D', light: '#69F0AE' },
-            'purple': { primary: '#A855F7', dark: '#7C3AED', light: '#C084FC' },
-            'pink': { primary: '#EC4899', dark: '#BE185D', light: '#F472B6' }
-        };
-        
-        const t = themes[theme];
-        if (!t) return;
-        
-        document.documentElement.style.setProperty('--gold', t.primary);
-        document.documentElement.style.setProperty('--gold-dark', t.dark);
-        document.documentElement.style.setProperty('--gold-light', t.light);
-        document.documentElement.style.setProperty('--gold-gradient', `linear-gradient(135deg, ${t.primary}, ${t.dark}, ${t.light})`);
-        
-        // Update active indicator
-        document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        // Save preference
-        localStorage.setItem('adminTheme', theme);
-        showToast('✅ تم تطبيق الثيم', 'success');
+                await db.collection('student_codes').doc(id).delete();
+                showToast('✅ تم الحذف', 'success');
+                renderCodes();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
     };
 
-    // ==========================================
-    // STUDENT PREVIEW
-    // ==========================================
-    function renderStudentPreview() {
-        const main = document.getElementById('mainContent');
-        
-        main.innerHTML = `
-        <div class="page-header">
-            <h1>👁️ معاينة تطبيق الطالب</h1>
-            <span class="breadcrumb">النظام / معاينة الطالب</span>
-        </div>
-        
-        <div class="card" style="padding:0; overflow:hidden;">
-            <iframe id="studentPreviewFrame" src="about:blank" style="width:100%; height:70vh; border:none; border-radius:var(--radius);" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
-        </div>
-        <p style="text-align:center; color:var(--text3); font-size:0.75rem; margin-top:8px;">هذه معاينة لتطبيق الطالب كما يظهر على الموبايل</p>
-        `;
-        
-        setTimeout(() => {
-            const frame = document.getElementById('studentPreviewFrame');
-            if (frame) {
-                const previewUrl = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
-                frame.src = previewUrl;
-            }
-        }, 500);
-    }
+    window.copyCode = function(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            showToast('📋 تم نسخ الكود: ' + code, 'success');
+        }).catch(() => {
+            // Fallback
+            const input = document.createElement('input');
+            input.value = code;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            showToast('📋 تم نسخ الكود', 'success');
+        });
+    };
 
-    // ==========================================
-    // NOTIFICATIONS PAGE
-    // ==========================================
-    function renderNotificationsPage() {
+    window.viewCodeDetails = async function(id) {
+        try {
+            const doc = await db.collection('student_codes').doc(id).get();
+            if (!doc.exists) return;
+            const c = doc.data();
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+            <div class="modal">
+                <span class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</span>
+                <h2>🔑 تفاصيل الكود</h2>
+                <div class="code-display" style="font-size:1.8rem;">${c.code}</div>
+                <table class="data-table" style="width:100%; margin-top:15px;">
+                    <tr><td><strong>👤 الطالب</strong></td><td>${c.studentName || '-'}</td></tr>
+                    <tr><td><strong>📱 الرقم</strong></td><td>${c.studentNumber || '-'}</td></tr>
+                    <tr><td><strong>📚 الصف</strong></td><td>${c.studentClass || '-'}</td></tr>
+                    <tr><td><strong>👤 النوع</strong></td><td>${c.type || '-'}</td></tr>
+                    <tr><td><strong>📋 المجموعات</strong></td><td>${(c.allowedGroups || []).length} مجموعة</td></tr>
+                    <tr><td><strong>🔒 مستخدم بواسطة</strong></td><td>${c.usedBy || 'غير مستخدم'}</td></tr>
+                    <tr><td><strong>📱 الجهاز</strong></td><td>${c.usedByDevice || '-'}</td></tr>
+                    <tr><td><strong>📅 تاريخ الإنشاء</strong></td><td>${formatDate(c.createdAt)}</td></tr>
+                </table>
+                <button class="btn btn-outline btn-sm" onclick="this.closest('.modal-overlay').remove()" style="width:100%; margin-top:15px;">إغلاق</button>
+            </div>
+            `;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    // ========== Chat ==========
+    function renderChat(gid) {
+        if (gid) currentChatGroupId = gid;
+        if (!currentChatGroupId) { switchPage('groups'); return; }
+        
         const main = document.getElementById('mainContent');
+        showLoading(main);
         
-        main.innerHTML = `
-        <div class="page-header">
-            <h1>🔔 مركز الإشعارات</h1>
-            <button class="btn btn-sm btn-outline" onclick="markAllNotifsRead()">✅ قراءة الكل</button>
-        </div>
-        
-        <div class="card">
-            ${notifications.length === 0 ? '<p style="text-align:center; color:var(--text3); padding:30px;">لا توجد إشعارات</p>' : ''}
-            ${notifications.map(n => `
-            <div class="notification-item ${n.read ? '' : 'unread'}">
-                <span class="notif-icon">${n.type === 'new_user' ? '👤' : n.type === 'report' ? '🚨' : n.type === 'message' ? '💬' : '🔔'}</span>
-                <div class="notif-content">
-                    <div class="notif-title">${n.title}</div>
-                    <div class="notif-body">${n.body}</div>
-                    <div class="notif-time">${timeAgo(n.timestamp)}</div>
+        db.collection('groups').doc(currentChatGroupId).get().then(doc => {
+            if (!doc.exists) { switchPage('groups'); return; }
+            const g = doc.data();
+            
+            main.innerHTML = `
+            <div class="chat-fullscreen">
+                <div class="chat-header-bar">
+                    <span class="back-btn" onclick="switchPage('groups')">⬅️</span>
+                    <img src="${g.picture || 'https://via.placeholder.com/42'}" width="42" height="42" style="border-radius:50%;" onerror="this.src='https://via.placeholder.com/42'">
+                    <div class="group-info">
+                        <div class="group-name">${g.name || 'مجموعة'} ${g.isLocked ? '🔒' : '🟢'}</div>
+                        <div class="group-subtitle">👥 ${g.memberCount || 0} عضو | ${g.type === 'open' ? 'مفتوحة' : 'مقفولة'}</div>
+                    </div>
+                    <button class="icon-circle-btn" onclick="switchPage('edit-group','${currentChatGroupId}')" title="إعدادات المجموعة" style="background:var(--surface3); color:var(--gold);">⚙️</button>
+                </div>
+                <div class="chat-messages-area" id="adminChatMessages"></div>
+                <div class="chat-input-bar">
+                    <button class="icon-circle-btn attach" onclick="uploadAdminMedia()" title="رفع ملفات">📎</button>
+                    <input id="adminMsgInput" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key==='Enter')sendAdminMsg()" autocomplete="off">
+                    <button class="icon-circle-btn send" onclick="sendAdminMsg()" title="إرسال">➤</button>
                 </div>
             </div>
-            `).join('')}
+            `;
+            
+            loadAdminMessages(currentChatGroupId);
+        });
+    }
+
+    function loadAdminMessages(gid) {
+        const container = document.getElementById('adminChatMessages');
+        if (!container) return;
+        if (chatUnsub) chatUnsub();
+        
+        let lastDate = null;
+        let shouldAutoScroll = true;
+        
+        container.addEventListener('scroll', () => {
+            const bottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+            shouldAutoScroll = bottom < 60;
+        }, { passive: true });
+        
+        chatUnsub = db.collection('groups').doc(gid).collection('messages')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snap => {
+                container.innerHTML = '';
+                lastDate = null;
+                
+                if (snap.empty) {
+                    container.innerHTML = '<div style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل بعد<br><span style="font-size:0.8rem;">كن أول من يرسل رسالة!</span></div>';
+                    return;
+                }
+                
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    m.id = doc.id;
+                    
+                    if (m.deleted) {
+                        container.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic; color:#666;">🗑️ تم حذف هذه الرسالة</div></div>';
+                        return;
+                    }
+                    
+                    let msgDate = '';
+                    if (m.timestamp) {
+                        try {
+                            const d = m.timestamp.toDate();
+                            const dateStr = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+                            if (dateStr !== lastDate) {
+                                container.innerHTML += `<div class="date-divider"><span>${dateStr}</span></div>`;
+                                lastDate = dateStr;
+                            }
+                            msgDate = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                        } catch(e) {}
+                    }
+                    
+                    const isSent = m.senderID === currentAdmin.uid;
+                    let contentHtml = '';
+                    
+                    if (m.type === 'image') {
+                        contentHtml = `<img src="${m.content}" onclick="window.open('${m.content}')" style="max-width:240px; border-radius:10px; cursor:pointer; display:block;" loading="lazy" onerror="this.style.display='none'">`;
+                        if (m.fileName) contentHtml += `<small style="font-size:0.7rem; color:#888; display:block;">📷 ${m.fileName}</small>`;
+                    } else if (m.type === 'video') {
+                        contentHtml = `<video controls src="${m.content}" style="max-width:240px; border-radius:10px;" preload="metadata" playsinline></video>`;
+                        if (m.fileName) contentHtml += `<small style="font-size:0.7rem; color:#888; display:block;">🎥 ${m.fileName}</small>`;
+                    } else if (m.type === 'audio') {
+                        contentHtml = `<audio controls src="${m.content}" style="max-width:220px;" preload="metadata"></audio>`;
+                    } else if (m.type === 'file') {
+                        contentHtml = `
+                        <div class="file-attachment" onclick="window.open('${m.content}')">
+                            <span style="font-size:1.8rem;">📄</span>
+                            <div>
+                                <strong style="font-size:0.85rem;">${m.fileName || 'ملف مرفق'}</strong>
+                                <br><small style="color:var(--text2);">اضغط للتحميل</small>
+                            </div>
+                        </div>`;
+                    } else if (m.type === 'broadcast') {
+                        contentHtml = `<strong style="color:var(--gold);">📢 ${(m.content || '').replace(/\n/g, '<br>')}</strong>`;
+                    } else {
+                        contentHtml = (m.content || '').replace(/\n/g, '<br>');
+                    }
+                    
+                    container.innerHTML += `
+                    <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
+                        <div class="msg-bubble">${contentHtml}</div>
+                        <div class="msg-meta-info">
+                            ${!isSent ? `<strong>${m.senderName || 'مستخدم'}</strong> • ` : ''}
+                            ${msgDate}
+                            ${isSent ? `<span class="seen-check">✓✓</span> <button class="delete-btn" onclick="deleteAdminMsg('${m.id}')" title="حذف">🗑️</button>` : ''}
+                        </div>
+                    </div>`;
+                });
+                
+                if (shouldAutoScroll) {
+                    requestAnimationFrame(() => {
+                        container.scrollTop = container.scrollHeight;
+                    });
+                }
+            });
+        
+        realtimeListeners.push(chatUnsub);
+    }
+
+    window.sendAdminMsg = function() {
+        const input = document.getElementById('adminMsgInput');
+        if (!input?.value?.trim()) return;
+        
+        db.collection('groups').doc(currentChatGroupId).collection('messages').add({
+            senderID: currentAdmin.uid,
+            senderName: currentAdmin.name,
+            type: 'text',
+            content: input.value.trim(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            input.value = '';
+            input.focus();
+        });
+    };
+
+    window.uploadAdminMedia = function() {
+        if (typeof cloudinary === 'undefined') { showToast('⚠️ ميزة الرفع غير متاحة', 'warning'); return; }
+        
+        cloudinary.createUploadWidget({
+            cloudName: CLOUD_NAME,
+            uploadPreset: UPLOAD_PRESET,
+            sources: ['local', 'url', 'camera', 'google_drive', 'dropbox'],
+            multiple: true,
+            maxFiles: 10,
+            maxFileSize: 50000000,
+            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'avi', 'mkv', 'mp3', 'wav', 'pdf', 'doc', 'docx', 'ppt', 'xls', 'zip'],
+            cropping: true,
+            showSkipCropButton: true,
+            styles: {
+                palette: {
+                    window: "#15151F",
+                    windowBorder: "#FFC107",
+                    tabIcon: "#FFC107",
+                    menuIcons: "#AAAAAA",
+                    textDark: "#FFFFFF",
+                    textLight: "#000000",
+                    link: "#FFC107",
+                    action: "#FFC107",
+                    inactiveTabIcon: "#555555",
+                    error: "#FF4757",
+                    inProgress: "#FFC107",
+                    complete: "#2ED573",
+                    sourceBg: "#1E1E2A"
+                }
+            }
+        }, (error, result) => {
+            if (!error && result && result.event === 'success') {
+                const url = result.info.secure_url;
+                const type = result.info.resource_type === 'image' ? 'image' : 
+                             result.info.resource_type === 'video' ? 'video' : 'file';
+                
+                db.collection('groups').doc(currentChatGroupId).collection('messages').add({
+                    senderID: currentAdmin.uid,
+                    senderName: currentAdmin.name,
+                    type: type,
+                    content: url,
+                    fileName: result.info.original_filename || 'ملف',
+                    fileSize: result.info.bytes,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            if (result && result.event === 'queues-end') {
+                showToast('✅ تم رفع جميع الملفات بنجاح', 'success');
+            }
+        }).open();
+    };
+
+    window.deleteAdminMsg = function(msgId) {
+        if (confirm('🗑️ هل أنت متأكد من حذف هذه الرسالة؟')) {
+            db.collection('groups').doc(currentChatGroupId).collection('messages').doc(msgId)
+                .update({ deleted: true })
+                .then(() => showToast('✅ تم حذف الرسالة', 'success'))
+                .catch(() => showToast('❌ فشل الحذف', 'error'));
+        }
+    };
+
+    // ========== Chat List ==========
+    async function renderChatsList() {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        try {
+            const snap = await db.collection('private_chats').where('participants', 'array-contains', currentAdmin.uid).get();
+            const chats = [];
+            
+            for (const doc of snap.docs) {
+                const cd = doc.data();
+                const otherId = cd.participants.find(p => p !== currentAdmin.uid);
+                if (otherId) {
+                    const userDoc = await db.collection('users').doc(otherId).get();
+                    if (userDoc.exists) {
+                        chats.push({
+                            id: doc.id,
+                            user: userDoc.data(),
+                            uid: otherId,
+                            last: cd.lastMessage || '',
+                            time: cd.lastMessageTime
+                        });
+                    }
+                }
+            }
+            
+            chats.sort((a, b) => (b.time?.toDate?.()?.getTime() || 0) - (a.time?.toDate?.()?.getTime() || 0));
+            
+            let html = `
+            <div class="page-header">
+                <h1>💬 المحادثات الخاصة</h1>
+                <span class="breadcrumb">التواصل / المحادثات</span>
+            </div>
+            
+            <div class="card">
+                <div class="search-box" style="margin-bottom:12px;">
+                    <span class="search-icon">🔍</span>
+                    <input class="input-field" id="adminChatSearch" placeholder="بحث في المحادثات..." oninput="searchAdminChats()" style="padding-left:35px;">
+                </div>
+                
+                ${chats.length === 0 ? `
+                <div class="empty-state">
+                    <div class="icon">💬</div>
+                    <h3>لا توجد محادثات</h3>
+                    <p>ابدأ محادثة مع مستخدم</p>
+                </div>
+                ` : chats.map(c => `
+                <div class="chat-list-item" onclick="switchPage('private-chat','${c.uid}')">
+                    <img src="${c.user.profilePic || 'https://via.placeholder.com/40'}" style="width:44px;height:44px;border-radius:50%; margin-left:10px;" class="${c.user.online ? 'online-border' : ''}">
+                    <div style="flex:1;">
+                        <strong>${c.user.name || 'مستخدم'}</strong>
+                        ${c.user.online ? ' <span style="color:var(--success);">🟢</span>' : ' <span style="color:var(--text3);">○</span>'}
+                        <br><small style="color:var(--text2);">${c.last || 'ابدأ المحادثة...'}</small>
+                    </div>
+                    <small style="color:var(--text3);">${formatTime(c.time)}</small>
+                </div>
+                `).join('')}
+                
+                <div style="margin-top:15px; padding-top:15px; border-top:1px solid #222;">
+                    <h4 style="color:var(--gold); margin-bottom:8px;">➕ بدء محادثة جديدة</h4>
+                    <div style="display:flex; gap:8px;">
+                        <input class="input-field" id="newChatUserId" placeholder="معرف المستخدم (UID)">
+                        <button class="btn btn-sm" onclick="startNewChat()">💬 بدء</button>
+                    </div>
+                </div>
+            </div>
+            `;
+            
+            main.innerHTML = html;
+            
+        } catch(e) {
+            main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
+        }
+    }
+
+    window.searchAdminChats = function() {
+        const query = (document.getElementById('adminChatSearch')?.value || '').toLowerCase();
+        document.querySelectorAll('.chat-list-item').forEach(item => {
+            item.style.display = query === '' || item.textContent.toLowerCase().includes(query) ? '' : 'none';
+        });
+    };
+
+    window.startNewChat = function() {
+        const uid = document.getElementById('newChatUserId')?.value?.trim();
+        if (!uid) return showToast('⚠️ أدخل معرف المستخدم', 'warning');
+        switchPage('private-chat', uid);
+    };
+
+    function renderPrivateChat(uid) {
+        currentPrivateChatUser = uid;
+        const main = document.getElementById('mainContent');
+        
+        db.collection('users').doc(uid).get().then(doc => {
+            const u = doc.data() || {};
+            const cid = [currentAdmin.uid, uid].sort().join('_');
+            
+            main.innerHTML = `
+            <div class="chat-fullscreen">
+                <div class="chat-header-bar">
+                    <span class="back-btn" onclick="switchPage('chats-list')">⬅️</span>
+                    <img src="${u.profilePic || 'https://via.placeholder.com/38'}" width="38" height="38" style="border-radius:50%;">
+                    <div class="group-info">
+                        <div class="group-name">${u.name || 'مستخدم'}</div>
+                        <div class="group-subtitle">${u.online ? '🟢 متصل الآن' : '○ غير متصل'} | ${u.email || ''}</div>
+                    </div>
+                </div>
+                <div class="chat-messages-area" id="privateChatMessages"></div>
+                <div class="chat-input-bar">
+                    <input id="privateMsgInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter')sendPrivateMsg()">
+                    <button class="icon-circle-btn send" onclick="sendPrivateMsg()">➤</button>
+                </div>
+            </div>
+            `;
+            
+            loadPrivateMessages(cid);
+        });
+    }
+
+    function loadPrivateMessages(cid) {
+        const container = document.getElementById('privateChatMessages');
+        if (!container) return;
+        if (privateChatUnsub) privateChatUnsub();
+        
+        privateChatUnsub = db.collection('private_chats').doc(cid).collection('messages')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snap => {
+                container.innerHTML = '';
+                if (snap.empty) {
+                    container.innerHTML = '<div style="text-align:center; color:#555; padding:50px;">💬 لا توجد رسائل</div>';
+                    return;
+                }
+                
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const isSent = m.senderID === currentAdmin.uid;
+                    container.innerHTML += `
+                    <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
+                        <div class="msg-bubble">${(m.content || '').replace(/\n/g, '<br>')}</div>
+                        <div class="msg-meta-info">
+                            ${m.timestamp ? formatTime(m.timestamp) : ''}
+                        </div>
+                    </div>`;
+                });
+                
+                container.scrollTop = container.scrollHeight;
+            });
+        
+        realtimeListeners.push(privateChatUnsub);
+    }
+
+    window.sendPrivateMsg = function() {
+        const input = document.getElementById('privateMsgInput');
+        if (!input?.value?.trim() || !currentPrivateChatUser) return;
+        
+        const cid = [currentAdmin.uid, currentPrivateChatUser].sort().join('_');
+        
+        db.collection('private_chats').doc(cid).set({
+            participants: [currentAdmin.uid, currentPrivateChatUser],
+            lastMessage: input.value.trim(),
+            lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        db.collection('private_chats').doc(cid).collection('messages').add({
+            senderID: currentAdmin.uid,
+            senderName: currentAdmin.name,
+            content: input.value.trim(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        input.value = '';
+    };
+
+    // ========== Broadcast ==========
+    function renderBroadcast() {
+        const main = document.getElementById('mainContent');
+        main.innerHTML = `
+        <div class="page-header">
+            <h1>📢 البث الجماعي</h1>
+            <span class="breadcrumb">التواصل / البث</span>
+        </div>
+        
+        <div class="card">
+            <h3 style="color:var(--gold); margin-bottom:15px;">📢 إرسال رسالة لجميع المجموعات</h3>
+            <div class="form-group">
+                <label>📝 نص الرسالة</label>
+                <textarea id="broadcastMsg" class="input-field" style="min-height:120px;" placeholder="اكتب رسالة البث هنا..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>🎨 نوع الرسالة</label>
+                <select id="broadcastType" class="input-field">
+                    <option value="broadcast">📢 إعلان</option>
+                    <option value="text">💬 رسالة عادية</option>
+                </select>
+            </div>
+            <button class="btn" onclick="sendBroadcast()" style="width:100%;">📢 إرسال البث</button>
         </div>
         `;
     }
 
-    // ==========================================
-    // UPDATE SIDEBAR COUNTS
-    // ==========================================
-    async function updateSidebarCounts() {
-        if (!currentAdmin) return;
+    window.sendBroadcast = async function() {
+        const msg = document.getElementById('broadcastMsg')?.value?.trim();
+        if (!msg) return showToast('⚠️ اكتب رسالة البث', 'warning');
+        
         try {
-            const [usersSnap, groupsSnap, reportsSnap] = await Promise.all([
-                db.collection('users').get(),
-                db.collection('groups').where('adminID', '==', currentAdmin.uid).get(),
-                db.collection('reports').where('status', '==', 'pending').get()
-            ]);
-            document.getElementById('userCountBadge').textContent = usersSnap.size;
-            document.getElementById('groupCountBadge').textContent = groupsSnap.size;
-            const reportBadge = document.getElementById('reportCountBadge');
-            reportBadge.textContent = reportsSnap.size;
-            if (reportsSnap.size > 0) { reportBadge.classList.add('pulse'); } else { reportBadge.classList.remove('pulse'); }
+            const groupsSnap = await db.collection('groups').where('adminID', '==', currentAdmin.uid).get();
+            if (groupsSnap.empty) return showToast('⚠️ لا توجد مجموعات', 'warning');
             
-            // Update notification badge
-            updateNotificationBadge();
-        } catch(e) { console.error('Error updating counts:', e); }
+            const batch = db.batch();
+            const type = document.getElementById('broadcastType')?.value || 'broadcast';
+            
+            groupsSnap.forEach(gd => {
+                const ref = db.collection('groups').doc(gd.id).collection('messages').doc();
+                batch.set(ref, {
+                    senderID: currentAdmin.uid,
+                    senderName: '📢 ' + currentAdmin.name,
+                    type: type,
+                    content: msg,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+            
+            await batch.commit();
+            showToast(`✅ تم إرسال البث إلى ${groupsSnap.size} مجموعة`, 'success');
+            document.getElementById('broadcastMsg').value = '';
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    // ========== Stories ==========
+    async function renderStories() {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        try {
+            const snap = await db.collection('stories').where('adminID', '==', currentAdmin.uid).get();
+            const stories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            let html = `
+            <div class="page-header">
+                <h1>📖 إدارة القصص</h1>
+                <span class="breadcrumb">المحتوى / القصص</span>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">➕ إضافة قصة جديدة</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📝 عنوان القصة</label>
+                        <input id="storyTitle" class="input-field" placeholder="عنوان القصة">
+                    </div>
+                    <div class="form-group">
+                        <label>🖼️ رابط الصورة/الفيديو</label>
+                        <input id="storyMedia" class="input-field" placeholder="رابط الوسائط">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>📄 نص القصة</label>
+                    <textarea id="storyCaption" class="input-field" style="min-height:80px;" placeholder="محتوى القصة..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🔗 رابط خارجي (اختياري)</label>
+                        <input id="storyLink" class="input-field" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>⏱️ مدة الظهور (ساعات)</label>
+                        <input id="storyDuration" type="number" class="input-field" value="24" min="1" max="168">
+                    </div>
+                </div>
+                <button class="btn" onclick="addStory()" style="width:100%;">➕ إضافة القصة</button>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">📋 القصص المنشورة (${stories.length})</h3>
+                ${stories.length === 0 ? '<p style="color:var(--text3); text-align:center;">لا توجد قصص</p>' : ''}
+                ${stories.map(s => `
+                <div style="display:flex; gap:12px; align-items:center; padding:12px; background:var(--surface2); margin:6px 0; border-radius:10px;">
+                    <img src="${s.mediaURL || 'https://via.placeholder.com/60'}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">
+                    <div style="flex:1;">
+                        <strong>${s.title || 'بدون عنوان'}</strong>
+                        <p style="font-size:0.8rem; color:var(--text2);">${(s.caption || '').substring(0, 80)}...</p>
+                        <small style="color:var(--text3);">${formatDate(s.createdAt)}</small>
+                    </div>
+                    <button class="btn btn-xs btn-danger" onclick="deleteStory('${s.id}')">🗑️</button>
+                </div>
+                `).join('')}
+            </div>
+            `;
+            
+            main.innerHTML = html;
+            
+        } catch(e) {
+            main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
+        }
     }
 
-    // ========== Groups / Chat / Codes / Reports / Banned / Backup / Settings / Logs ==========
-    // [All original functions remain exactly the same as the original code]
-    // [Including: renderGroups, toggleGroupLock, deleteGroup, openAdminChat, renderMembers,
-    //  addMemberToGroup, removeMemberFromGroup, renderCreateGroup, createGroup, renderEditGroup,
-    //  togglePermSectionEdit, saveGroupEdit, renderCodes, generateSingleCode, generateBulkCodesModal,
-    //  generateBulkCodes, deleteCode, copyCode, viewCodeDetails, renderChat, loadAdminMessages,
-    //  sendAdminMsg, uploadAdminMedia, deleteAdminMsg, renderChatsList, searchAdminChats,
-    //  startNewChat, renderPrivateChat, loadPrivateMessages, sendPrivateMsg, renderBroadcast,
-    //  sendBroadcast, renderStories, addStory, deleteStory, renderMediaPage, loadGroupMedia,
-    //  renderStickers, addSticker, deleteSticker, renderReports, resolveReport, dismissReport,
-    //  renderBanned, renderBackup, createManualBackup, exportAllData, exportCodes,
-    //  renderSettings, saveSupportSettings, changePassword, renderLogs, filterTable, filterByRole,
-    //  viewUserDetails, changeUserRole, toggleUserBan]
-    //
-    // NOTE: Due to length limit, all original functions from the original admin code
-    // are preserved exactly as they were. Only new functions are added.
+    window.addStory = async function() {
+        const title = document.getElementById('storyTitle')?.value?.trim();
+        const media = document.getElementById('storyMedia')?.value?.trim();
+        
+        if (!title && !media) return showToast('⚠️ أدخل عنوان أو صورة', 'warning');
+        
+        try {
+            await db.collection('stories').add({
+                adminID: currentAdmin.uid,
+                title: title,
+                mediaURL: media,
+                caption: document.getElementById('storyCaption')?.value || '',
+                link: document.getElementById('storyLink')?.value || '',
+                duration: parseInt(document.getElementById('storyDuration')?.value) || 24,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('✅ تم إضافة القصة', 'success');
+            renderStories();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
 
-    // ==========================================
-    // KEYBOARD SHORTCUTS
-    // ==========================================
+    window.deleteStory = async function(id) {
+        if (confirm('حذف هذه القصة؟')) {
+            try {
+                await db.collection('stories').doc(id).delete();
+                showToast('✅ تم الحذف', 'success');
+                renderStories();
+            } catch(e) {
+                showToast('❌ خطأ: ' + e.message, 'error');
+            }
+        }
+    };
+
+    // ========== Media ==========
+    function renderMediaPage() {
+        const main = document.getElementById('mainContent');
+        
+        db.collection('groups').where('adminID', '==', currentAdmin.uid).get().then(snap => {
+            const options = snap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('');
+            
+            main.innerHTML = `
+            <div class="page-header">
+                <h1>📁 الوسائط</h1>
+                <span class="breadcrumb">المحتوى / الوسائط</span>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label>📋 اختر المجموعة</label>
+                    <select id="mediaGroupSelect" class="input-field" onchange="loadGroupMedia()">
+                        <option value="">-- اختر مجموعة --</option>
+                        ${options}
+                    </select>
+                </div>
+                <div id="mediaGrid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+                    <p style="color:var(--text3); width:100%; text-align:center;">اختر مجموعة لعرض الوسائط</p>
+                </div>
+            </div>
+            `;
+        });
+    }
+
+    window.loadGroupMedia = function() {
+        const gid = document.getElementById('mediaGroupSelect')?.value;
+        if (!gid) return;
+        
+        const grid = document.getElementById('mediaGrid');
+        grid.innerHTML = '<p style="color:var(--text2); text-align:center; width:100%;">⏳ جاري التحميل...</p>';
+        
+        db.collection('groups').doc(gid).collection('messages')
+            .where('type', 'in', ['image', 'video', 'file'])
+            .orderBy('timestamp', 'desc')
+            .limit(50)
+            .get()
+            .then(snap => {
+                if (snap.empty) {
+                    grid.innerHTML = '<p style="color:var(--text3); text-align:center; width:100%;">لا توجد وسائط</p>';
+                    return;
+                }
+                
+                let html = '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    if (m.type === 'image') {
+                        html += `
+                        <div style="width:100px;height:100px;overflow:hidden;border-radius:8px;cursor:pointer;position:relative;" onclick="window.open('${m.content}')">
+                            <img src="${m.content}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">
+                            <small style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); padding:1px 4px; border-radius:3px; font-size:0.6rem;">📷</small>
+                        </div>`;
+                    } else if (m.type === 'video') {
+                        html += `
+                        <div style="width:100px; position:relative;">
+                            <video src="${m.content}" controls style="width:100%; border-radius:8px;" preload="metadata" playsinline></video>
+                            <small style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); padding:1px 4px; border-radius:3px; font-size:0.6rem;">🎥</small>
+                        </div>`;
+                    } else {
+                        html += `
+                        <div style="width:100px;height:100px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;flex-direction:column;" onclick="window.open('${m.content}')">
+                            <span style="font-size:1.8rem;">📄</span>
+                            <small style="font-size:0.6rem; color:var(--text2);">${(m.fileName || 'ملف').substring(0, 10)}</small>
+                        </div>`;
+                    }
+                });
+                grid.innerHTML = html;
+            });
+    };
+
+    // ========== Stickers ==========
+    function renderStickers() {
+        const main = document.getElementById('mainContent');
+        main.innerHTML = `
+        <div class="page-header">
+            <h1>🎨 الملصقات</h1>
+            <span class="breadcrumb">المحتوى / الملصقات</span>
+        </div>
+        
+        <div class="card">
+            <h3 style="color:var(--gold); margin-bottom:15px;">➕ إضافة ملصق جديد</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🏷️ اسم الملصق</label>
+                    <input id="stickerName" class="input-field" placeholder="اسم الملصق">
+                </div>
+                <div class="form-group">
+                    <label>🖼️ رابط الصورة</label>
+                    <input id="stickerUrl" class="input-field" placeholder="رابط صورة الملصق">
+                </div>
+            </div>
+            <button class="btn" onclick="addSticker()" style="width:100%;">➕ إضافة</button>
+        </div>
+        
+        <div class="card">
+            <h3 style="color:var(--gold); margin-bottom:15px;">📋 الملصقات</h3>
+            <div id="stickersList">
+                <p style="color:var(--text3);">⏳ جاري التحميل...</p>
+            </div>
+        </div>
+        `;
+        
+        db.collection('stickers').where('adminID', '==', currentAdmin.uid).get().then(snap => {
+            const stickers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const list = document.getElementById('stickersList');
+            
+            if (stickers.length === 0) {
+                list.innerHTML = '<p style="color:var(--text3); text-align:center;">لا توجد ملصقات</p>';
+            } else {
+                list.innerHTML = stickers.map(s => `
+                <div style="display:flex; gap:10px; align-items:center; padding:10px; background:var(--surface2); margin:4px 0; border-radius:10px;">
+                    <img src="${s.url}" style="width:50px;height:50px;object-fit:contain; border-radius:8px;">
+                    <div style="flex:1;"><strong>${s.name || 'ملصق'}</strong></div>
+                    <button class="btn btn-xs btn-danger" onclick="deleteSticker('${s.id}')">🗑️</button>
+                </div>
+                `).join('');
+            }
+        });
+    }
+
+    window.addSticker = async function() {
+        const name = document.getElementById('stickerName')?.value?.trim();
+        const url = document.getElementById('stickerUrl')?.value?.trim();
+        if (!url) return showToast('⚠️ أدخل رابط الصورة', 'warning');
+        
+        try {
+            await db.collection('stickers').add({
+                adminID: currentAdmin.uid,
+                name: name || 'ملصق',
+                url: url,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('✅ تم إضافة الملصق', 'success');
+            renderStickers();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.deleteSticker = async function(id) {
+        if (confirm('حذف هذا الملصق؟')) {
+            await db.collection('stickers').doc(id).delete();
+            showToast('✅ تم الحذف', 'success');
+            renderStickers();
+        }
+    };
+
+    // ========== Reports ==========
+    async function renderReports() {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        try {
+            const snap = await db.collection('reports').get();
+            const reports = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (b.createdAt?.toDate?.()?.getTime() || 0) - (a.createdAt?.toDate?.()?.getTime() || 0));
+            
+            const pending = reports.filter(r => r.status === 'pending');
+            
+            let html = `
+            <div class="page-header">
+                <h1>🚨 البلاغات</h1>
+                <span class="breadcrumb">الأمان / البلاغات</span>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card stat-card">
+                    <div class="stat-value">${reports.length}</div>
+                    <div class="stat-label">إجمالي البلاغات</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" style="color:var(--warning);">${pending.length}</div>
+                    <div class="stat-label">🚨 معلقة</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" style="color:var(--success);">${reports.length - pending.length}</div>
+                    <div class="stat-label">✅ محلولة</div>
+                </div>
+            </div>
+            `;
+            
+            reports.forEach(r => {
+                html += `
+                <div class="card fade-in">
+                    <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="color:var(--gold);">🚨 ${r.reason || 'بلاغ'}</h4>
+                            <p style="font-size:0.8rem; color:var(--text2);">من: ${r.reporterName || 'مجهول'} (${r.reporterID || '-'})</p>
+                            ${r.messageID ? `<p style="font-size:0.75rem;">📨 رسالة: ${r.messageID}</p>` : ''}
+                            ${r.groupID ? `<p style="font-size:0.75rem;">📋 مجموعة: ${r.groupID}</p>` : ''}
+                            <small style="color:var(--text3);">${formatDate(r.createdAt)}</small>
+                        </div>
+                        <div style="display:flex; gap:5px; align-items:center;">
+                            <span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'resolved' ? 'badge-open' : 'badge-closed'}">${r.status === 'pending' ? '⏳ معلق' : r.status === 'resolved' ? '✅ محلول' : '❌ مرفوض'}</span>
+                            ${r.status === 'pending' ? `
+                                <button class="btn btn-xs btn-success" onclick="resolveReport('${r.id}')">✅ حل</button>
+                                <button class="btn btn-xs btn-danger" onclick="dismissReport('${r.id}')">❌ رفض</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            if (reports.length === 0) {
+                html += '<div class="empty-state"><div class="icon">✅</div><h3>لا توجد بلاغات</h3><p>كل شيء على ما يرام!</p></div>';
+            }
+            
+            main.innerHTML = html;
+            updateSidebarCounts();
+            
+        } catch(e) {
+            main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
+        }
+    }
+
+    window.resolveReport = async function(id) {
+        try {
+            await db.collection('reports').doc(id).update({
+                status: 'resolved',
+                resolvedBy: currentAdmin.uid,
+                resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('✅ تم حل البلاغ', 'success');
+            renderReports();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.dismissReport = async function(id) {
+        try {
+            await db.collection('reports').doc(id).update({
+                status: 'dismissed',
+                dismissedBy: currentAdmin.uid,
+                dismissedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('❌ تم رفض البلاغ', 'info');
+            renderReports();
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    // ========== Banned Users ==========
+    async function renderBanned() {
+        const main = document.getElementById('mainContent');
+        showLoading(main);
+        
+        try {
+            const snap = await db.collection('users').where('banned', '==', true).get();
+            const banned = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            let html = `
+            <div class="page-header">
+                <h1>🚫 المستخدمين المحظورين</h1>
+                <span class="breadcrumb">الأمان / المحظورين</span>
+            </div>
+            `;
+            
+            if (banned.length === 0) {
+                html += '<div class="empty-state"><div class="icon">✅</div><h3>لا يوجد مستخدمين محظورين</h3></div>';
+            } else {
+                html += `
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>المستخدم</th><th>البريد</th><th>تاريخ الحظر</th><th>بواسطة</th><th>إجراءات</th></tr></thead>
+                            <tbody>
+                                ${banned.map(u => `
+                                <tr>
+                                    <td><strong>${u.name || '-'}</strong></td>
+                                    <td>${u.email || '-'}</td>
+                                    <td>${formatDate(u.bannedAt)}</td>
+                                    <td>${u.bannedBy || '-'}</td>
+                                    <td><button class="btn btn-xs btn-success" onclick="toggleUserBan('${u.id}',true)">🔓 فك الحظر</button></td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                `;
+            }
+            
+            main.innerHTML = html;
+            
+        } catch(e) {
+            main.innerHTML = '<div class="card" style="text-align:center; color:var(--danger);">❌ حدث خطأ: ' + e.message + '</div>';
+        }
+    }
+
+    // ========== Backup ==========
+    function renderBackup() {
+        const main = document.getElementById('mainContent');
+        main.innerHTML = `
+        <div class="page-header">
+            <h1>💾 النسخ الاحتياطي</h1>
+            <span class="breadcrumb">النظام / النسخ الاحتياطي</span>
+        </div>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h3 style="color:var(--gold);">💾 نسخ احتياطي يدوي</h3>
+                <p style="color:var(--text2); margin-bottom:15px;">إنشاء نسخة احتياطية يدوية من قاعدة البيانات</p>
+                <button class="btn" onclick="createManualBackup()">💾 إنشاء نسخة</button>
+            </div>
+            <div class="card">
+                <h3 style="color:var(--gold);">📤 تصدير البيانات</h3>
+                <p style="color:var(--text2); margin-bottom:15px;">تصدير بيانات المستخدمين إلى ملف Excel</p>
+                <button class="btn btn-outline" onclick="exportAllData()">📤 تصدير Excel</button>
+            </div>
+        </div>
+        `;
+    }
+
+    window.createManualBackup = async function() {
+        try {
+            await db.collection('backups').add({
+                adminID: currentAdmin.uid,
+                adminName: currentAdmin.name,
+                type: 'manual',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('✅ تم إنشاء نسخة احتياطية', 'success');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.exportAllData = async function() {
+        try {
+            showToast('⏳ جاري تجهيز البيانات...', 'info');
+            const snap = await db.collection('users').get();
+            const data = snap.docs.map(d => {
+                const u = d.data();
+                return {
+                    'الاسم': u.name || '',
+                    'البريد': u.email || '',
+                    'الهاتف': u.phone || '',
+                    'الدور': u.role || 'user',
+                    'الرسائل': u.totalMessages || 0,
+                    'النقاط': u.points || 0,
+                    'محظور': u.banned ? 'نعم' : 'لا',
+                    'تاريخ التسجيل': formatDate(u.createdAt)
+                };
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "المستخدمين");
+            XLSX.writeFile(wb, `WebEgypt_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ تم التصدير بنجاح', 'success');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.exportCodes = async function() {
+        try {
+            const snap = await db.collection('student_codes').where('adminID', '==', currentAdmin.uid).get();
+            const data = snap.docs.map(d => {
+                const c = d.data();
+                return {
+                    'الكود': c.code,
+                    'الطالب': c.studentName || '',
+                    'الصف': c.studentClass || '',
+                    'النوع': c.type || '',
+                    'الحالة': c.usedBy ? 'مستخدم' : 'متاح',
+                    'المجموعات': (c.allowedGroups || []).length
+                };
+            });
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "الأكواد");
+            XLSX.writeFile(wb, `WebEgypt_Codes_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('✅ تم تصدير الأكواد', 'success');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    // ========== Settings ==========
+    function renderSettings() {
+        const main = document.getElementById('mainContent');
+        
+        db.collection('config').doc('support').get().then(doc => {
+            const s = doc.exists ? doc.data() : {};
+            
+            main.innerHTML = `
+            <div class="page-header">
+                <h1>⚙️ إعدادات النظام</h1>
+                <span class="breadcrumb">النظام / الإعدادات</span>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">📞 روابط الدعم الفني</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📱 رابط واتساب</label>
+                        <input id="supWa" class="input-field" value="${s.whatsapp || ''}" placeholder="https://wa.me/...">
+                    </div>
+                    <div class="form-group">
+                        <label>📘 رابط فيسبوك</label>
+                        <input id="supFb" class="input-field" value="${s.facebook || ''}" placeholder="https://facebook.com/...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📞 رقم الهاتف</label>
+                        <input id="supPhone" class="input-field" value="${s.phone || ''}" placeholder="+20...">
+                    </div>
+                    <div class="form-group">
+                        <label>📧 البريد الإلكتروني</label>
+                        <input id="supEmail" class="input-field" value="${s.email || ''}" placeholder="support@...">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveSupportSettings()">💾 حفظ إعدادات الدعم</button>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">🔒 تغيير كلمة المرور</h3>
+                <div class="form-group">
+                    <label>كلمة المرور الجديدة</label>
+                    <input id="newPass" type="password" class="input-field" placeholder="أدخل كلمة المرور الجديدة" minlength="6">
+                </div>
+                <button class="btn btn-warning" onclick="changePassword()">🔐 تحديث كلمة المرور</button>
+            </div>
+            
+            <div class="card">
+                <h3 style="color:var(--gold); margin-bottom:15px;">🖼️ صورة الأدمن</h3>
+                <p style="color:var(--text2); margin-bottom:10px;">تغيير صورة البروفايل</p>
+                <button class="btn btn-outline" onclick="changeAdminAvatar()">📷 تغيير الصورة</button>
+            </div>
+            `;
+        });
+    }
+
+    window.saveSupportSettings = async function() {
+        try {
+            await db.collection('config').doc('support').set({
+                whatsapp: document.getElementById('supWa')?.value || '',
+                facebook: document.getElementById('supFb')?.value || '',
+                phone: document.getElementById('supPhone')?.value || '',
+                email: document.getElementById('supEmail')?.value || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            showToast('✅ تم حفظ الإعدادات', 'success');
+        } catch(e) {
+            showToast('❌ خطأ: ' + e.message, 'error');
+        }
+    };
+
+    window.changePassword = async function() {
+        const newPass = document.getElementById('newPass')?.value;
+        if (!newPass || newPass.length < 6) return showToast('⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'warning');
+        
+        try {
+            await auth.currentUser.updatePassword(newPass);
+            showToast('✅ تم تحديث كلمة المرور بنجاح', 'success');
+            document.getElementById('newPass').value = '';
+        } catch(e) {
+            showToast('❌ ' + e.message, 'error');
+        }
+    };
+
+    // ========== Logs ==========
+    function renderLogs() {
+        const main = document.getElementById('mainContent');
+        main.innerHTML = `
+        <div class="page-header">
+            <h1>📜 سجل النشاطات</h1>
+            <span class="breadcrumb">النظام / السجلات</span>
+        </div>
+        
+        <div class="card">
+            <h3 style="color:var(--gold); margin-bottom:15px;">📋 آخر النشاطات</h3>
+            <div id="logsList">
+                <p style="color:var(--text3);">⏳ جاري التحميل...</p>
+            </div>
+        </div>
+        `;
+        
+        db.collection('activity_logs')
+            .where('adminID', '==', currentAdmin.uid)
+            .orderBy('timestamp', 'desc')
+            .limit(50)
+            .get()
+            .then(snap => {
+                const logs = snap.docs.map(d => d.data());
+                const list = document.getElementById('logsList');
+                
+                if (logs.length === 0) {
+                    list.innerHTML = '<p style="color:var(--text3); text-align:center;">لا توجد سجلات</p>';
+                } else {
+                    list.innerHTML = logs.map(l => `
+                    <div style="display:flex; justify-content:space-between; padding:8px 12px; background:var(--surface2); margin:3px 0; border-radius:8px; font-size:0.8rem;">
+                        <span>${l.action || 'نشاط'}</span>
+                        <small style="color:var(--text3);">${formatDate(l.timestamp)} ${formatTime(l.timestamp)}</small>
+                    </div>
+                    `).join('');
+                }
+            });
+    }
+
+    // ========== Keyboard Shortcuts ==========
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             document.querySelector('.modal-overlay')?.remove();
             closeSidebar();
-            document.getElementById('notificationCenter')?.classList.remove('open');
         }
+        // Ctrl+1-9 for quick navigation
         if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
             e.preventDefault();
             const pages = ['dashboard', 'users', 'groups', 'codes', 'chats-list', 'stories', 'media', 'reports', 'settings'];
@@ -1864,46 +2841,10 @@
         }
     });
 
-    // ==========================================
-    // INIT
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', () => {
-        // Load saved theme
-        const savedTheme = localStorage.getItem('adminTheme');
-        if (savedTheme && savedTheme !== 'gold') {
-            applyTheme(savedTheme);
-        }
-        
-        // Add ripple effect to buttons
-        document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn');
-            if (btn) {
-                const ripple = document.createElement('span');
-                ripple.className = 'ripple-effect';
-                const rect = btn.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.width = ripple.style.height = size + 'px';
-                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                btn.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-            }
-        });
-        
-        // Pre-fill saved email
-        const savedEmail = localStorage.getItem('adminEmail');
-        if (savedEmail) {
-            const emailInput = document.getElementById('adminEmail');
-            if (emailInput) emailInput.value = savedEmail;
-        }
-    });
-
-    console.log('🛡️ Admin Panel ULTIMATE v20 | Web Egypt 2026 🔥');
-    console.log('✅ New: Notification Center, ID Cards, Scheduled Messages');
-    console.log('✅ New: Auto Reply Bot, Word Filter, Login As User');
-    console.log('✅ New: Theme Customization, Student Preview, PDF Export');
-    console.log('✅ New: Auto Backup, Ripple Effects, Security Enhanced');
-    console.log('✅ New: Back Button Support, Force Logout on Delete');
+    // ========== Init ==========
+    console.log('🛡️ Admin Panel v12 ULTIMATE - Fully Featured | Web Egypt 2026 🔥');
+    console.log('📊 Features: Dashboard, Analytics, Users, Groups, Codes, Chat, Broadcast, Stories, Media, Stickers, Reports, Banned, Backup, Settings, Logs');
+    console.log('⌨️ Shortcuts: Ctrl+1-9 for quick navigation, Esc to close modals');
 </script>
 </body>
 </html>
