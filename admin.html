@@ -696,23 +696,43 @@
             const cred = await auth.signInWithEmailAndPassword(email, pass);
             const userDoc = await db.collection('users').doc(cred.user.uid).get();
             
-            if (!userDoc.exists) {
+                        if (!userDoc.exists) {
+                // 🔥🔥🔥 إنشاء أدمن جديد تلقائياً
+                const adminName = email.split('@')[0];
                 await db.collection('users').doc(cred.user.uid).set({
                     userID: cred.user.uid,
-                    name: email.split('@')[0],
+                    name: adminName,
                     email: email,
                     role: 'admin',
                     phone: '',
                     profilePic: '',
                     online: true,
+                    totalMessages: 0,
+                    points: 0,
+                    banned: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                currentAdmin = { uid: cred.user.uid, name: email.split('@')[0], email: email, role: 'admin' };
+                currentAdmin = { uid: cred.user.uid, name: adminName, email: email, role: 'admin' };
+                showToast('✅ تم إنشاء حساب الأدمن: ' + adminName, 'success');
             } else {
                 const userData = userDoc.data();
-                if (userData.role !== 'admin') throw new Error('⛔ غير مصرح بالدخول - هذا الحساب ليس أدمن');
-                await userDoc.ref.update({ online: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
-                currentAdmin = { uid: cred.user.uid, name: userData.name, email: userData.email, role: 'admin' };
+                if (userData.role !== 'admin') {
+                    throw new Error('⛔ غير مصرح بالدخول - هذا الحساب ليس أدمن');
+                }
+                if (userData.banned) {
+                    throw new Error('🚫 هذا الحساب محظور');
+                }
+                await userDoc.ref.update({ 
+                    online: true, 
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
+                });
+                currentAdmin = { 
+                    uid: cred.user.uid, 
+                    name: userData.name, 
+                    email: userData.email, 
+                    role: userData.role || 'admin' 
+                };
             }
             
             saveEmail(email);
