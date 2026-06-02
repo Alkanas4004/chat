@@ -369,10 +369,41 @@
                 <p style="color:var(--text3); text-align:center;">لا توجد إشعارات</p>
             </div>
         </div>
-    </div>
+  </div>
 </div>
 
 <script>
+    // ========== Update Notification ==========
+    function showUpdateNotification() {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--gold-gradient);color:#000;padding:14px 20px;text-align:center;z-index:9999;font-weight:bold;font-size:0.9rem;box-shadow:0 4px 20px rgba(255,193,7,0.4);animation:slideDown 0.5s ease;display:flex;align-items:center;justify-content:center;gap:10px;';
+        banner.innerHTML = '🔄 تحديث جديد متاح! <button onclick="applyUpdate()" style="background:#000;color:#fff;border:none;padding:6px 16px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.8rem;">تحديث الآن</button>';
+        document.body.prepend(banner);
+        setTimeout(function() { if (banner.parentNode) banner.remove(); }, 30000);
+    }
+    
+    function applyUpdate() {
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.ready.then(function(reg) {
+                if (reg.active) reg.active.postMessage('skipWaiting');
+            });
+        }
+        window.location.reload();
+    }
+    
+    // ========== Version Check ==========
+    var APP_VERSION = '2.1.0';
+    var storedVersion = localStorage.getItem('educhat_admin_version');
+    if (storedVersion && storedVersion !== APP_VERSION) {
+        localStorage.setItem('educhat_admin_version', APP_VERSION);
+        if (caches) {
+            caches.keys().then(function(keys) { keys.forEach(function(key) { caches.delete(key); }); });
+        }
+        setTimeout(function() { window.location.reload(); }, 1000);
+    } else {
+        localStorage.setItem('educhat_admin_version', APP_VERSION);
+    }
+
     // ========== Firebase Init ==========
     firebase.initializeApp({ 
         apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY", 
