@@ -333,13 +333,60 @@
             position: fixed;
             width: 100%;
         }
+                /* 🔥🔥🔥 الحل النهائي لاختفاء الشات على الموبايل */
+        #app {
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+            overflow: hidden !important;
+        }
+        
+        #mainScreen {
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        #contentArea {
+            flex: 1 !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        .chat-fullscreen {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            width: 100% !important;
+        }
+        
+        .chat-messages-area {
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            overflow-y: scroll !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        
+        .chat-input-bar {
+            flex-shrink: 0 !important;
+            display: flex !important;
+            visibility: visible !important;
+            position: relative !important;
+            z-index: 10 !important;
+        }
     </style>
     </style>
 </head>
 <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
 <div id="app">
     <div id="loadingOverlay" class="loading-overlay hidden"><div class="loading-spinner"></div><p class="loading-text">⏳ جاري التحميل...</p></div>
-    
+    <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false" style="position:fixed; width:100%; height:100dvh; overflow:hidden;"></body>
     <div id="loginScreen" class="login-container">
         <div class="login-card scale-in">
             <div class="app-icon">🏫</div>
@@ -1089,12 +1136,21 @@
     }
 
     // ========== Chat System - Core ==========
-    function renderChat(groupId) {
+        function renderChat(groupId) {
         if (groupId) currentGroupId = groupId;
         if (!currentGroupId) { switchTab('groups'); return; }
         
         const content = document.getElementById('contentArea');
-        content.innerHTML = '<div style="text-align:center; padding:50px;"><div class="loading-spinner" style="margin:0 auto;"></div><p style="color:var(--gold); margin-top:12px;">⏳ جاري فتح المحادثة...</p></div>';
+        
+        // 🔥🔥🔥 الحل السحري لاختفاء الشات
+        content.style.cssText = 'height:100%; overflow:hidden; display:flex; flex-direction:column;';
+        document.getElementById('app').style.cssText = 'height:100dvh; overflow:hidden;';
+        document.body.style.cssText = 'height:100dvh; overflow:hidden; position:fixed; width:100%;';
+        document.documentElement.style.cssText = 'height:100dvh; overflow:hidden;';
+        
+        content.innerHTML = '<div style="display:flex;flex-direction:column;height:100%;width:100%;">' +
+            '<div style="text-align:center; padding:50px;"><div class="loading-spinner" style="margin:0 auto;"></div><p style="color:var(--gold); margin-top:12px;">⏳ جاري فتح المحادثة...</p></div>' +
+            '</div>';
         
         db.collection('groups').doc(currentGroupId).get().then(doc => {
             if (!doc.exists) { switchTab('groups'); return; }
@@ -1122,8 +1178,9 @@
             const canWriteText = canWrite && allowText;
             const canUploadAnyMedia = canWrite && (allowImages || allowVideos || allowFiles || allowAudio);
             
-            let html = `
-            <div class="chat-fullscreen">
+            let html = '<div style="display:flex;flex-direction:column;height:100%;width:100%;">';
+            
+            html += `
                 <div class="chat-header-bar">
                     <span class="back-btn" onclick="history.back()">⬅️</span>
                     <img src="${g.picture || 'https://via.placeholder.com/40'}" alt="صورة" onerror="this.src='https://via.placeholder.com/40'">
@@ -1147,10 +1204,10 @@
             }
             
             html += `
-                <div class="chat-messages-area" id="chatMessages" style="background-image:url('${currentUser.chatBg || ''}');">
+                <div class="chat-messages-area" id="chatMessages" style="background-image:url('${currentUser.chatBg || ''}'); flex:1; min-height:0; overflow-y:auto;">
                     <button id="scrollBottomBtn" class="scroll-bottom-btn hidden" onclick="scrollToBottom()">⬇️ <span id="newMsgCount">0</span> جديد</button>
                 </div>
-                <div class="chat-input-bar">`;
+                <div class="chat-input-bar" style="display:flex; flex-shrink:0;">`;
             
             if (canUploadAnyMedia) {
                 html += '<button class="icon-circle-btn attach" onclick="uploadMedia()" title="رفع ملفات">📎</button>';
@@ -1162,28 +1219,27 @@
             else if (!canWrite) placeholder = '🔐 لا يمكنك الكتابة';
             
             html += `
-                <input id="msgInput" placeholder="${placeholder}" onkeydown="if(event.key==='Enter')sendMessage()" oninput="handleTyping()" autocomplete="off" ${!canWriteText ? 'disabled' : ''}>
+                <input id="msgInput" placeholder="${placeholder}" onkeydown="if(event.key==='Enter')sendMessage()" oninput="handleTyping()" autocomplete="off" ${!canWriteText ? 'disabled' : ''} style="flex:1;">
                 <button class="icon-circle-btn send" onclick="sendMessage()" ${!canWriteText ? 'disabled' : ''}>➤</button>
-            </div></div>`;
+            </div>`;
             
-                        content.innerHTML = html;
+            html += '</div>';
+            
+            content.innerHTML = html;
             newMessageCounter = 0;
             
-            // 🔥🔥🔥 إصلاح مشكلة اختفاء مربع الكتابة
+            // 🔥 إجبار الشات على الظهور
             setTimeout(function() {
                 var msgArea = document.getElementById('chatMessages');
                 if (msgArea) {
-                    msgArea.style.height = '0px';
-                    msgArea.style.flex = '1 1 0%';
-                    msgArea.style.minHeight = '0px';
+                    msgArea.style.cssText = 'flex:1 1 0% !important; min-height:0 !important; overflow-y:auto !important; padding:12px 14px;';
                     msgArea.scrollTop = msgArea.scrollHeight;
                 }
                 var inputBar = document.querySelector('.chat-input-bar');
                 if (inputBar) {
-                    inputBar.style.display = 'flex';
-                    inputBar.style.visibility = 'visible';
+                    inputBar.style.cssText = 'display:flex !important; visibility:visible !important; flex-shrink:0; padding:10px 12px; padding-bottom:15px; background:var(--surface); border-top:1px solid #1a1a25; gap:8px; z-index:10;';
                 }
-            }, 100);
+            }, 200);
             
             loadMessages();
             loadTypingIndicator();
