@@ -2549,27 +2549,249 @@
     };
 
     // ========== Support ==========
-    function renderSupport() {
+        function renderSupport() {
         const c = document.getElementById('contentArea');
-        db.collection('config').doc('support').get().then(d => {
-            const s = d.exists ? d.data() : {};
-            c.innerHTML = `
-            <div class="info-card scale-in">
-             <img src="${s.adminImageURL || 'https://i.ibb.co/Ls0fgDZ/admin-profile.jpg'}" style="width:85px;height:85px;border-radius:50%;border:3px solid var(--gold); object-fit:cover;" onerror="this.src='https://via.placeholder.com/85'">
-                <h2 style="color:var(--gold); margin:12px 0;">📞 الدعم الفني</h2>
-                <p style="color:var(--text2); margin-bottom:15px;">للتواصل والاستفسارات، اختر إحدى الوسائل التالية:</p>
-                <div class="support-links">
-                    ${s.whatsapp ? `<a href="${s.whatsapp}" target="_blank" rel="noopener" class="support-link"><img src="https://img.icons8.com/color/48/whatsapp.png" alt="واتساب" onerror="this.style.display='none'"><span>واتساب</span></a>` : ''}
-                    ${s.facebook ? `<a href="${s.facebook}" target="_blank" rel="noopener" class="support-link"><img src="https://img.icons8.com/color/48/facebook.png" alt="فيسبوك" onerror="this.style.display='none'"><span>فيسبوك</span></a>` : ''}
-                    ${s.phone ? `<a href="tel:${s.phone}" class="support-link"><img src="https://img.icons8.com/color/48/phone.png" alt="هاتف" onerror="this.style.display='none'"><span>هاتف</span></a>` : ''}
-                    ${s.email ? `<a href="mailto:${s.email}" class="support-link"><img src="https://img.icons8.com/color/48/gmail.png" alt="بريد" onerror="this.style.display='none'"><span>بريد</span></a>` : ''}
-                </div>
-                ${!s.whatsapp && !s.facebook && !s.phone && !s.email ? '<p style="color:var(--text3); margin-top:15px;">لم يتم إضافة روابط تواصل بعد</p>' : ''}
-                <p style="color:var(--text3); font-size:0.7rem; margin-top:15px;">🕐 أوقات الدعم: من السبت إلى الخميس، 9 صباحاً - 6 مساءً</p>
-            </div>`;
-        }).catch(() => {
-            c.innerHTML = '<div class="info-card"><p style="color:var(--text2);">لم يتم تحميل معلومات الدعم</p></div>';
-        });
+        
+        const adminData = {
+            name: 'القناص',
+            title: '⚡ مطور المنصة',
+            bio: '❰❰❰√ẪⱢ[ҜẦ₦ẤṤ]➸🥶💙♕❱❱❱',
+            image: 'https://i.ibb.co/Ls0fgDZ/admin-profile.jpg',
+            whatsapp: '201118159399',
+            telegram: 'https://t.me/alkanasimexlxoem',
+            youtube: 'https://www.youtube.com/@alkanasalkaber1',
+            tiktok: 'https://tiktok.com/@.alkanas8'
+        };
+        
+        c.innerHTML = `
+        <style>
+            .support-hero {
+                background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+                border-radius: 24px;
+                padding: 30px 20px;
+                text-align: center;
+                margin-bottom: 16px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                border: 1px solid rgba(255,193,7,0.2);
+            }
+            .support-hero::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: conic-gradient(transparent, rgba(255,193,7,0.05), transparent, rgba(255,193,7,0.08), transparent);
+                animation: spin 12s linear infinite;
+            }
+            .support-hero > * { position: relative; z-index: 1; }
+            
+            .admin-avatar-wrapper {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+            .admin-avatar {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                border: 4px solid var(--gold);
+                object-fit: cover;
+                box-shadow: 0 0 40px rgba(255,193,7,0.4);
+                animation: glow 2s ease-in-out infinite;
+            }
+            .admin-status {
+                position: absolute;
+                bottom: 8px;
+                right: 8px;
+                width: 20px;
+                height: 20px;
+                background: #2ED573;
+                border-radius: 50%;
+                border: 3px solid #1a1a2e;
+                animation: pulse 2s infinite;
+            }
+            .admin-name {
+                font-size: 1.8rem;
+                font-weight: bold;
+                background: var(--gold-gradient);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 5px 0;
+            }
+            .admin-title {
+                color: var(--gold);
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+            .admin-bio {
+                color: var(--text2);
+                font-size: 0.85rem;
+                margin: 8px 0;
+                letter-spacing: 1px;
+            }
+            
+            .support-links-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin: 16px 0;
+            }
+            .support-link-card {
+                background: var(--surface);
+                border-radius: 20px;
+                padding: 20px 15px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255,255,255,0.05);
+                text-decoration: none;
+                color: #fff;
+                position: relative;
+                overflow: hidden;
+            }
+            .support-link-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            }
+            .support-link-card:active {
+                transform: scale(0.95);
+            }
+            .support-link-card.whatsapp {
+                background: linear-gradient(135deg, #075e54, #128c7e);
+                border-color: #25d366;
+            }
+            .support-link-card.telegram {
+                background: linear-gradient(135deg, #0088cc, #00a8ff);
+                border-color: #00a8ff;
+            }
+            .support-link-card.youtube {
+                background: linear-gradient(135deg, #cc0000, #ff0000);
+                border-color: #ff0000;
+            }
+            .support-link-card.tiktok {
+                background: linear-gradient(135deg, #000000, #333333);
+                border-color: #ff0050;
+            }
+            .link-icon {
+                font-size: 3rem;
+                margin-bottom: 8px;
+                display: block;
+                animation: float 3s ease-in-out infinite;
+            }
+            .link-name {
+                font-weight: bold;
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+            .link-desc {
+                font-size: 0.7rem;
+                opacity: 0.8;
+            }
+            .link-arrow {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                opacity: 0.6;
+            }
+            
+            .support-footer {
+                text-align: center;
+                color: var(--text3);
+                font-size: 0.7rem;
+                margin-top: 15px;
+                padding: 15px;
+                background: var(--surface);
+                border-radius: 16px;
+            }
+            
+            @keyframes pulse-status {
+                0% { box-shadow: 0 0 0 0 rgba(46,213,115,0.6); }
+                70% { box-shadow: 0 0 0 15px rgba(46,213,115,0); }
+                100% { box-shadow: 0 0 0 0 rgba(46,213,115,0); }
+            }
+            .admin-status { animation: pulse-status 2s infinite; }
+            
+            .shooting-stars {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+            .star {
+                position: absolute;
+                width: 2px;
+                height: 2px;
+                background: var(--gold);
+                border-radius: 50%;
+                animation: shoot 3s linear infinite;
+            }
+            @keyframes shoot {
+                0% { transform: translate(0, 0); opacity: 1; }
+                100% { transform: translate(-100px, 100px); opacity: 0; }
+            }
+        </style>
+        
+        <div class="support-hero">
+            <div class="shooting-stars">
+                ${Array(15).fill(0).map((_, i) => `
+                    <div class="star" style="left:${Math.random()*90}%; top:${Math.random()*90}%; animation-delay:${Math.random()*3}s; animation-duration:${2+Math.random()*3}s;"></div>
+                `).join('')}
+            </div>
+            
+            <div class="admin-avatar-wrapper">
+                <img src="${adminData.image}" class="admin-avatar" alt="الأدمن" onerror="this.src='https://i.ibb.co/Ls0fgDZ/admin-profile.jpg'">
+                <div class="admin-status"></div>
+            </div>
+            <div class="admin-name">${adminData.name}</div>
+            <div class="admin-title">${adminData.title}</div>
+            <div class="admin-bio">${adminData.bio}</div>
+        </div>
+        
+        <h2 class="section-title">📞 تواصل معنا</h2>
+        
+        <div class="support-links-grid">
+            <a href="https://wa.me/${adminData.whatsapp}?text=جامد%20يقناص%20جاي%20من%20تطبيق%20الشات%20عاش%20عليك%F0%9F%A5%B3%F0%9F%98%98" 
+               target="_blank" class="support-link-card whatsapp">
+                <span class="link-arrow">↗️</span>
+                <span class="link-icon">💚</span>
+                <div class="link-name">واتساب</div>
+                <div class="link-desc">دردشة فورية مباشرة</div>
+            </a>
+            
+            <a href="${adminData.telegram}?text=جامد%20يقناص%20جاي%20من%20تطبيق%20الشات%20عاش%20عليك%F0%9F%A5%B3%F0%9F%98%98" 
+               target="_blank" class="support-link-card telegram">
+                <span class="link-arrow">↗️</span>
+                <span class="link-icon">✈️</span>
+                <div class="link-name">تليجرام</div>
+                <div class="link-desc">قناة التحديثات</div>
+            </a>
+            
+            <a href="${adminData.youtube}" target="_blank" class="support-link-card youtube">
+                <span class="link-arrow">↗️</span>
+                <span class="link-icon">▶️</span>
+                <div class="link-name">يوتيوب</div>
+                <div class="link-desc">فيديوهات وشروحات</div>
+            </a>
+            
+            <a href="${adminData.tiktok}" target="_blank" class="support-link-card tiktok">
+                <span class="link-arrow">↗️</span>
+                <span class="link-icon">🎵</span>
+                <div class="link-name">تيك توك</div>
+                <div class="link-desc">مقاطع قصيرة</div>
+            </a>
+        </div>
+        
+        <div class="support-footer">
+            <p>🕐 متاح للدعم: السبت - الخميس | 9 صباحاً - 10 مساءً</p>
+            <p style="margin-top:5px;">© 2026 Web Egypt - ${adminData.name}</p>
+        </div>`;
     }
 
     // ========== About Page ==========
