@@ -409,34 +409,95 @@
         if (target) addRipple(e);
     }, {passive: true});
 
-    // ========== Mobile Back Button Handling ==========
+        // ========== Mobile Back Button Handling ==========
     let historyStack = [];
+    let isInChat = false;
     
     function pushHistory(view, id) {
         id = id || null;
         const state = { view: view, id: id };
         history.pushState(state, '', '#' + view + (id ? '-' + id : ''));
         historyStack.push(state);
+        
+        if (view === 'group-chat' || view === 'private-chat') {
+            isInChat = true;
+        } else {
+            isInChat = false;
+        }
     }
 
+    // 🔥🔥🔥 التعامل مع زرار الرجوع في الموبايل
     window.addEventListener('popstate', function(e) {
         if (e.state && e.state.view) {
+            // لو كان في شات وضغط رجوع
             if (e.state.view === 'group-chat') {
                 currentGroupId = null;
+                isInChat = false;
+                cleanListeners();
                 switchTab('groups');
             } else if (e.state.view === 'private-chat') {
                 currentPrivateChatUser = null;
+                isInChat = false;
+                cleanListeners();
                 switchTab('chats');
-            } else if (e.state.view === 'stories' || e.state.view === 'media' || e.state.view === 'support' || e.state.view === 'stats' || e.state.view === 'settings' || e.state.view === 'notes' || e.state.view === 'leaderboard') {
+            } else if (e.state.view === 'stories' || e.state.view === 'media' || 
+                       e.state.view === 'support' || e.state.view === 'stats' || 
+                       e.state.view === 'settings' || e.state.view === 'notes' || 
+                       e.state.view === 'leaderboard' || e.state.view === 'group-info' ||
+                       e.state.view === 'about') {
+                isInChat = false;
+                cleanListeners();
                 switchTab('more');
             }
         } else {
-            // إذا لم يكن هناك state، يعني المستخدم وصل للصفحة الرئيسية
-            if (currentGroupId) { currentGroupId = null; switchTab('groups'); }
-            else if (currentPrivateChatUser) { currentPrivateChatUser = null; switchTab('chats'); }
+            // لو مفيش state، يبقى راجع للصفحة الرئيسية
+            if (currentGroupId) { 
+                currentGroupId = null; 
+                isInChat = false;
+                cleanListeners();
+                switchTab('groups'); 
+            } else if (currentPrivateChatUser) { 
+                currentPrivateChatUser = null; 
+                isInChat = false;
+                cleanListeners();
+                switchTab('chats'); 
+            }
+        }
+        
+        // إزالة آخر عنصر من الـ stack
+        if (historyStack.length > 0) {
+            historyStack.pop();
         }
     });
 
+    // 🔥🔥🔥 منع الخروج بالغلط من التطبيق (للـ PWA)
+    document.addEventListener('backbutton', function(e) {
+        e.preventDefault();
+        
+        if (isInChat && currentGroupId) {
+            // في شات مجموعة - ارجع لقائمة المجموعات
+            currentGroupId = null;
+            isInChat = false;
+            cleanListeners();
+            switchTab('groups');
+        } else if (isInChat && currentPrivateChatUser) {
+            // في شات خاص - ارجع لقائمة المحادثات
+            currentPrivateChatUser = null;
+            isInChat = false;
+            cleanListeners();
+            switchTab('chats');
+        } else if (document.querySelector('.modal-overlay')) {
+            // في نافذة مفتوحة - اقفلها
+            document.querySelectorAll('.modal-overlay').forEach(function(m) { m.remove(); });
+        } else {
+            // في الصفحة الرئيسية - اسأل قبل الخروج
+            if (confirm('🚪 هل تريد الخروج من التطبيق؟')) {
+                if (navigator.app && navigator.app.exitApp) {
+                    navigator.app.exitApp();
+                }
+            }
+        }
+    }, false);
     // ========== User Deletion Listener ==========
     function startUserDeletionListener() {
         if (userDeletionListener) userDeletionListener();
@@ -930,9 +991,10 @@
         allListeners.push(unsub);
     }
 
-    function openGroupChat(groupId) {
+        function openGroupChat(groupId) {
         currentGroupId = groupId;
         setLastReadTimestamp(groupId, 'group');
+        pushHistory('group-chat', groupId);  // 🔥 السطر ده مهم عشان زرار الرجوع
         navigate('chat', groupId);
     }
 
@@ -1024,10 +1086,10 @@
         });
     }
 
-    function loadMessages() {
+        function loadMessages() {
         const div = document.getElementById('chatMessages'); 
         if (!div) return; 
-        if (chatUnsubscribe) chatUnsubscribe();
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         
         let lastDate = null;
         let shouldAutoScroll = true;
@@ -1036,31 +1098,50 @@
         const scrollBtn = document.getElementById('scrollBottomBtn');
         const newMsgSpan = document.getElementById('newMsgCount');
         
-        // 🔥 Smart Scroll Detection
+        // 🔥🔥🔥 تتبع المستخدم بالكامل عشان نعرف هو فين
+        div.addEventListener('touchstart', function() {
+            shouldAutoScroll = false;
+        }, { passive: true });
+        
+        div.addEventListener('touchend', function() {
+            setTimeout(function() {
+                const bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
+                if (bottom < 80) {
+                    shouldAutoScroll = true;
+                    if (scrollBtn) scrollBtn.classList.add('hidden');
+                    newMsgCount = 0;
+                    setLastReadTimestamp(currentGroupId, 'group');
+                }
+            }, 1000);
+        }, { passive: true });
+        
         div.addEventListener('scroll', function() {
             const bottom = div.scrollHeight - div.scrollTop - div.clientHeight;
-            shouldAutoScroll = bottom < 60;
-            
-            if (shouldAutoScroll) {
+            if (bottom < 60) {
+                shouldAutoScroll = true;
                 newMsgCount = 0;
                 if (scrollBtn) scrollBtn.classList.add('hidden');
                 setLastReadTimestamp(currentGroupId, 'group');
+            } else if (bottom > 200) {
+                shouldAutoScroll = false;
             }
         }, { passive: true });
         
+        // 🔥🔥🔥 الـ listener الأساسي للرسائل
         chatUnsubscribe = db.collection('groups').doc(currentGroupId).collection('messages')
             .orderBy('timestamp', 'asc')
-            .onSnapshot(snap => {
+            .onSnapshot(function(snap) {
                 const wasAtBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 80;
                 
-                // 🔥 كشف الرسائل الجديدة
-                const newMessages = snap.docChanges().filter(change => 
-                    change.type === 'added' && 
-                    change.doc.data().senderID !== currentUser.uid &&
-                    change.doc.data().timestamp
-                );
+                // كشف الرسائل الجديدة
+                const newMessages = snap.docChanges().filter(function(change) {
+                    return change.type === 'added' && 
+                           change.doc.data().senderID !== currentUser.uid &&
+                           change.doc.data().timestamp;
+                });
                 
-                if (newMessages.length > 0 && !wasAtBottom && !document.hidden) {
+                // لو في رسائل جديدة والمستخدم مش في الآخر
+                if (newMessages.length > 0 && !shouldAutoScroll && !document.hidden) {
                     newMsgCount += newMessages.length;
                     if (scrollBtn && newMsgSpan) {
                         newMsgSpan.textContent = newMsgCount;
@@ -1068,10 +1149,12 @@
                     }
                 }
                 
-                // 🔊 صوت وإشعار
+                // 🔊 صوت للرسائل الجديدة
                 if (newMessages.length > 0 && !document.hidden) {
                     playNotificationSound('group');
                 }
+                
+                // إشعارات المتصفح
                 if (newMessages.length > 0 && document.hidden) {
                     const lastMsg = newMessages[newMessages.length - 1].doc.data();
                     showBrowserNotification(
@@ -1088,7 +1171,7 @@
                     return; 
                 }
                 
-                snap.forEach(doc => {
+                snap.forEach(function(doc) {
                     const m = doc.data(); 
                     m.id = doc.id;
                     
@@ -1133,9 +1216,17 @@
                     div.innerHTML += '<div class="msg-wrapper ' + cls + '"><div class="msg-bubble">' + contentHtml + '</div><div class="msg-meta-info">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? ' <span class="seen-check">' + (m.seen ? '✓✓' : '✓') + '</span>' : '') + (isSent ? ' <button class="delete-msg-btn" onclick="deleteMyMessage(\'' + m.id + '\')" title="حذف">🗑️</button>' : '') + (!isSent ? ' <button class="report-btn" onclick="reportMessage(\'' + m.id + '\',\'' + m.senderID + '\',\'' + (m.senderName || '') + '\')" title="تبليغ">🚩</button>' : '') + '</div></div>';
                 });
                 
+                // 🔥🔥🔥 النزول لآخر رسالة (زي الواتساب بالظبط)
                 if (shouldAutoScroll || wasAtBottom) {
-                    requestAnimationFrame(() => { div.scrollTop = div.scrollHeight; });
-                    setTimeout(() => { div.scrollTop = div.scrollHeight; }, 150);
+                    requestAnimationFrame(function() {
+                        div.scrollTop = div.scrollHeight;
+                    });
+                    setTimeout(function() {
+                        div.scrollTop = div.scrollHeight;
+                    }, 50);
+                    setTimeout(function() {
+                        div.scrollTop = div.scrollHeight;
+                    }, 150);
                 }
                 
                 if (!shouldAutoScroll && newMsgCount > 0 && scrollBtn) {
@@ -1144,6 +1235,17 @@
             });
         
         allListeners.push(chatUnsubscribe);
+    }
+
+    function scrollToBottom() {
+        const div = document.getElementById('chatMessages');
+        if (div) {
+            div.scrollTo({ top: div.scrollHeight, behavior: 'smooth' });
+            newMsgCount = 0;
+            const btn = document.getElementById('scrollBottomBtn');
+            if (btn) btn.classList.add('hidden');
+            setLastReadTimestamp(currentGroupId, 'group');
+        }
     }
 
     function scrollToBottom() {
@@ -1463,10 +1565,11 @@
         }
     }
 
-    function openPrivateChat(uid) {
+        function openPrivateChat(uid) {
         currentPrivateChatUser = uid;
         const chatId = [currentUser.uid, uid].sort().join('_');
         setLastReadTimestamp(chatId, 'private');
+        pushHistory('private-chat', uid);  // 🔥 السطر ده هو اللي بيخلي زرار الرجوع يشتغل
         navigate('private-chat', uid);
     }
 
@@ -2291,4 +2394,4 @@
     console.log('%c🛡️ Protected by Web Egypt Security System', 'color: #FFA502;');
 </script>
 </body>
-</html>
+</html>ب
