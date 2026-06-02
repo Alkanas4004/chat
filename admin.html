@@ -635,13 +635,13 @@
         } catch(e) {}
     }
 
-    function switchPage(page, data) {
+        function switchPage(page, data) {
         data = data || null;
         cleanListeners();
         closeSidebar();
-        pushHistory(page, data);
         
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
         const pageTitles = {
             'dashboard': 'الإحصائيات', 'analytics': 'التحليلات', 'users': 'المستخدمين',
             'id-cards': 'بطاقات هوية', 'groups': 'المجموعات', 'create-group': 'إنشاء مجموعة',
@@ -653,14 +653,26 @@
             'student-preview': 'معاينة الطالب', 'settings': 'الإعدادات', 'logs': 'سجل النشاطات'
         };
         
-        document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.textContent.includes(pageTitles[page] || '')) item.classList.add('active');
+        // 🔥🔥🔥 تثبيت العنصر النشط
+        const targetText = pageTitles[page] || '';
+        document.querySelectorAll('.nav-item').forEach(function(item) {
+            if (targetText && item.textContent.includes(targetText)) {
+                item.classList.add('active');
+            }
         });
         
         const main = document.getElementById('mainContent');
+        
+        // 🔥🔥🔥 للشات - نخلي المساحة كاملة
+        if (page === 'chat' || page === 'private-chat') {
+            main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
+        } else {
+            main.style.cssText = 'padding:20px; overflow-y:auto;';
+        }
+        
         showLoading(main);
         
-        setTimeout(() => {
+        setTimeout(function() {
             switch(page) {
                 case 'dashboard': renderDashboard(); break;
                 case 'analytics': renderAnalytics(); break;
@@ -1710,10 +1722,19 @@
         }
     };
 
-    window.openAdminChat = function(gid) {
+        window.openAdminChat = function(gid) {
         currentChatGroupId = gid;
         switchPage('chat', gid);
     };
+    
+    // 🔥🔥🔥 إصلاح فتح الشات من القائمة الجانبية
+    function openChatFromSidebar(gid) {
+        currentChatGroupId = gid;
+        currentPrivateChatUser = null;
+        cleanListeners();
+        closeSidebar();
+        switchPage('chat', gid);
+    }
 
     function renderMembers(gid) {
         const main = document.getElementById('mainContent');
@@ -2249,11 +2270,12 @@
     };
 
     // ========== Chat ==========
-    function renderChat(gid) {
+        function renderChat(gid) {
         if (gid) currentChatGroupId = gid;
         if (!currentChatGroupId) { switchPage('groups'); return; }
         
         const main = document.getElementById('mainContent');
+        main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
         showLoading(main);
         
         db.collection('groups').doc(currentChatGroupId).get().then(doc => {
@@ -3522,6 +3544,27 @@
     console.log('%c📊 20+ Features: Dashboard, Analytics, Users, ID Cards, Groups, Codes, Chat, Broadcast, Scheduled Messages, Auto Reply, Stories, Media, Stickers, Notifications, Reports, Word Filter, Banned, Backup, Theme, Student Preview, Settings, Logs', 'color: #2ED573;');
     console.log('%c👻 Ghost Mode | 📄 Export PDF/Excel | 🔔 Notification Center | 🎨 5 Themes | ⏰ Scheduled Messages | 🤖 Auto Reply Bot', 'color: #1E90FF;');
     console.log('%c⌨️ Shortcuts: Ctrl+1-9 | Esc to close', 'color: #FFA502;');
+        // 🔥🔥🔥 إغلاق القايمة عند الضغط على أي عنصر في الموبايل
+    document.addEventListener('DOMContentLoaded', function() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-item')) {
+                    setTimeout(function() {
+                        closeSidebar();
+                    }, 200);
+                }
+            });
+        }
+        
+        // 🔥🔥🔥 إغلاق القايمة عند الضغط على الخلفية
+        var overlay = document.getElementById('sidebarOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                closeSidebar();
+            });
+        }
+    });
 </script>
 </body>
 </html>
