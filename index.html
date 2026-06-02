@@ -6,13 +6,14 @@
     <meta name="theme-color" content="#0A0A0F">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Web Egypt">
-    <title>Web Egypt | الطالب</title>
+    <meta name="apple-mobile-web-app-title" content="EduChat Pro ">
+        <title>EduChat Pro | الطالب</title>
     
     <!-- PWA Manifest -->
      <link rel="icon" href="https://i.ibb.co/pB3f1tt7/amg-1.png" type="image/png">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/pB3f1tt7/amg-1.png">
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIldlYiBFZ3lwdCIsCiAgInNob3J0X25hbWUiOiAiV2ViRWd5cHQiLAogICJkZXNjcmlwdGlvbiI6ICLZhdmB2YrYh9inINin2YTZgtmI2YrZhiDYp9mE2LHZitin2YrYqSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEEwQTBGIiwKICAidGhlbWVfY29sb3IiOiAiI0ZGQzEwNyIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiaWNvbnMiOiBbCiAgICB7InNyYyI6ICJodHRwczovL3ZpYS5wbGFjZWhvbGRlci5jb20vMTkyIiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkifSwKICAgIHsic3JjIjogImh0dHBzOi8vdmlhLnBsYWNlaG9sZGVyLmNvbS81MTIiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSJ9CiAgXSwKICAic2hvcnRjdXRzIjogW10sCiAgInNjcmVlbnNob3RzIjogW10KfQ==">
+     <link rel="apple-touch-icon" href="https://i.ibb.co/pB3f1tt7/amg-1.png">
+     <meta name="apple-mobile-web-app-title" content="EduChat Pro">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkVkdUNoYXQgUHJvIiwKICAic2hvcnRfbmFtZSI6ICJFZHVDaGF0IiwKICAiZGVzY3JpcHRpb24iOiAi2YXYp9mE2KfZhti32Kkg2KfZhNmI2YrZhiDYp9mE2LHZitiq2KkgLSDZhdin2YTZgtmI2YrZhiDZhNmH2KfYsdqpIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwQTBBMEYiLAogICJ0aGVtZV9jb2xvciI6ICIjRkZDQzA3IiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJpY29ucyI6IFsKICAgIHsic3JjIjogImh0dHBzOi8vaS5pYmIuY28vcEIzZjF0dDcvYW1nLTEucG5nIiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkifSwKICAgIHsic3JjIjogImh0dHBzOi8vaS5pYmIuY28vcEIzZjF0dDcvYW1nLTEucG5nIiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkifQogIF0sCiAgInNob3J0Y3V0cyI6IFtdLAogICJzY3JlZW5zaG90cyI6IFtdCn0=">
     
     <!-- Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -436,19 +437,19 @@
     <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false" style="position:fixed; width:100%; height:100dvh; overflow:hidden;"></body>
     <div id="loginScreen" class="login-container">
         <div class="login-card scale-in">
-              <div class="app-icon"><img src="https://i.ibb.co/pB3f1tt7/amg-1.png" style="width:70px; height:70px; border-radius:20px;" alt="Web Egypt"></div
-            <h1>Web Egypt</h1>
-            <p class="subtitle">منصة التعليم الذكية المتطورة</p>
+              <div class="app-icon"><img src="https://i.ibb.co/pB3f1tt7/amg-1.png" style="width:70px; height:70px; border-radius:20px;" alt="EduChat Pro "></div
+             <h1>EduChat Pro</h1>
+            <p class="subtitle">واتساب القناص  بيئه امنه ومتطوره</p>
             <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text">
             <button class="btn pulse-animation" onclick="studentLogin()">🚀 دخول</button>
             <p id="loginError" class="error-text"></p>
-            <p style="color:var(--text3); font-size:0.65rem; margin-top:12px;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
+            <p style="color:var(--text3); font-size:0.65rem; margin-top:12px;">© 2026 EduChat Pro - جميع الحقوق محفوظة</p></p>
         </div>
     </div>
     
     <div id="mainScreen" class="hidden" style="flex:1; display:flex; flex-direction:column;">
         <div class="app-header">
-            <div class="logo" onclick="switchTab('groups')">Web Egypt</div>
+        <div class="logo" onclick="switchTab('groups')">EduChat Pro</div>
             <div class="header-icons">
                 <button class="icon-btn" onclick="navigate('stories')" title="القصص">📖<span class="notification-dot" id="storiesDot" style="display:none;"></span></button>
                 <button class="icon-btn" onclick="navigate('support')" title="الدعم">📞</button>
@@ -506,7 +507,7 @@
         }
     });
     document.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
-    setInterval(() => { if (console.clear) { console.clear(); console.log('%c🛡️ Web Egypt - محمي', 'color:#FFC107;font-size:16px;'); } }, 4000);
+    setInterval(() => { if (console.clear) { console.clear(); console.log('%c🛡️ EduChat Pro  - محمي', 'color:#FFC107;font-size:16px;'); } }, 4000);
 
     // ========== Global State ==========
     let currentUser = null;
@@ -2169,7 +2170,7 @@
             { icon: '📁', name: 'الوسائط المشتركة', desc: 'الصور والملفات في المجموعات', page: 'media' },
             { icon: '📞', name: 'الدعم الفني', desc: 'تواصل مع المشرفين', page: 'support' },
             { icon: '📊', name: 'إحصائياتي', desc: 'تفاصيل نشاطك ونقاطك', page: 'stats' },
-            { icon: 'ℹ️', name: 'عن التطبيق', desc: 'Web Egypt v2.0', page: 'about' }
+            { icon: 'ℹ️', name: 'عن التطبيق', desc: 'EduChat Pro  v2.0', page: 'about' }
         ];
         
         content.innerHTML = `
@@ -2186,7 +2187,7 @@
         `).join('')}
         
         <div style="text-align:center; margin-top:20px; padding:15px; color:var(--text3); font-size:0.7rem;">
-            <p>🛡️ Web Egypt Student v2.0</p>
+            <p>🛡️ EduChat Pro  Student v2.0</p>
             <p>© 2026 جميع الحقوق محفوظة</p>
         </div>`;
     }
@@ -2790,7 +2791,7 @@
         
         <div class="support-footer">
             <p>🕐 متاح للدعم: السبت - الخميس | 9 صباحاً - 10 مساءً</p>
-            <p style="margin-top:5px;">© 2026 Web Egypt - ${adminData.name}</p>
+            <p style="margin-top:5px;">© 2026 EduChat Pro  - ${adminData.name}</p>
         </div>`;
     }
 
@@ -2800,7 +2801,7 @@
         c.innerHTML = `
         <div class="info-card scale-in">
             <div class="app-icon" style="font-size:4rem; margin-bottom:10px;">🏫</div>
-            <h2 style="color:var(--gold);">Web Egypt</h2>
+            <h2 style="color:var(--gold);">EduChat Pro</h2>
             <p style="color:var(--text2);">منصة التعليم الذكية المتطورة</p>
             <p style="color:var(--text2); font-size:0.85rem;">الإصدار 2.0</p>
             
@@ -2820,7 +2821,7 @@
                 </ul>
             </div>
             
-            <p style="color:var(--text3); font-size:0.7rem;">© 2026 Web Egypt - جميع الحقوق محفوظة</p>
+            <p style="color:var(--text3); font-size:0.7rem;">© 2026 EduChat Pro  - جميع الحقوق محفوظة</p>
             <button class="btn btn-outline btn-sm" onclick="switchTab('more')" style="width:100%; margin-top:12px;">⬅️ رجوع</button>
         </div>`;
     }
@@ -2981,13 +2982,13 @@
         }
     });
 
-    console.log('%c🚀 Web Egypt Student ULTIMATE v2.0 | All Systems GO! 🔥', 'color: #FFC107; font-size: 18px; font-weight: bold;');
+    console.log('%c🚀 EduChat Pro  Student ULTIMATE v2.0 | All Systems GO! 🔥', 'color: #FFC107; font-size: 18px; font-weight: bold;');
     console.log('%c✅ Features:', 'color: #2ED573;');
     console.log('%c  📚 Groups | 💬 Chats | 📊 Stats | 🏆 Leaderboard', 'color: #AAA;');
     console.log('%c  📖 Stories | 📁 Media | 📝 Notes | 🎨 Themes', 'color: #AAA;');
     console.log('%c  🔔 Notifications | 🔊 Sound | 👻 Auto-login', 'color: #AAA;');
     console.log('%c  🔒 Anti-theft | 📱 PWA | ⚡ Real-time | 🎉 Confetti', 'color: #AAA;');
-    console.log('%c🛡️ Protected by Web Egypt Security System', 'color: #FFA502;');
+    console.log('%c🛡️ Protected by EduChat Pro  Security System', 'color: #FFA502;');
 </script>
 </body>
 </html>
