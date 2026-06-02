@@ -10,6 +10,8 @@
     <title>Web Egypt | الطالب</title>
     
     <!-- PWA Manifest -->
+     <link rel="icon" href="https://i.ibb.co/pB3f1tt7/amg-1.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/pB3f1tt7/amg-1.png">
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIldlYiBFZ3lwdCIsCiAgInNob3J0X25hbWUiOiAiV2ViRWd5cHQiLAogICJkZXNjcmlwdGlvbiI6ICLZhdmB2YrYh9inINin2YTZgtmI2YrZhiDYp9mE2LHZitin2YrYqSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEEwQTBGIiwKICAidGhlbWVfY29sb3IiOiAiI0ZGQzEwNyIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiaWNvbnMiOiBbCiAgICB7InNyYyI6ICJodHRwczovL3ZpYS5wbGFjZWhvbGRlci5jb20vMTkyIiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkifSwKICAgIHsic3JjIjogImh0dHBzOi8vdmlhLnBsYWNlaG9sZGVyLmNvbS81MTIiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSJ9CiAgXSwKICAic2hvcnRjdXRzIjogW10sCiAgInNjcmVlbnNob3RzIjogW10KfQ==">
     
     <!-- Confetti Library -->
@@ -434,7 +436,7 @@
     <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false" style="position:fixed; width:100%; height:100dvh; overflow:hidden;"></body>
     <div id="loginScreen" class="login-container">
         <div class="login-card scale-in">
-            <div class="app-icon">🏫</div>
+              <div class="app-icon"><img src="https://i.ibb.co/pB3f1tt7/amg-1.png" style="width:70px; height:70px; border-radius:20px;" alt="Web Egypt"></div
             <h1>Web Egypt</h1>
             <p class="subtitle">منصة التعليم الذكية المتطورة</p>
             <input type="text" id="codeInput" class="input-field" placeholder="🔑 أدخل الكود" autocomplete="off" maxlength="10" inputmode="text">
@@ -2442,7 +2444,7 @@
     };
 
     // ========== Media Gallery ==========
-    function renderMediaPage() {
+       function renderMediaPage() {
         const c = document.getElementById('contentArea');
         c.innerHTML = `
         <h2 class="section-title">📁 الوسائط المشتركة</h2>
@@ -2460,42 +2462,60 @@
     let allMediaCache = [];
     let currentMediaFilter = 'all';
 
-    async function loadAllMedia() {
+        async function loadAllMedia() {
         const co = document.getElementById('mediaGrid');
         if (!co) return;
         
+        co.innerHTML = '<p style="color:var(--text2); grid-column:1/-1; text-align:center;">⏳ جاري تحميل الوسائط...</p>';
+        
         try {
             const groupsSnap = await db.collection('groups').where('members', 'array-contains', currentUser.uid).get();
+            
+            if (groupsSnap.empty) {
+                co.innerHTML = '<p style="color:var(--text3); text-align:center; grid-column:1/-1; padding:30px;">لا توجد مجموعات</p>';
+                return;
+            }
+            
             allMediaCache = [];
             
+            // 🔥🔥🔥 جيب كل الوسائط من كل المجموعات
             for (const gd of groupsSnap.docs) {
                 const msgs = await db.collection('groups').doc(gd.id).collection('messages')
                     .where('type', 'in', ['image', 'video', 'file'])
-                    .where('deleted', '==', false)
                     .orderBy('timestamp', 'desc')
                     .limit(100)
                     .get();
-                msgs.forEach(d => {
+                
+                msgs.forEach(function(d) {
                     const m = d.data();
-                    m.groupId = gd.id;
-                    allMediaCache.push(m);
+                    if (!m.deleted) {
+                        m.groupId = gd.id;
+                        m.groupName = gd.data().name || 'مجموعة';
+                        allMediaCache.push(m);
+                    }
                 });
             }
             
-            allMediaCache.sort((a, b) => (b.timestamp?.toDate?.()?.getTime() || 0) - (a.timestamp?.toDate?.()?.getTime() || 0));
+            // ترتيب حسب الوقت - الأحدث أولاً
+            allMediaCache.sort(function(a, b) {
+                return (b.timestamp?.toDate?.()?.getTime() || 0) - (a.timestamp?.toDate?.()?.getTime() || 0);
+            });
+            
             renderMediaGrid();
+            
         } catch(e) {
-            co.innerHTML = '<p style="color:var(--danger); text-align:center; grid-column:1/-1;">❌ حدث خطأ</p>';
+            console.error('Media load error:', e);
+            co.innerHTML = '<p style="color:var(--danger); text-align:center; grid-column:1/-1;">❌ حدث خطأ: ' + e.message + '</p>';
         }
     }
 
-    function renderMediaGrid() {
+        function renderMediaGrid() {
         const co = document.getElementById('mediaGrid');
         if (!co) return;
         
         let items = allMediaCache;
         if (currentMediaFilter !== 'all') {
-            items = items.filter(m => m.type === currentMediaFilter);
+            items = items.filter(function(m) { return m.type === currentMediaFilter; });
         }
         
         if (items.length === 0) {
@@ -2503,22 +2523,21 @@
             return;
         }
         
-        co.innerHTML = items.map(m => {
+        co.innerHTML = items.map(function(m) {
             if (m.type === 'image') {
-                return `<div class="media-item" onclick="viewImage('${m.content}')"><img src="${m.content}" alt="صورة" loading="lazy" onerror="this.style.display='none'"><span class="media-type-badge">📷</span></div>`;
+                return '<div class="media-item" onclick="viewImage(\'' + m.content + '\')"><img src="' + m.content + '" alt="صورة" loading="lazy" onerror="this.style.display=\'none\'"><span class="media-type-badge">📷</span></div>';
             } else if (m.type === 'video') {
-                return `<div class="media-item"><video src="${m.content}" controls preload="metadata" playsinline style="width:100%;height:100%;object-fit:cover;"></video><span class="media-type-badge">🎥</span></div>`;
+                return '<div class="media-item"><video src="' + m.content + '" controls preload="metadata" playsinline style="width:100%;height:100%;object-fit:cover;"></video><span class="media-type-badge">🎥</span></div>';
             } else {
-                return `<div class="media-item"><div class="file-placeholder" onclick="window.open('${m.content}')"><span style="font-size:2rem;">📄</span><br><small style="font-size:0.6rem;">${(m.fileName || 'ملف').substring(0, 12)}</small></div></div>`;
+                return '<div class="media-item"><div class="file-placeholder" onclick="window.open(\'' + m.content + '\')"><span style="font-size:2rem;">📄</span><br><small style="font-size:0.6rem;">' + (m.fileName || 'ملف').substring(0, 12) + '</small></div></div>';
             }
         }).join('');
     }
 
-    window.filterMedia = function(type) {
+        window.filterMedia = function(type) {
         currentMediaFilter = type;
         
-        // Update button styles
-        ['all', 'image', 'video', 'file'].forEach(t => {
+        ['all', 'image', 'video', 'file'].forEach(function(t) {
             const btn = document.getElementById('mediaFilter' + t.charAt(0).toUpperCase() + t.slice(1));
             if (btn) {
                 btn.style.background = t === type ? 'var(--gold)' : 'transparent';
@@ -2536,7 +2555,7 @@
             const s = d.exists ? d.data() : {};
             c.innerHTML = `
             <div class="info-card scale-in">
-                <img src="${s.adminImageURL || 'https://via.placeholder.com/85'}" style="width:85px;height:85px;border-radius:50%;border:3px solid var(--gold); object-fit:cover;" onerror="this.src='https://via.placeholder.com/85'">
+             <img src="${s.adminImageURL || 'https://i.ibb.co/Ls0fgDZ/admin-profile.jpg'}" style="width:85px;height:85px;border-radius:50%;border:3px solid var(--gold); object-fit:cover;" onerror="this.src='https://via.placeholder.com/85'">
                 <h2 style="color:var(--gold); margin:12px 0;">📞 الدعم الفني</h2>
                 <p style="color:var(--text2); margin-bottom:15px;">للتواصل والاستفسارات، اختر إحدى الوسائل التالية:</p>
                 <div class="support-links">
