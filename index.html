@@ -380,6 +380,51 @@
             position: relative !important;
             z-index: 10 !important;
         }
+                /* 🔥🔥🔥 سكرول ناعم لكل الصفحات زي الشات */
+        .screen {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scroll-behavior: smooth !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
+            -webkit-transform: translateZ(0) !important;
+            transform: translateZ(0) !important;
+            will-change: scroll-position !important;
+        }
+        
+        #contentArea {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scroll-behavior: smooth !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
+            -webkit-transform: translateZ(0) !important;
+            transform: translateZ(0) !important;
+            will-change: scroll-position !important;
+        }
+        
+        /* سكرول سلس لكل الحاويات */
+        #groupsList,
+        #chatsListContainer,
+        #leaderboardList,
+        #mediaGrid,
+        #storiesList,
+        #privateUsersList,
+        #notifPanelBody {
+            -webkit-overflow-scrolling: touch !important;
+            scroll-behavior: smooth !important;
+            overscroll-behavior: contain !important;
+        }
+        
+        /* تحسين السكرول على الموبايل */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
     </style>
     </style>
 </head>
@@ -424,6 +469,7 @@
 </div>
 
 <script>
+
     // ========== Service Worker Registration ==========
     if ('serviceWorker' in navigator) {
         const swCode = `
@@ -473,6 +519,7 @@
     let unreadCounts = { groups: {}, privateChats: {} };
     let newMessageCounter = 0;
     let userDeletionListener = null;
+    let userCodeListener = null;
     let notificationSoundEnabled = true;
     let lastNotificationTime = 0;
     const NOTIFICATION_COOLDOWN = 2000; // 2 seconds between sounds
@@ -562,6 +609,52 @@
             isInChat = false;
         }
     }
+        // ========== Smooth Scroll Everywhere ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // تطبيق سكرول ناعم على كل الصفحات
+        const contentArea = document.getElementById('contentArea');
+        if (contentArea) {
+            contentArea.style.overflowY = 'auto';
+            contentArea.style.webkitOverflowScrolling = 'touch';
+            contentArea.style.scrollBehavior = 'smooth';
+            contentArea.style.overscrollBehavior = 'contain';
+        }
+    });
+    
+    // 🔥🔥🔥 إصلاح السكرول في كل الصفحات عند التبديل
+    const originalSwitchTab = switchTab;
+    switchTab = function(tab) {
+        originalSwitchTab(tab);
+        
+        // تأكيد السكرول الناعم بعد كل تبديل
+        setTimeout(function() {
+            const contentArea = document.getElementById('contentArea');
+            if (contentArea) {
+                contentArea.style.overflowY = 'auto';
+                contentArea.style.webkitOverflowScrolling = 'touch';
+                contentArea.style.scrollBehavior = 'smooth';
+                contentArea.style.overscrollBehavior = 'contain';
+                contentArea.style.touchAction = 'pan-y';
+            }
+        }, 100);
+    };
+    
+    const originalNavigate = navigate;
+    navigate = function(page, data) {
+        originalNavigate(page, data);
+        
+        // تأكيد السكرول الناعم بعد كل تنقل
+        setTimeout(function() {
+            const contentArea = document.getElementById('contentArea');
+            if (contentArea) {
+                contentArea.style.overflowY = 'auto';
+                contentArea.style.webkitOverflowScrolling = 'touch';
+                contentArea.style.scrollBehavior = 'smooth';
+                contentArea.style.overscrollBehavior = 'contain';
+                contentArea.style.touchAction = 'pan-y';
+            }
+        }, 100);
+    };
 
     // 🔥🔥🔥 التعامل مع زرار الرجوع في الموبايل
     window.addEventListener('popstate', function(e) {
@@ -636,18 +729,52 @@
         }
     }, false);
     // ========== User Deletion Listener ==========
+        // ========== User & Code Deletion Listener ==========
     function startUserDeletionListener() {
         if (userDeletionListener) userDeletionListener();
         if (!currentUser) return;
         
+        const deviceID = getDeviceID();
+        
+        // 🔥🔥🔥 مراقبة حذف حساب المستخدم
         userDeletionListener = db.collection('users').doc(currentUser.uid)
-            .onSnapshot(doc => {
+            .onSnapshot(function(doc) {
                 if (!doc.exists && currentUser) {
+                    // المستخدم اتحذف من قاعدة البيانات
                     showToast('⚠️ تم حذف حسابك بواسطة الأدمن! جاري الخروج...', 'error');
-                    setTimeout(() => logout(), 2000);
+                    setTimeout(function() { logout(); }, 2000);
+                    return;
+                }
+                
+                // 🔥🔥🔥 فحص إذا كان محظور
+                if (doc.exists && doc.data().banned && currentUser) {
+                    showToast('🚫 تم حظر حسابك! جاري الخروج...', 'error');
+                    setTimeout(function() { logout(); }, 2000);
+                    return;
                 }
             });
         allListeners.push(userDeletionListener);
+        
+        // 🔥🔥🔥 مراقبة حذف الكود الخاص بالمستخدم
+        if (userCodeListener) userCodeListener();
+        userCodeListener = db.collection('student_codes')
+            .where('usedBy', '==', currentUser.uid)
+            .where('usedByDevice', '==', deviceID)
+            .onSnapshot(function(snap) {
+                if (snap.empty && currentUser) {
+                    // الكود اتمسح أو اتغير
+                    showToast('⚠️ تم حذف الكود الخاص بك! جاري الخروج...', 'error');
+                    setTimeout(function() { logout(); }, 2000);
+                } else if (!snap.empty && currentUser) {
+                    // فحص إذا كان الكود لسه شغال على جهاز تاني
+                    var codeData = snap.docs[0].data();
+                    if (codeData.usedByDevice && codeData.usedByDevice !== deviceID) {
+                        showToast('⚠️ تم استخدام الكود على جهاز آخر! جاري الخروج...', 'error');
+                        setTimeout(function() { logout(); }, 2000);
+                    }
+                }
+            });
+        allListeners.push(userCodeListener);
     }
         // ========== Navigation ==========
     function switchTab(tab) {
@@ -716,13 +843,32 @@
     }
 
     // ========== Auth System ==========
-    window.studentLogin = async function() {
+       window.studentLogin = async function() {
         const codeInput = document.getElementById('codeInput');
         const code = codeInput.value.trim().toUpperCase();
         const errEl = document.getElementById('loginError');
         errEl.textContent = '';
         
+        // 🔥🔥🔥 لو مفيش كود مكتوب والجهاز متوثق - خش تلقائي
         if (!code) {
+            const deviceAuth = localStorage.getItem('webEgyptDeviceAuth');
+            if (deviceAuth === 'true') {
+                showLoading('🔍 جاري الدخول التلقائي...');
+                const loggedIn = await autoLogin();
+                hideLoading();
+                if (loggedIn) {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainScreen').classList.remove('hidden');
+                    startUserDeletionListener();
+                    switchTab('groups');
+                    showToast('✅ أهلاً بك ' + currentUser.name + '!', 'success');
+                    
+                    if ('Notification' in window && Notification.permission === 'default') {
+                        Notification.requestPermission();
+                    }
+                    return;
+                }
+            }
             errEl.textContent = '⚠️ الرجاء إدخال الكود';
             codeInput.classList.add('shake-animation');
             setTimeout(() => codeInput.classList.remove('shake-animation'), 500);
@@ -823,9 +969,13 @@
                 banned: u.banned || false
             };
             
-            // 🔥 حفظ الجلسة في LocalStorage
+             // 🔥🔥🔥 حفظ الجلسة + الكود + الجهاز
             localStorage.setItem('webEgyptUserID', userId);
             localStorage.setItem('webEgyptUserCode', code);
+            localStorage.setItem('webEgyptDeviceAuth', 'true');
+            localStorage.setItem('webEgyptAuthTime', Date.now());
+            localStorage.setItem('webEgyptDeviceAuth', 'true');  // تم التوثيق على الجهاز ده
+            localStorage.setItem('webEgyptAuthTime', Date.now()); // وقت التوثيق
             
             hideLoading();
             document.getElementById('loginScreen').classList.add('hidden');
@@ -852,29 +1002,35 @@
         }
     };
 
-    // ========== Auto Login ==========
+       // ========== Auto Login ==========
     async function autoLogin() {
         const savedUserID = localStorage.getItem('webEgyptUserID');
         const deviceID = getDeviceID();
+        const deviceAuth = localStorage.getItem('webEgyptDeviceAuth');
+        
+        if (!savedUserID && !deviceAuth) return false;
         if (!savedUserID) return false;
         
         try {
-            const userDoc = await db.collection('users').doc(savedUserID).get();
+            const userRef = db.collection('users').doc(savedUserID);
+            const userDoc = await userRef.get();
+            
             if (!userDoc.exists) {
                 localStorage.removeItem('webEgyptUserID');
+                localStorage.removeItem('webEgyptDeviceAuth');
+                localStorage.removeItem('webEgyptUserCode');
                 return false;
             }
             
             const userData = userDoc.data();
             
-            // 🔥 فحص الحظر
             if (userData.banned) {
                 showToast('🚫 حسابك محظور. تواصل مع الأدمن.', 'error');
                 localStorage.removeItem('webEgyptUserID');
+                localStorage.removeItem('webEgyptDeviceAuth');
                 return false;
             }
             
-            // 🔥 فحص إذا تم حذف الكود الخاص بالمستخدم
             const codeSnap = await db.collection('student_codes')
                 .where('usedBy', '==', savedUserID)
                 .where('usedByDevice', '==', deviceID)
@@ -882,9 +1038,13 @@
                 .get();
             
             if (codeSnap.empty && userData.role !== 'admin') {
-                // المستخدم ليس لديه كود صالح - قد تم حذفه
-                localStorage.removeItem('webEgyptUserID');
-                return false;
+                if (deviceAuth === 'true') {
+                    console.log('⚠️ Code not found but device is authenticated');
+                } else {
+                    localStorage.removeItem('webEgyptUserID');
+                    localStorage.removeItem('webEgyptDeviceAuth');
+                    return false;
+                }
             }
             
             currentUser = {
@@ -900,7 +1060,10 @@
                 banned: userData.banned || false
             };
             
-            await userRef.update({ online: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
+            await userRef.update({ 
+                online: true, 
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
+            });
             
             return true;
         } catch(e) {
@@ -925,11 +1088,27 @@
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     }
 
-    window.logout = function() {
+        window.logout = function() {
         if (currentUser) {
             db.collection('users').doc(currentUser.uid).update({ online: false }).catch(() => {});
         }
         if (userDeletionListener) { userDeletionListener(); userDeletionListener = null; }
+        if (userCodeListener) { userCodeListener(); userCodeListener = null; }
+        currentUser = null;
+        currentGroupId = null;
+        localStorage.removeItem('webEgyptUserID');
+        cleanListeners();
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('mainScreen').classList.add('hidden');
+        document.getElementById('codeInput').value = localStorage.getItem('webEgyptUserCode') || '';
+        showToast('👋 تم تسجيل الخروج', 'info');
+    };
+        window.logout = function() {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ online: false }).catch(() => {});
+        }
+        if (userDeletionListener) { userDeletionListener(); userDeletionListener = null; }
+        if (userCodeListener) { userCodeListener(); userCodeListener = null; }  // ← ضيف السطر ده
         currentUser = null;
         currentGroupId = null;
         localStorage.removeItem('webEgyptUserID');
@@ -2478,37 +2657,51 @@
     });
 
     // ========== Init ==========
-    document.addEventListener('DOMContentLoaded', () => {
-        // تحميل إعدادات الصوت
+        document.addEventListener('DOMContentLoaded', () => {
         const soundSetting = localStorage.getItem('webEgyptSoundEnabled');
         if (soundSetting === '0') notificationSoundEnabled = false;
         
-        showLoading('🔍 جاري التحقق من الجلسة...');
+        const deviceAuth = localStorage.getItem('webEgyptDeviceAuth');
+        const savedCode = localStorage.getItem('webEgyptUserCode');
         
-        autoLogin().then(loggedIn => {
-            hideLoading();
-            if (!loggedIn) {
+        if (deviceAuth === 'true' && savedCode) {
+            showLoading('🔍 جاري التحقق من الجلسة...');
+            autoLogin().then(loggedIn => {
+                hideLoading();
+                if (loggedIn) {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainScreen').classList.remove('hidden');
+                    startUserDeletionListener();
+                    switchTab('groups');
+                    updateUnreadBadges();
+                    
+                    if ('Notification' in window && Notification.permission === 'default') {
+                        setTimeout(() => Notification.requestPermission(), 3000);
+                    }
+                } else {
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    document.getElementById('codeInput').focus();
+                    if (savedCode) {
+                        document.getElementById('codeInput').value = savedCode;
+                    }
+                }
+            }).catch(() => {
+                hideLoading();
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('codeInput').focus();
-                // استعادة الكود المحفوظ
-                const savedCode = localStorage.getItem('webEgyptUserCode');
                 if (savedCode) {
                     document.getElementById('codeInput').value = savedCode;
                 }
-            } else {
-                document.getElementById('mainScreen').classList.remove('hidden');
-                startUserDeletionListener();
-                updateUnreadBadges().then(() => switchTab('groups'));
-                
-                // طلب إذن الإشعارات بصمت
-                if ('Notification' in window && Notification.permission === 'default') {
-                    setTimeout(() => Notification.requestPermission(), 3000);
-                }
-            }
-        }).catch(() => {
+            });
+        } else {
             hideLoading();
             document.getElementById('loginScreen').classList.remove('hidden');
-        });
+            document.getElementById('codeInput').focus();
+            if (savedCode) {
+                document.getElementById('codeInput').value = savedCode;
+            }
+        }
+    });
         
         // تنظيف المؤقتات عند الخروج
         window.addEventListener('beforeunload', () => {
@@ -2517,7 +2710,6 @@
                 window._autoSaveIntervals = [];
             }
         });
-    });
 
     // ========== Online/Offline Detection ==========
     window.addEventListener('online', () => {
