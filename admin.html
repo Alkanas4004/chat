@@ -3,25 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- 🔥 PWA Meta Tags -->
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#0A0A0F">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EduChat Pro">
-    
-    <!-- 🔥 App Icons -->
-    <link rel="icon" href="https://i.ibb.co/9msttCbY/unnamed.webp" type="image/webp">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/9msttCbY/unnamed.webp">
-    <link rel="apple-touch-icon" sizes="192x192" href="https://i.ibb.co/9msttCbY/unnamed.webp">
-    <link rel="apple-touch-icon" sizes="512x512" href="https://i.ibb.co/9msttCbY/unnamed.webp">
-    
-    <!-- 🔥 PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkVkdUNoYXQgUHJvIEFkbWluIiwKICAic2hvcnRfbmFtZSI6ICJFZHVDaGF0IEFkbWluIiwKICAiZGVzY3JpcHRpb24iOiAi2YXYp9mE2KfZhti32Kkg2KfZhNmI2YrZhiAtINin2YTZgtmI2YrZhiDZhNmH2KfYsdqpIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwQTBBMEYiLAogICJ0aGVtZV9jb2xvciI6ICIjRkZDQzA3IiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJkaXIiOiAicnRsIiwKICAibGFuZyI6ICJhciIsCiAgImljb25zIjogWwogICAgeyJzcmMiOiAiaHR0cHM6Ly9pLmliYi5jby85bXN0dENiWS91bm5hbWVkLndlYnAiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3dlYnAiLCAicHVycG9zZSI6ICJhbnkifSwKICAgIHsic3JjIjogImh0dHBzOi8vaS5pYmIuY28vOW1zdHRDYlkvdW5uYW1lZC53ZWJwIiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS93ZWJwIiwgInB1cnBvc2UiOiAiYW55In0KICBdLAogICJzaG9ydGN1dHMiOiBbXSwKICAic2NyZWVuc2hvdHMiOiBbXQp9">
-    
-    <title>لوحة الأدمن | EduChat Pro 🔥</title>
-    
-    <!-- 🔥 Firebase & Libraries -->
+    <meta name="apple-mobile-web-app-title" content="Web Egypt">
+    <link rel="manifest" href="data:application/json,{"name":"Web Egypt Admin","short_name":"WE Admin","icons":[{"src":"https://via.placeholder.com/192","sizes":"192x192","type":"image/png"},{"src":"https://via.placeholder.com/512","sizes":"512x512","type":"image/png"}],"start_url":".","display":"standalone","background_color":"#0A0A0F","theme_color":"#FFC107","dir":"rtl","lang":"ar"}">
+    <title>لوحة الأدمن | Web Egypt 🔥</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -369,41 +356,10 @@
                 <p style="color:var(--text3); text-align:center;">لا توجد إشعارات</p>
             </div>
         </div>
-  </div>
+    </div>
 </div>
 
 <script>
-    // ========== Update Notification ==========
-    function showUpdateNotification() {
-        var banner = document.createElement('div');
-        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--gold-gradient);color:#000;padding:14px 20px;text-align:center;z-index:9999;font-weight:bold;font-size:0.9rem;box-shadow:0 4px 20px rgba(255,193,7,0.4);animation:slideDown 0.5s ease;display:flex;align-items:center;justify-content:center;gap:10px;';
-        banner.innerHTML = '🔄 تحديث جديد متاح! <button onclick="applyUpdate()" style="background:#000;color:#fff;border:none;padding:6px 16px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.8rem;">تحديث الآن</button>';
-        document.body.prepend(banner);
-        setTimeout(function() { if (banner.parentNode) banner.remove(); }, 30000);
-    }
-    
-    function applyUpdate() {
-        if (navigator.serviceWorker) {
-            navigator.serviceWorker.ready.then(function(reg) {
-                if (reg.active) reg.active.postMessage('skipWaiting');
-            });
-        }
-        window.location.reload();
-    }
-    
-    // ========== Version Check ==========
-    var APP_VERSION = '2.1.0';
-    var storedVersion = localStorage.getItem('educhat_admin_version');
-    if (storedVersion && storedVersion !== APP_VERSION) {
-        localStorage.setItem('educhat_admin_version', APP_VERSION);
-        if (caches) {
-            caches.keys().then(function(keys) { keys.forEach(function(key) { caches.delete(key); }); });
-        }
-        setTimeout(function() { window.location.reload(); }, 1000);
-    } else {
-        localStorage.setItem('educhat_admin_version', APP_VERSION);
-    }
-
     // ========== Firebase Init ==========
     firebase.initializeApp({ 
         apiKey: "AIzaSyAvMxzDf2nZ7l26Cl-xunqe6Dcghi_aCCY", 
@@ -635,13 +591,13 @@
         } catch(e) {}
     }
 
-        function switchPage(page, data) {
+    function switchPage(page, data) {
         data = data || null;
         cleanListeners();
         closeSidebar();
+        pushHistory(page, data);
         
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
         const pageTitles = {
             'dashboard': 'الإحصائيات', 'analytics': 'التحليلات', 'users': 'المستخدمين',
             'id-cards': 'بطاقات هوية', 'groups': 'المجموعات', 'create-group': 'إنشاء مجموعة',
@@ -653,26 +609,14 @@
             'student-preview': 'معاينة الطالب', 'settings': 'الإعدادات', 'logs': 'سجل النشاطات'
         };
         
-        // 🔥🔥🔥 تثبيت العنصر النشط
-        const targetText = pageTitles[page] || '';
-        document.querySelectorAll('.nav-item').forEach(function(item) {
-            if (targetText && item.textContent.includes(targetText)) {
-                item.classList.add('active');
-            }
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.textContent.includes(pageTitles[page] || '')) item.classList.add('active');
         });
         
         const main = document.getElementById('mainContent');
-        
-        // 🔥🔥🔥 للشات - نخلي المساحة كاملة
-        if (page === 'chat' || page === 'private-chat') {
-            main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
-        } else {
-            main.style.cssText = 'padding:20px; overflow-y:auto;';
-        }
-        
         showLoading(main);
         
-        setTimeout(function() {
+        setTimeout(() => {
             switch(page) {
                 case 'dashboard': renderDashboard(); break;
                 case 'analytics': renderAnalytics(); break;
@@ -739,43 +683,23 @@
             const cred = await auth.signInWithEmailAndPassword(email, pass);
             const userDoc = await db.collection('users').doc(cred.user.uid).get();
             
-                        if (!userDoc.exists) {
-                // 🔥🔥🔥 إنشاء أدمن جديد تلقائياً
-                const adminName = email.split('@')[0];
+            if (!userDoc.exists) {
                 await db.collection('users').doc(cred.user.uid).set({
                     userID: cred.user.uid,
-                    name: adminName,
+                    name: email.split('@')[0],
                     email: email,
                     role: 'admin',
                     phone: '',
                     profilePic: '',
                     online: true,
-                    totalMessages: 0,
-                    points: 0,
-                    banned: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                currentAdmin = { uid: cred.user.uid, name: adminName, email: email, role: 'admin' };
-                showToast('✅ تم إنشاء حساب الأدمن: ' + adminName, 'success');
+                currentAdmin = { uid: cred.user.uid, name: email.split('@')[0], email: email, role: 'admin' };
             } else {
                 const userData = userDoc.data();
-                if (userData.role !== 'admin') {
-                    throw new Error('⛔ غير مصرح بالدخول - هذا الحساب ليس أدمن');
-                }
-                if (userData.banned) {
-                    throw new Error('🚫 هذا الحساب محظور');
-                }
-                await userDoc.ref.update({ 
-                    online: true, 
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
-                });
-                currentAdmin = { 
-                    uid: cred.user.uid, 
-                    name: userData.name, 
-                    email: userData.email, 
-                    role: userData.role || 'admin' 
-                };
+                if (userData.role !== 'admin') throw new Error('⛔ غير مصرح بالدخول - هذا الحساب ليس أدمن');
+                await userDoc.ref.update({ online: true, lastSeen: firebase.firestore.FieldValue.serverTimestamp() });
+                currentAdmin = { uid: cred.user.uid, name: userData.name, email: userData.email, role: 'admin' };
             }
             
             saveEmail(email);
@@ -1722,19 +1646,10 @@
         }
     };
 
-        window.openAdminChat = function(gid) {
+    window.openAdminChat = function(gid) {
         currentChatGroupId = gid;
         switchPage('chat', gid);
     };
-    
-    // 🔥🔥🔥 إصلاح فتح الشات من القائمة الجانبية
-    function openChatFromSidebar(gid) {
-        currentChatGroupId = gid;
-        currentPrivateChatUser = null;
-        cleanListeners();
-        closeSidebar();
-        switchPage('chat', gid);
-    }
 
     function renderMembers(gid) {
         const main = document.getElementById('mainContent');
@@ -2270,12 +2185,11 @@
     };
 
     // ========== Chat ==========
-        function renderChat(gid) {
+    function renderChat(gid) {
         if (gid) currentChatGroupId = gid;
         if (!currentChatGroupId) { switchPage('groups'); return; }
         
         const main = document.getElementById('mainContent');
-        main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
         showLoading(main);
         
         db.collection('groups').doc(currentChatGroupId).get().then(doc => {
@@ -3544,27 +3458,6 @@
     console.log('%c📊 20+ Features: Dashboard, Analytics, Users, ID Cards, Groups, Codes, Chat, Broadcast, Scheduled Messages, Auto Reply, Stories, Media, Stickers, Notifications, Reports, Word Filter, Banned, Backup, Theme, Student Preview, Settings, Logs', 'color: #2ED573;');
     console.log('%c👻 Ghost Mode | 📄 Export PDF/Excel | 🔔 Notification Center | 🎨 5 Themes | ⏰ Scheduled Messages | 🤖 Auto Reply Bot', 'color: #1E90FF;');
     console.log('%c⌨️ Shortcuts: Ctrl+1-9 | Esc to close', 'color: #FFA502;');
-        // 🔥🔥🔥 إغلاق القايمة عند الضغط على أي عنصر في الموبايل
-    document.addEventListener('DOMContentLoaded', function() {
-        var sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.addEventListener('click', function(e) {
-                if (e.target.closest('.nav-item')) {
-                    setTimeout(function() {
-                        closeSidebar();
-                    }, 200);
-                }
-            });
-        }
-        
-        // 🔥🔥🔥 إغلاق القايمة عند الضغط على الخلفية
-        var overlay = document.getElementById('sidebarOverlay');
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                closeSidebar();
-            });
-        }
-    });
 </script>
 </body>
 </html>
