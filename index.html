@@ -27,6 +27,10 @@
         :root {
             --gold: #FFC107; --gold-dark: #B8860B; --gold-light: #FFD54F;
             --gold-gradient: linear-gradient(135deg, #FFC107, #B8860B, #FFD54F);
+              [data-theme="blue"] { --gold: #1E90FF; --gold-dark: #0055CC; --gold-light: #70A1FF; --gold-gradient: linear-gradient(135deg, #1E90FF, #0055CC, #70A1FF); }
+              [data-theme="green"] { --gold: #2ED573; --gold-dark: #00883A; --gold-light: #7BED9F; --gold-gradient: linear-gradient(135deg, #2ED573, #00883A, #7BED9F); }
+              [data-theme="purple"] { --gold: #A855F7; --gold-dark: #6B21A8; --gold-light: #C084FC; --gold-gradient: linear-gradient(135deg, #A855F7, #6B21A8, #C084FC); }
+              [data-theme="pink"] { --gold: #FF69B4; --gold-dark: #CC1470; --gold-light: #FFB6D9; --gold-gradient: linear-gradient(135deg, #FF69B4, #CC1470, #FFB6D9); }
             --bg: #0A0A0F; --surface: #15151F; --surface2: #1E1E2A;
             --surface3: #252532; --text: #FFFFFF; --text2: #AAAAAA; --text3: #777777;
             --danger: #FF4757; --success: #2ED573; --online: #2ED573;
@@ -901,6 +905,7 @@
             case 'group-info': renderGroupInfo(); break;
             case 'stats': renderStudentStats(); break;
             case 'settings': pushHistory('settings'); renderSettings(); break;
+            case 'theme': pushHistory('theme'); renderTheme(); break;
             case 'notes': pushHistory('notes'); renderNotes(); break;
             case 'leaderboard': pushHistory('leaderboard'); renderLeaderboard(); break;
             case 'report': showReportModal(data); break;
@@ -2248,16 +2253,16 @@
     // ========== More Page ==========
     function renderMorePage() {
         const content = document.getElementById('contentArea');
-        const items = [
+         const items = [
             { icon: '⚙️', name: 'الإعدادات', desc: 'تخصيص حسابك وخلفية الشات', page: 'settings' },
-            { icon: '🎨', name: 'تغيير الخلفية', desc: 'تخصيص خلفية المحادثة', page: 'settings' },
+            { icon: '🎨', name: 'تخصيص المظهر', desc: 'تغيير ألوان التطبيق بالكامل', page: 'theme' },
             { icon: '📝', name: 'ملاحظاتي', desc: 'مفكرتك الشخصية للمذاكرة', page: 'notes' },
             { icon: '🏆', name: 'لوحة المتصدرين', desc: 'أفضل الطلاب تفاعلاً', page: 'leaderboard' },
             { icon: '📖', name: 'القصص', desc: 'آخر الأخبار والتحديثات', page: 'stories' },
             { icon: '📁', name: 'الوسائط المشتركة', desc: 'الصور والملفات في المجموعات', page: 'media' },
             { icon: '📞', name: 'الدعم الفني', desc: 'تواصل مع المشرفين', page: 'support' },
             { icon: '📊', name: 'إحصائياتي', desc: 'تفاصيل نشاطك ونقاطك', page: 'stats' },
-            { icon: 'ℹ️', name: 'عن التطبيق', desc: 'EduChat Pro  v2.0', page: 'about' }
+            { icon: 'ℹ️', name: 'عن التطبيق', desc: 'EduChat Pro v2.0', page: 'about' }
         ];
         
         content.innerHTML = `
@@ -2635,6 +2640,60 @@
         
         renderMediaGrid();
     };
+        // ========== Theme Customizer ==========
+    function renderTheme() {
+        var c = document.getElementById('contentArea');
+        var currentTheme = localStorage.getItem('edu_theme') || 'gold';
+        
+        c.innerHTML = `
+        <h2 class="section-title">🎨 تخصيص المظهر</h2>
+        
+        <div class="info-card">
+            <h3 style="color:var(--gold); margin-bottom:15px;">اختر لون التطبيق</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div onclick="changeAppTheme('gold')" style="background:linear-gradient(135deg,#FFC107,#B8860B); padding:25px; border-radius:16px; text-align:center; cursor:pointer; ${currentTheme === 'gold' ? 'border:3px solid #fff;' : ''}">
+                    <span style="font-size:2rem;">✨</span>
+                    <p style="color:#000; font-weight:bold; margin-top:5px;">ذهبي</p>
+                </div>
+                <div onclick="changeAppTheme('blue')" style="background:linear-gradient(135deg,#1E90FF,#0055CC); padding:25px; border-radius:16px; text-align:center; cursor:pointer; ${currentTheme === 'blue' ? 'border:3px solid #fff;' : ''}">
+                    <span style="font-size:2rem;">🔵</span>
+                    <p style="color:#fff; font-weight:bold; margin-top:5px;">أزرق</p>
+                </div>
+                <div onclick="changeAppTheme('green')" style="background:linear-gradient(135deg,#2ED573,#00883A); padding:25px; border-radius:16px; text-align:center; cursor:pointer; ${currentTheme === 'green' ? 'border:3px solid #fff;' : ''}">
+                    <span style="font-size:2rem;">🟢</span>
+                    <p style="color:#000; font-weight:bold; margin-top:5px;">أخضر</p>
+                </div>
+                <div onclick="changeAppTheme('purple')" style="background:linear-gradient(135deg,#A855F7,#6B21A8); padding:25px; border-radius:16px; text-align:center; cursor:pointer; ${currentTheme === 'purple' ? 'border:3px solid #fff;' : ''}">
+                    <span style="font-size:2rem;">🟣</span>
+                    <p style="color:#fff; font-weight:bold; margin-top:5px;">بنفسجي</p>
+                </div>
+                <div onclick="changeAppTheme('pink')" style="background:linear-gradient(135deg,#FF69B4,#CC1470); padding:25px; border-radius:16px; text-align:center; cursor:pointer; grid-column:1/-1; ${currentTheme === 'pink' ? 'border:3px solid #fff;' : ''}">
+                    <span style="font-size:2rem;">💗</span>
+                    <p style="color:#000; font-weight:bold; margin-top:5px;">وردي</p>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="switchTab('more')" style="width:100%; margin-top:10px;">⬅️ رجوع</button>`;
+    }
+    
+    window.changeAppTheme = function(theme) {
+        localStorage.setItem('edu_theme', theme);
+        if (theme === 'gold') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        showToast('✅ تم تغيير المظهر', 'success');
+        renderTheme();
+    };
+    
+    // تحميل الثيم عند فتح التطبيق
+    (function() {
+        var savedTheme = localStorage.getItem('edu_theme') || 'gold';
+        if (savedTheme !== 'gold') {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    })();
 
     // ========== Support ==========
         function renderSupport() {
