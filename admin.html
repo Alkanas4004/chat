@@ -1693,78 +1693,76 @@
         }
     };
 
-        window.openAdminChat = function(gid) {
+           window.openAdminChat = function(gid) {
         currentChatGroupId = gid;
-        switchPage('chat', gid);
-    };
-    
-    // 🔥🔥🔥 إصلاح فتح الشات من القائمة الجانبية
-    function openChatFromSidebar(gid) {
-        currentChatGroupId = gid;
-        currentPrivateChatUser = null;
+        
+        // 🔥 تنظيف وفتح الشات مباشرة
         cleanListeners();
         closeSidebar();
-        switchPage('chat', gid);
-    }
-
-    function renderMembers(gid) {
-        const main = document.getElementById('mainContent');
+        
+        var main = document.getElementById('mainContent');
+        main.style.cssText = 'padding:0 !important; margin:0 !important; overflow:hidden !important; height:100% !important; width:100% !important; position:absolute; top:0; left:0; right:0; bottom:0;';
+        
         showLoading(main);
         
-        db.collection('groups').doc(gid).get().then(doc => {
+        db.collection('groups').doc(gid).get().then(function(doc) {
             if (!doc.exists) { switchPage('groups'); return; }
-            const g = doc.data();
-            const members = g.members || [];
+            var g = doc.data();
             
-            let html = `
-            <div class="page-header">
-                <h1>👤 إدارة الأعضاء - ${g.name || 'المجموعة'}</h1>
-                <button class="btn btn-sm btn-outline" onclick="switchPage('groups')">⬅️ رجوع</button>
-            </div>
+            var h = '';
+            h += '<div style="position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#0d0d14;z-index:999;">';
+            h += '<div style="display:flex;align-items:center;padding:15px;background:#14141D;color:var(--gold);gap:10px;min-height:60px;">';
+            h += '<span onclick="switchPage(\'groups\')" style="font-size:1.5rem;cursor:pointer;">⬅️</span>';
+            h += '<img src="' + (g.picture || 'https://via.placeholder.com/42') + '" width="42" height="42" style="border-radius:50%;border:2px solid gold;">';
+            h += '<div style="flex:1;"><div style="font-weight:bold;font-size:1.1rem;">' + (g.name || 'مجموعة') + '</div><div style="font-size:0.7rem;color:#AAA;">👥 ' + (g.memberCount || 0) + ' عضو</div></div>';
+            h += '</div>';
+            h += '<div id="adminChatMessages" style="flex:1;padding:15px;overflow-y:auto;background:#0d0d14;"></div>';
+            h += '<div style="display:flex;align-items:center;padding:10px 15px;background:#14141D;gap:10px;min-height:60px;">';
+            h += '<input id="adminMsgInput" placeholder="اكتب رسالة..." style="flex:1;padding:12px 16px;border-radius:24px;border:none;background:#1C1C28;color:#fff;font-size:16px;outline:none;">';
+            h += '<button onclick="sendAdminMsgDirect()" style="width:45px;height:45px;border-radius:50%;border:none;background:linear-gradient(135deg,#FFC107,#B8860B);color:#000;font-size:1.2rem;cursor:pointer;">➤</button>';
+            h += '</div>';
+            h += '</div>';
             
-            <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:12px;">➕ إضافة عضو</h3>
-                <div style="display:flex; gap:8px;">
-                    <input class="input-field" id="newMemberId" placeholder="معرف المستخدم (UID)">
-                    <button class="btn btn-sm" onclick="addMemberToGroup('${gid}')">➕ إضافة</button>
-                </div>
-            </div>
+            main.innerHTML = h;
             
-            <div class="card">
-                <h3 style="color:var(--gold); margin-bottom:12px;">👥 الأعضاء (${members.length})</h3>
-                <div id="membersList"></div>
-            </div>
-            `;
+            // تحميل الرسائل
+            setTimeout(function() {
+                var container = document.getElementById('adminChatMessages');
+                if (!container) return;
+                
+                db.collection('groups').doc(gid).collection('messages')
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot(function(snap) {
+                        container.innerHTML = '';
+                        if (snap.empty) {
+                            container.innerHTML = '<div style="text-align:center;color:#888;padding:50px;">💬 لا توجد رسائل</div>';
+                            return;
+                        }
+                        snap.forEach(function(doc) {
+                            var m = doc.data();
+                            var isSent = m.senderID === currentAdmin.uid;
+                            container.innerHTML += '<div style="margin-bottom:8px;display:flex;flex-direction:column;' + (isSent ? 'align-items:flex-end;' : 'align-items:flex-start;') + '"><div style="max-width:80%;padding:10px 15px;border-radius:18px;font-size:0.9rem;' + (isSent ? 'background:linear-gradient(135deg,#FFC107,#B8860B);color:#000;' : 'background:#1C1C28;color:#fff;') + '">' + (m.content || '') + '</div></div>';
+                        });
+                        container.scrollTop = container.scrollHeight;
+                    });
+            }, 500);
             
-            main.innerHTML = html;
-            
-            if (members.length > 0) {
-                Promise.all(members.map(uid => db.collection('users').doc(uid).get())).then(users => {
-                    const listHtml = users.map((u, i) => {
-                        const ud = u.exists ? u.data() : {};
-                        return `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--surface2); margin:4px 0; border-radius:10px;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <img src="${ud.profilePic || 'https://via.placeholder.com/32'}" style="width:32px;height:32px;border-radius:50%;">
-                                <div>
-                                    <strong>${ud.name || 'مستخدم'}</strong>
-                                    <small style="color:var(--text2); display:block;">${members[i]}</small>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:5px;">
-                                ${members[i] === g.adminID ? '<span class="badge badge-admin">مالك</span>' : ''}
-                                <button class="btn btn-xs btn-danger" onclick="removeMemberFromGroup('${gid}','${members[i]}')">❌ إزالة</button>
-                            </div>
-                        </div>
-                        `;
-                    }).join('');
-                    document.getElementById('membersList').innerHTML = listHtml || '<p style="color:var(--text3);">لا يوجد أعضاء</p>';
-                });
-            } else {
-                document.getElementById('membersList').innerHTML = '<p style="color:var(--text3); text-align:center;">لا يوجد أعضاء</p>';
-            }
+        }).catch(function(e) {
+            main.innerHTML = '<div style="text-align:center;padding:50px;color:red;">❌ خطأ: ' + e.message + '</div>';
         });
-    }
+    };
+    
+    window.sendAdminMsgDirect = function() {
+        var input = document.getElementById('adminMsgInput');
+        if (!input || !input.value.trim() || !currentChatGroupId) return;
+        db.collection('groups').doc(currentChatGroupId).collection('messages').add({
+            senderID: currentAdmin.uid,
+            senderName: currentAdmin.name,
+            type: 'text',
+            content: input.value.trim(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() { input.value = ''; input.focus(); });
+    };
 
     window.addMemberToGroup = async function(gid) {
         const uid = document.getElementById('newMemberId')?.value?.trim();
