@@ -2269,49 +2269,61 @@
         } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
     };
 
-    // ========== Chat ==========
-         function renderChat(gid) {
+       // ========== Chat ==========
+    window.openAdminChat = function(gid) {
+        currentChatGroupId = gid;
+        currentPrivateChatUser = null;
+        cleanListeners();
+        closeSidebar();
+        switchPage('chat', gid);
+    };
+
+    function renderChat(gid) {
         if (gid) currentChatGroupId = gid;
         if (!currentChatGroupId) { switchPage('groups'); return; }
         
-        const main = document.getElementById('mainContent');
+        var main = document.getElementById('mainContent');
         main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
         
         showLoading(main);
         
         db.collection('groups').doc(currentChatGroupId).get().then(function(doc) {
             if (!doc.exists) { switchPage('groups'); return; }
-            const g = doc.data();
+            var g = doc.data();
             
-            main.innerHTML = '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#0d0d14;z-index:50;">' +
-                '<div style="display:flex;align-items:center;padding:12px 15px;background:var(--surface);border-bottom:1px solid #1a1a25;gap:10px;flex-shrink:0;z-index:10;">' +
-                    '<span onclick="switchPage(\'groups\')" style="font-size:1.3rem;cursor:pointer;color:var(--gold);padding:5px;">⬅️</span>' +
-                    '<img src="' + (g.picture || 'https://via.placeholder.com/42') + '" width="42" height="42" style="border-radius:50%;border:2px solid var(--gold);object-fit:cover;" onerror="this.src=\'https://via.placeholder.com/42\'">' +
-                    '<div style="flex:1;min-width:0;">' +
-                        '<div style="font-weight:bold;color:var(--gold);font-size:1.05rem;">' + (g.name || 'مجموعة') + ' ' + (g.isLocked ? '🔒' : '🟢') + '</div>' +
-                        '<div style="font-size:0.7rem;color:var(--text2);">👥 ' + (g.memberCount || 0) + ' عضو | ' + (g.type === 'open' ? 'مفتوحة' : 'مقفولة') + '</div>' +
-                    '</div>' +
-                    '<button onclick="switchPage(\'edit-group\',\'' + currentChatGroupId + '\')" title="إعدادات" style="background:var(--surface3);color:var(--gold);width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;">⚙️</button>' +
-                '</div>' +
-                '<div id="adminChatMessages" style="flex:1;padding:12px 15px;overflow-y:scroll;-webkit-overflow-scrolling:touch;background-color:#0d0d14;"></div>' +
-                '<div style="display:flex;align-items:center;padding:10px 12px;background:var(--surface);border-top:1px solid #1a1a25;gap:8px;flex-shrink:0;">' +
-                    '<button onclick="uploadAdminMedia()" title="رفع ملفات" style="background:var(--surface3);color:var(--gold);border:1px solid #333;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.1rem;">📎</button>' +
-                    '<input id="adminMsgInput" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key===\'Enter\')sendAdminMsg()" autocomplete="off" style="flex:1;padding:11px 16px;border-radius:22px;border:none;background:var(--surface2);color:#fff;font-size:16px;outline:none;font-family:\'Cairo\',sans-serif;">' +
-                    '<button onclick="sendAdminMsg()" title="إرسال" style="background:var(--gold-gradient);color:#000;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;">➤</button>' +
-                '</div>' +
-            '</div>';
+            var html = '<div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#0d0d14;z-index:50;">';
+            html += '<div style="display:flex;align-items:center;padding:12px 15px;background:var(--surface);border-bottom:1px solid #1a1a25;gap:10px;flex-shrink:0;min-height:60px;">';
+            html += '<span onclick="switchPage(\'groups\')" style="font-size:1.5rem;cursor:pointer;color:var(--gold);padding:5px;">⬅️</span>';
+            html += '<img src="' + (g.picture || 'https://via.placeholder.com/42') + '" width="42" height="42" style="border-radius:50%;border:2px solid var(--gold);object-fit:cover;">';
+            html += '<div style="flex:1;min-width:0;">';
+            html += '<div style="font-weight:bold;color:var(--gold);font-size:1.1rem;">' + (g.name || 'مجموعة') + ' ' + (g.isLocked ? '🔒' : '🟢') + '</div>';
+            html += '<div style="font-size:0.7rem;color:var(--text2);">👥 ' + (g.memberCount || 0) + ' عضو | ' + (g.type === 'open' ? 'مفتوحة' : 'مقفولة') + '</div>';
+            html += '</div>';
+            html += '<button onclick="switchPage(\'edit-group\',\'' + currentChatGroupId + '\')" style="background:var(--surface3);color:var(--gold);width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;">⚙️</button>';
+            html += '</div>';
+            html += '<div id="adminChatMessages" style="flex:1;padding:12px 15px;overflow-y:scroll;-webkit-overflow-scrolling:touch;background-color:#0d0d14;"></div>';
+            html += '<div style="display:flex;align-items:center;padding:10px 12px;background:var(--surface);border-top:1px solid #1a1a25;gap:8px;flex-shrink:0;min-height:60px;">';
+            html += '<button onclick="uploadAdminMedia()" style="background:var(--surface3);color:var(--gold);border:1px solid #333;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.1rem;">📎</button>';
+            html += '<input id="adminMsgInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key===\'Enter\')sendAdminMsg()" autocomplete="off" style="flex:1;padding:12px 16px;border-radius:22px;border:none;background:var(--surface2);color:#fff;font-size:16px;outline:none;font-family:Cairo,sans-serif;">';
+            html += '<button onclick="sendAdminMsg()" style="background:var(--gold-gradient);color:#000;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:1.1rem;">➤</button>';
+            html += '</div>';
+            html += '</div>';
             
-            loadAdminMessages(currentChatGroupId);
+            main.innerHTML = html;
+            
+            setTimeout(function() {
+                loadAdminMessages(currentChatGroupId);
+            }, 300);
+            
         }).catch(function(e) {
-            console.error('Chat render error:', e);
-            main.innerHTML = '<div class="card" style="text-align:center;color:var(--danger);">❌ حدث خطأ</div>';
+            main.innerHTML = '<div style="text-align:center;padding:50px;color:var(--danger);">❌ حدث خطأ</div>';
         });
     }
 
     function loadAdminMessages(gid) {
         var container = document.getElementById('adminChatMessages');
         if (!container) return;
-        if (chatUnsub) chatUnsub();
+        if (chatUnsub) { chatUnsub(); chatUnsub = null; }
         
         var lastDate = null;
         
@@ -2322,16 +2334,15 @@
                 lastDate = null;
                 
                 if (snap.empty) {
-                    container.innerHTML = '<div style="text-align:center;color:#555;padding:50px;">💬 لا توجد رسائل بعد</div>';
+                    container.innerHTML = '<div style="text-align:center;color:#888;padding:50px;">💬 لا توجد رسائل بعد</div>';
                     return;
                 }
                 
                 snap.forEach(function(doc) {
                     var m = doc.data();
-                    m.id = doc.id;
                     
                     if (m.deleted) {
-                        container.innerHTML += '<div class="msg-wrapper"><div class="msg-bubble" style="font-style:italic;color:#666;">🗑️ تم حذف هذه الرسالة</div></div>';
+                        container.innerHTML += '<div style="margin:4px 0;text-align:center;"><span style="font-style:italic;color:#666;background:rgba(0,0,0,0.3);padding:4px 12px;border-radius:10px;font-size:0.8rem;">🗑️ تم حذف الرسالة</span></div>';
                         return;
                     }
                     
@@ -2341,7 +2352,7 @@
                             var d = m.timestamp.toDate();
                             var dateStr = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
                             if (dateStr !== lastDate) {
-                                container.innerHTML += '<div class="date-divider"><span>' + dateStr + '</span></div>';
+                                container.innerHTML += '<div style="text-align:center;margin:14px 0;"><span style="background:#0d0d14;padding:5px 14px;border-radius:10px;font-size:0.7rem;color:#777;border:1px solid #222;">' + dateStr + '</span></div>';
                                 lastDate = dateStr;
                             }
                             msgTime = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
@@ -2349,21 +2360,26 @@
                     }
                     
                     var isSent = m.senderID === currentAdmin.uid;
-                    var contentHtml = '';
+                    var contentHtml = (m.content || '').replace(/\n/g, '<br>');
                     
                     if (m.type === 'image') {
-                        contentHtml = '<img src="' + m.content + '" onclick="window.open(\'' + m.content + '\')" style="max-width:240px;border-radius:10px;cursor:pointer;display:block;" loading="lazy" onerror="this.style.display=\'none\'">';
+                        contentHtml = '<img src="' + m.content + '" style="max-width:220px;border-radius:10px;cursor:pointer;display:block;" onclick="window.open(\'' + m.content + '\')">';
                     } else if (m.type === 'video') {
-                        contentHtml = '<video controls src="' + m.content + '" style="max-width:240px;border-radius:10px;" preload="metadata" playsinline></video>';
+                        contentHtml = '<video controls src="' + m.content + '" style="max-width:220px;border-radius:10px;"></video>';
                     } else if (m.type === 'audio') {
-                        contentHtml = '<audio controls src="' + m.content + '" style="max-width:220px;" preload="metadata"></audio>';
+                        contentHtml = '<audio controls src="' + m.content + '" style="max-width:200px;"></audio>';
                     } else if (m.type === 'file') {
-                        contentHtml = '<div class="file-attachment" onclick="window.open(\'' + m.content + '\')"><span style="font-size:1.8rem;">📄</span><div><strong>' + (m.fileName || 'ملف مرفق') + '</strong></div></div>';
-                    } else {
-                        contentHtml = (m.content || '').replace(/\n/g, '<br>');
+                        contentHtml = '<div onclick="window.open(\'' + m.content + '\')" style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;"><span>📄</span><strong>' + (m.fileName || 'ملف') + '</strong></div>';
                     }
                     
-                    container.innerHTML += '<div class="msg-wrapper ' + (isSent ? 'sent' : 'received') + '"><div class="msg-bubble" style="max-width:82%;padding:9px 14px;border-radius:18px;word-break:break-word;font-size:0.9rem;line-height:1.5;box-shadow:0 1px 3px rgba(0,0,0,0.3);' + (isSent ? 'background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;border-bottom-left-radius:4px;' : 'background:var(--surface2);color:#fff;border-bottom-right-radius:4px;') + '">' + contentHtml + '</div><div class="msg-meta-info" style="font-size:0.65rem;color:#777;margin:2px 8px;display:flex;align-items:center;gap:6px;">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? '<span class="seen-check">✓✓</span>' : '') + '</div></div>';
+                    var bubbleStyle = isSent ? 
+                        'background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;border-bottom-left-radius:4px;' : 
+                        'background:var(--surface2);color:#fff;border-bottom-right-radius:4px;';
+                    
+                    container.innerHTML += '<div style="margin-bottom:6px;display:flex;flex-direction:column;' + (isSent ? 'align-items:flex-end;' : 'align-items:flex-start;') + '">' +
+                        '<div style="max-width:82%;padding:10px 15px;border-radius:18px;word-break:break-word;font-size:0.9rem;line-height:1.6;box-shadow:0 2px 5px rgba(0,0,0,0.25);' + bubbleStyle + '">' + contentHtml + '</div>' +
+                        '<div style="font-size:0.65rem;color:#777;margin:3px 8px;">' + (!isSent ? '<strong>' + (m.senderName || 'مستخدم') + '</strong> • ' : '') + msgTime + (isSent ? ' <span style="color:var(--gold);">✓✓</span>' : '') + '</div>' +
+                        '</div>';
                 });
                 
                 container.scrollTop = container.scrollHeight;
@@ -2371,46 +2387,10 @@
         
         realtimeListeners.push(chatUnsub);
     }
-                    
-                    const isSent = m.senderID === currentAdmin.uid;
-                    let contentHtml = '';
-                    
-                    if (m.type === 'image') {
-                        contentHtml = `<img src="${m.content}" onclick="window.open('${m.content}')" style="max-width:240px; border-radius:10px; cursor:pointer; display:block;" loading="lazy" onerror="this.style.display='none'">`;
-                    } else if (m.type === 'video') {
-                        contentHtml = `<video controls src="${m.content}" style="max-width:240px; border-radius:10px;" preload="metadata" playsinline></video>`;
-                    } else if (m.type === 'audio') {
-                        contentHtml = `<audio controls src="${m.content}" style="max-width:220px;" preload="metadata"></audio>`;
-                    } else if (m.type === 'file') {
-                        contentHtml = `<div class="file-attachment" onclick="window.open('${m.content}')"><span style="font-size:1.8rem;">📄</span><div><strong style="font-size:0.85rem;">${m.fileName || 'ملف مرفق'}</strong></div></div>`;
-                    } else if (m.type === 'broadcast') {
-                        contentHtml = `<strong style="color:var(--gold);">📢 ${(m.content || '').replace(/\n/g, '<br>')}</strong>`;
-                    } else {
-                        contentHtml = (m.content || '').replace(/\n/g, '<br>');
-                    }
-                    
-                    container.innerHTML += `
-                    <div class="msg-wrapper ${isSent ? 'sent' : 'received'}">
-                        <div class="msg-bubble">${contentHtml}</div>
-                        <div class="msg-meta-info">
-                            ${!isSent ? `<strong>${m.senderName || 'مستخدم'}</strong> • ` : ''}
-                            ${msgDate}
-                            ${isSent ? `<span class="seen-check">✓✓</span> <button class="delete-btn" onclick="deleteAdminMsg('${m.id}')" title="حذف">🗑️</button>` : ''}
-                        </div>
-                    </div>`;
-                });
-                
-                if (shouldAutoScroll) {
-                    requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
-                }
-            });
-        
-        realtimeListeners.push(chatUnsub);
-    }
 
     window.sendAdminMsg = function() {
-        const input = document.getElementById('adminMsgInput');
-        if (!input?.value?.trim()) return;
+        var input = document.getElementById('adminMsgInput');
+        if (!input || !input.value.trim()) return;
         
         db.collection('groups').doc(currentChatGroupId).collection('messages').add({
             senderID: currentAdmin.uid,
@@ -2418,27 +2398,26 @@
             type: 'text',
             content: input.value.trim(),
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => { input.value = ''; input.focus(); });
+        }).then(function() { input.value = ''; input.focus(); });
     };
 
     window.uploadAdminMedia = function() {
-        if (typeof cloudinary === 'undefined') { showToast('⚠️ ميزة الرفع غير متاحة', 'warning'); return; }
+        if (typeof cloudinary === 'undefined') { showToast('⚠️ ميزة غير متاحة', 'warning'); return; }
         
         cloudinary.createUploadWidget({
             cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET,
-            sources: ['local', 'url', 'camera', 'google_drive', 'dropbox'],
+            sources: ['local', 'url', 'camera'],
             multiple: true, maxFiles: 10, maxFileSize: 50000000,
-            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'avi', 'mkv', 'mp3', 'wav', 'pdf', 'doc', 'docx', 'ppt', 'xls', 'zip'],
+            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'mp3', 'wav', 'pdf', 'doc', 'docx'],
             cropping: true, showSkipCropButton: true,
-        }, (error, result) => {
+        }, function(error, result) {
             if (!error && result && result.event === 'success') {
-                const url = result.info.secure_url;
-                const type = result.info.resource_type === 'image' ? 'image' : result.info.resource_type === 'video' ? 'video' : 'file';
+                var url = result.info.secure_url;
+                var type = result.info.resource_type === 'image' ? 'image' : result.info.resource_type === 'video' ? 'video' : 'file';
                 db.collection('groups').doc(currentChatGroupId).collection('messages').add({
                     senderID: currentAdmin.uid, senderName: currentAdmin.name,
                     type: type, content: url,
                     fileName: result.info.original_filename || 'ملف',
-                    fileSize: result.info.bytes,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
@@ -2447,13 +2426,15 @@
     };
 
     window.deleteAdminMsg = function(msgId) {
-        if (confirm('🗑️ هل أنت متأكد من حذف هذه الرسالة؟')) {
+        if (confirm('🗑️ حذف هذه الرسالة؟')) {
             db.collection('groups').doc(currentChatGroupId).collection('messages').doc(msgId)
                 .update({ deleted: true })
-                .then(() => showToast('✅ تم حذف الرسالة', 'success'))
-                .catch(() => showToast('❌ فشل الحذف', 'error'));
+                .then(function() { showToast('✅ تم الحذف', 'success'); })
+                .catch(function() { showToast('❌ فشل الحذف', 'error'); });
         }
     };
+
+    // ========== Chat List ==========
         // ========== Chat List ==========
     async function renderChatsList() {
         const main = document.getElementById('mainContent');
