@@ -635,8 +635,8 @@
         const main = document.getElementById('mainContent');
         
         // 🔥🔥🔥 للشات - نخلي المساحة كاملة
-        if (page === 'chat' || page === 'private-chat') {
-            main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
+              if (page === 'chat' || page === 'private-chat') {
+            main.style.cssText = 'padding:0 !important; margin:0 !important; overflow:hidden !important; height:100% !important; width:100% !important; position:absolute; top:0; left:0; right:0; bottom:0; background:#0d0d14;';
         } else {
             main.style.cssText = 'padding:20px; overflow-y:auto;';
         }
@@ -2254,8 +2254,7 @@
         if (!currentChatGroupId) { switchPage('groups'); return; }
         
         var main = document.getElementById('mainContent');
-        main.style.cssText = 'padding:0 !important; overflow:hidden !important; height:100% !important;';
-        
+        main.style.cssText = 'padding:0 !important; margin:0 !important; overflow:hidden !important; height:100% !important; width:100% !important; position:absolute; top:0; left:0; right:0; bottom:0; background:#0d0d14;';        
         showLoading(main);
         
         db.collection('groups').doc(currentChatGroupId).get().then(function(doc) {
