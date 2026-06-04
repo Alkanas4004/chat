@@ -23,6 +23,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     
+    
     <style>
         :root {
             --gold: #FFC107; --gold-dark: #B8860B; --gold-light: #FFD54F;
@@ -539,6 +540,355 @@
 </div>
 
 <script>
+        // ========== 🔐🛡️🚦 نظام الحماية والتشفير المتكامل - EduChat Pro Security Suite ==========
+    
+    // ==========================================
+    // 🔐 الجزء الأول: نظام التشفير المتقدم
+    // ==========================================
+    var SecuritySystem = {
+        _key: 'EduChatPro_Secure_2026_alkanas_ULTIMATE',
+        _salt: 'alkanas_salt_' + Math.floor(Date.now() / 86400000),
+        
+        encrypt: function(data) {
+            try {
+                var jsonStr = JSON.stringify(data);
+                var key = this._key + this._salt;
+                var encrypted = '';
+                for (var i = 0; i < jsonStr.length; i++) {
+                    var charCode = jsonStr.charCodeAt(i);
+                    var keyChar = key.charCodeAt(i % key.length);
+                    var saltChar = this._salt.charCodeAt(i % this._salt.length);
+                    encrypted += String.fromCharCode(charCode + keyChar + saltChar);
+                }
+                var reversed = encrypted.split('').reverse().join('');
+                return btoa(reversed);
+            } catch(e) { return data; }
+        },
+        
+        decrypt: function(encryptedData) {
+            try {
+                var key = this._key + this._salt;
+                var reversed = atob(encryptedData);
+                var encrypted = reversed.split('').reverse().join('');
+                var decrypted = '';
+                for (var i = 0; i < encrypted.length; i++) {
+                    var charCode = encrypted.charCodeAt(i);
+                    var keyChar = key.charCodeAt(i % key.length);
+                    var saltChar = this._salt.charCodeAt(i % this._salt.length);
+                    decrypted += String.fromCharCode(charCode - keyChar - saltChar);
+                }
+                return JSON.parse(decrypted);
+            } catch(e) { return encryptedData; }
+        },
+        
+        encryptText: function(text) {
+            if (!text || typeof text !== 'string') return text;
+            try {
+                var key = this._key + this._salt;
+                var result = '';
+                for (var i = 0; i < text.length; i++) {
+                    var charCode = text.charCodeAt(i);
+                    var keyChar = key.charCodeAt(i % key.length);
+                    result += String.fromCharCode(charCode + keyChar);
+                }
+                return btoa(result);
+            } catch(e) { return text; }
+        },
+        
+        decryptText: function(encryptedText) {
+            if (!encryptedText || typeof encryptedText !== 'string') return encryptedText;
+            try {
+                var key = this._key + this._salt;
+                var decoded = atob(encryptedText);
+                var result = '';
+                for (var i = 0; i < decoded.length; i++) {
+                    var charCode = decoded.charCodeAt(i);
+                    var keyChar = key.charCodeAt(i % key.length);
+                    result += String.fromCharCode(charCode - keyChar);
+                }
+                return result;
+            } catch(e) { return encryptedText; }
+        },
+        
+        generateSignature: function(data, timestamp) {
+            var raw = JSON.stringify(data) + timestamp + this._key;
+            var hash = 0;
+            for (var i = 0; i < raw.length; i++) {
+                var char = raw.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(36);
+        }
+    };
+
+    // ==========================================
+    // 🛡️ الجزء الثاني: نظام الحماية الشامل
+    // ==========================================
+    var ProtectionSystem = {
+        _suspiciousWords: ['script', 'javascript', 'onerror', 'onload', 'eval', 'document.cookie', 'window.location', 'innerHTML'],
+        
+        checkRequestIntegrity: function(request) {
+            if (!request || typeof request !== 'string') return false;
+            
+            if (request.length > 10000) {
+                return false;
+            }
+            
+            var lowerRequest = request.toLowerCase();
+            for (var i = 0; i < this._suspiciousWords.length; i++) {
+                if (lowerRequest.indexOf(this._suspiciousWords[i]) !== -1) {
+                    this.logSuspicious('suspicious_word', this._suspiciousWords[i]);
+                    return false;
+                }
+            }
+            
+            var now = Date.now();
+            var lastRequest = parseInt(localStorage.getItem('_lastSecReq') || '0');
+            var requestCount = parseInt(localStorage.getItem('_reqCount') || '0');
+            
+            if (now - lastRequest < 200) {
+                requestCount++;
+                if (requestCount > 5) {
+                    this.logSuspicious('rate_limit', '');
+                    return false;
+                }
+            } else {
+                requestCount = 0;
+            }
+            
+            localStorage.setItem('_lastSecReq', now.toString());
+            localStorage.setItem('_reqCount', requestCount.toString());
+            
+            return true;
+        },
+        
+        sanitizeInput: function(input) {
+            if (typeof input !== 'string') return input;
+            return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+        },
+        
+        sanitizeFirestore: function(input) {
+            if (typeof input !== 'string') return input;
+            return input.replace(/\./g, '_').replace(/\$/g, '_').replace(/\[/g, '_').replace(/\]/g, '_').replace(/\//g, '_').replace(/\\/g, '_').replace(/\0/g, '');
+        },
+        
+        logSuspicious: function(type, data) {
+            var logs = JSON.parse(localStorage.getItem('_securityLogs') || '[]');
+            logs.push({
+                type: type,
+                data: data.substring(0, 200),
+                timestamp: Date.now()
+            });
+            if (logs.length > 50) logs = logs.slice(-50);
+            localStorage.setItem('_securityLogs', JSON.stringify(logs));
+        },
+        
+        validateUser: function(user) {
+            if (!user) return false;
+            if (!user.uid || typeof user.uid !== 'string') return false;
+            if (user.uid.length < 10 || user.uid.length > 100) return false;
+            if (user.banned) return false;
+            return true;
+        },
+        
+        getDeviceFingerprint: function() {
+            var fp = '';
+            fp += navigator.userAgent || '';
+            fp += navigator.language || '';
+            fp += screen.colorDepth || '';
+            fp += screen.width + 'x' + screen.height;
+            return SecuritySystem.encryptText(fp);
+        }
+    };
+
+    // ==========================================
+    // 🚦 الجزء الثالث: نظام منع التكرار
+    // ==========================================
+    var RateLimiter = {
+        _requests: {},
+        _maxRequests: 5,
+        _timeWindow: 3000,
+        _blockDuration: 30000,
+        _blockedUntil: {},
+        
+        canProceed: function(action) {
+            var now = Date.now();
+            
+            if (this._blockedUntil[action] && now < this._blockedUntil[action]) {
+                return false;
+            }
+            
+            if (!this._requests[action]) {
+                this._requests[action] = { count: 1, startTime: now };
+                return true;
+            }
+            
+            var record = this._requests[action];
+            
+            if (now - record.startTime > this._timeWindow) {
+                this._requests[action] = { count: 1, startTime: now };
+                return true;
+            }
+            
+            record.count++;
+            
+            if (record.count > this._maxRequests) {
+                this._blockedUntil[action] = now + this._blockDuration;
+                ProtectionSystem.logSuspicious('rate_limit_blocked', action);
+                return false;
+            }
+            
+            return true;
+        },
+        
+        reset: function(action) {
+            delete this._requests[action];
+            delete this._blockedUntil[action];
+        }
+    };
+
+    // ==========================================
+    // 🔒 الجزء الرابع: قاعدة البيانات الآمنة
+    // ==========================================
+    var SecureDB = {
+        addMessage: async function(groupId, message) {
+            if (!RateLimiter.canProceed('sendMessage')) {
+                showToast('⚠️ انتظر قليلاً قبل الإرسال', 'warning');
+                return false;
+            }
+            
+            if (!ProtectionSystem.checkRequestIntegrity(message.content)) {
+                showToast('⚠️ محتوى غير صالح', 'error');
+                return false;
+            }
+            
+            if (!ProtectionSystem.validateUser(currentUser)) {
+                showToast('⚠️ جلسة غير صالحة', 'error');
+                return false;
+            }
+            
+            var sanitizedContent = ProtectionSystem.sanitizeInput(message.content);
+            var sanitizedName = ProtectionSystem.sanitizeInput(message.senderName || currentUser.name);
+            var timestamp = Date.now();
+            var signature = SecuritySystem.generateSignature({content: sanitizedContent, sender: currentUser.uid}, timestamp);
+            
+            try {
+                return await db.collection('groups').doc(groupId).collection('messages').add({
+                    senderID: currentUser.uid,
+                    senderName: sanitizedName,
+                    type: 'text',
+                    content: sanitizedContent,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    _secure: true,
+                    _signature: signature
+                });
+            } catch(e) {
+                return false;
+            }
+        },
+        
+        updateUser: async function(data) {
+            if (!ProtectionSystem.validateUser(currentUser)) return false;
+            
+            var sanitized = {};
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var safeKey = ProtectionSystem.sanitizeFirestore(key);
+                    sanitized[safeKey] = ProtectionSystem.sanitizeInput(data[key]);
+                }
+            }
+            
+            try {
+                return await db.collection('users').doc(currentUser.uid).update(sanitized);
+            } catch(e) {
+                return false;
+            }
+        }
+    };
+
+    // ==========================================
+    // 🔐 الجزء الخامس: إرسال رسالة آمن
+    // ==========================================
+    window.sendSecureMessage = function() {
+        var input = document.getElementById('msgInput');
+        if (!input || input.disabled) return;
+        
+        var text = input.value.trim();
+        if (!text) return;
+        
+        if (!ProtectionSystem.checkRequestIntegrity(text)) {
+            showToast('⚠️ محتوى غير مسموح به', 'error');
+            return;
+        }
+        
+        if (!RateLimiter.canProceed('sendMessage')) {
+            showToast('⚠️ انتظر قليلاً', 'warning');
+            return;
+        }
+        
+        input.value = '';
+        input.disabled = true;
+        
+        SecureDB.addMessage(currentGroupId, {
+            content: text,
+            senderID: currentUser.uid,
+            senderName: currentUser.name
+        }).then(function(result) {
+            if (result) {
+                input.disabled = false;
+                input.focus();
+                if (typeof playSendSound === 'function') playSendSound();
+            } else {
+                input.disabled = false;
+                input.value = text;
+                showToast('❌ فشل الإرسال', 'error');
+            }
+        }).catch(function() {
+            input.disabled = false;
+            input.value = text;
+        });
+    };
+
+    // ==========================================
+    // 🛡️ الجزء السادس: تفعيل الحماية تلقائياً
+    // ==========================================
+    (function() {
+        setInterval(function() {
+            var session = localStorage.getItem('webEgyptUserID');
+            if (session && !currentUser) {
+                localStorage.removeItem('webEgyptUserID');
+                localStorage.removeItem('webEgyptDeviceAuth');
+                location.reload();
+            }
+            
+            var logs = JSON.parse(localStorage.getItem('_securityLogs') || '[]');
+            var cutoff = Date.now() - 86400000;
+            logs = logs.filter(function(log) { return log.timestamp > cutoff; });
+            localStorage.setItem('_securityLogs', JSON.stringify(logs));
+        }, 30000);
+        
+        window.addEventListener('beforeunload', function() {
+            RateLimiter.reset('sendMessage');
+            if (currentUser) {
+                db.collection('users').doc(currentUser.uid).update({ 
+                    online: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(function() {});
+            }
+        });
+        
+        var lastActivity = Date.now();
+        document.addEventListener('click', function() { lastActivity = Date.now(); });
+        document.addEventListener('keydown', function() { lastActivity = Date.now(); });
+        document.addEventListener('touchstart', function() { lastActivity = Date.now(); });
+        
+        setInterval(function() {
+            if (currentUser && Date.now() - lastActivity > 300000) {
+                db.collection('users').doc(currentUser.uid).update({ online: false }).catch(function() {});
+            }
+        }, 60000);
+    })();
 
     // ========== Service Worker Registration ==========
     if ('serviceWorker' in navigator) {
