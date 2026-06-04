@@ -2676,24 +2676,30 @@
         <button class="btn btn-outline btn-sm" onclick="switchTab('more')" style="width:100%; margin-top:10px;">⬅️ رجوع</button>`;
     }
     
-    window.changeAppTheme = function(theme) {
+        window.changeAppTheme = function(theme) {
         localStorage.setItem('edu_theme', theme);
-        if (theme === 'gold') {
-            document.documentElement.removeAttribute('data-theme');
+        
+        // 🔥🔥🔥 تطبيق اللون فوراً
+        document.documentElement.removeAttribute('data-theme');
+        if (theme === 'blue') {
+            document.documentElement.setAttribute('data-theme', 'blue');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0055CC');
+        } else if (theme === 'green') {
+            document.documentElement.setAttribute('data-theme', 'green');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#00883A');
+        } else if (theme === 'purple') {
+            document.documentElement.setAttribute('data-theme', 'purple');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#6B21A8');
+        } else if (theme === 'pink') {
+            document.documentElement.setAttribute('data-theme', 'pink');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#CC1470');
         } else {
-            document.documentElement.setAttribute('data-theme', theme);
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#FFC107');
         }
+        
         showToast('✅ تم تغيير المظهر', 'success');
-        renderTheme();
+        setTimeout(function() { switchTab('more'); }, 300);
     };
-    
-    // تحميل الثيم عند فتح التطبيق
-    (function() {
-        var savedTheme = localStorage.getItem('edu_theme') || 'gold';
-        if (savedTheme !== 'gold') {
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-    })();
 
     // ========== Support ==========
         function renderSupport() {
@@ -3131,6 +3137,7 @@
     var notificationSound = true;
     
     function playSendSound() {
+        
         if (!notificationSound) return;
         try {
             var ctx = new (window.AudioContext || window.webkitAudioContext)();
