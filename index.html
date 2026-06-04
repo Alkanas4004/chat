@@ -1158,7 +1158,27 @@
         document.body.appendChild(modal);
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     }
-
+        // 🔥🔥🔥 تطبيق الثيم بعد كل تنقل
+    (function() {
+        var _switchTab = switchTab;
+        switchTab = function(tab) {
+            _switchTab(tab);
+            setTimeout(function() {
+                var saved = localStorage.getItem('edu_theme_colors');
+                if (saved) { try { applyThemeToPage(JSON.parse(saved)); } catch(e) {} }
+            }, 300);
+        };
+        
+        var _navigate = navigate;
+        navigate = function(page, data) {
+            _navigate(page, data);
+            setTimeout(function() {
+                var saved = localStorage.getItem('edu_theme_colors');
+                if (saved) { try { applyThemeToPage(JSON.parse(saved)); } catch(e) {} }
+            }, 300);
+        };
+    })();
+    // ========== Logout =========
         window.logout = function() {
         if (currentUser) {
             db.collection('users').doc(currentUser.uid).update({ online: false }).catch(() => {});
