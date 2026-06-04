@@ -1257,6 +1257,7 @@
             case 'group-info': renderGroupInfo(); break;
             case 'stats': renderStudentStats(); break;
             case 'settings': pushHistory('settings'); renderSettings(); break;
+            case 'profile': pushHistory('profile'); renderProfile(); break;
             case 'theme': pushHistory('theme'); renderTheme(); break;
             case 'notes': pushHistory('notes'); renderNotes(); break;
             case 'leaderboard': pushHistory('leaderboard'); renderLeaderboard(); break;
@@ -2657,6 +2658,7 @@
     function renderMorePage() {
         const content = document.getElementById('contentArea');
          const items = [
+            { icon: '👤', name: 'الملف الشخصي', desc: 'صورتك وبياناتك الشخصية', page: 'profile' },
             { icon: '⚙️', name: 'الإعدادات', desc: 'تخصيص حسابك وخلفية الشات', page: 'settings' },
             { icon: '🎨', name: 'تخصيص المظهر', desc: 'تغيير ألوان التطبيق بالكامل', page: 'theme' },
             { icon: '📝', name: 'ملاحظاتي', desc: 'مفكرتك الشخصية للمذاكرة', page: 'notes' },
@@ -3446,6 +3448,97 @@
     console.log('%c  🔔 Notifications | 🔊 Sound | 👻 Auto-login', 'color: #AAA;');
     console.log('%c  🔒 Anti-theft | 📱 PWA | ⚡ Real-time | 🎉 Confetti', 'color: #AAA;');
     console.log('%c🛡️ Protected by EduChat Pro  Security System', 'color: #FFA502;');
+        // ========== 👤 الملف الشخصي ==========
+    function renderProfile() {
+        var c = document.getElementById('contentArea');
+        if (!currentUser) return;
+        
+        db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+            var u = doc.data() || {};
+            var level = Math.floor((u.points || 0) / 50) + 1;
+            
+            var html = '';
+            html += '<h2 class="section-title">👤 الملف الشخصي</h2>';
+            
+            // 🔥🔥🔥 صورة البروفايل
+            html += '<div style="text-align:center;padding:20px 15px;background:var(--surface);border-radius:20px;margin-bottom:15px;">';
+            html += '<div style="position:relative;display:inline-block;margin-bottom:12px;">';
+            html += '<img id="profileImage" src="' + (u.profilePic || 'https://via.placeholder.com/120') + '" style="width:120px;height:120px;border-radius:50%;border:4px solid var(--gold);object-fit:cover;box-shadow:0 0 30px rgba(255,193,7,0.4);" onerror="this.src=\'https://via.placeholder.com/120\'">';
+            html += '<div style="position:absolute;bottom:5px;right:5px;width:25px;height:25px;background:var(--success);border-radius:50%;border:3px solid #0A0A0F;"></div>';
+            html += '<button onclick="changeProfilePic()" style="position:absolute;bottom:5px;left:5px;background:var(--gold);color:#000;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;">📷</button>';
+            html += '</div>';
+            html += '<h3 style="color:var(--gold);font-size:1.3rem;">' + (u.name || 'طالب') + '</h3>';
+            html += '<p style="color:var(--text2);font-size:0.8rem;">🏆 المستوى ' + level + '</p>';
+            html += '</div>';
+            
+            // 🔥🔥🔥 تغيير الاسم
+            html += '<div style="background:var(--surface);border-radius:16px;padding:15px;margin-bottom:12px;">';
+            html += '<h4 style="color:var(--gold);margin-bottom:10px;">✏️ تعديل الاسم</h4>';
+            html += '<input id="profileName" class="input-field" value="' + (u.name || '') + '" placeholder="اسمك الجديد" style="text-align:right;letter-spacing:0;font-size:0.9rem;">';
+            html += '<button class="btn btn-sm" onclick="updateProfileName()" style="width:100%;margin-top:8px;">💾 حفظ الاسم</button>';
+            html += '</div>';
+            
+            // 🔥🔥🔥 تغيير الصورة
+            html += '<div style="background:var(--surface);border-radius:16px;padding:15px;margin-bottom:12px;">';
+            html += '<h4 style="color:var(--gold);margin-bottom:10px;">🖼️ تغيير الصورة</h4>';
+            html += '<p style="color:var(--text2);font-size:0.75rem;margin-bottom:8px;">ضع رابط صورة مباشر من الإنترنت</p>';
+            html += '<input id="profilePicUrl" class="input-field" value="' + (u.profilePic || '') + '" placeholder="رابط الصورة المباشر" style="text-align:left;letter-spacing:0;font-size:0.85rem;">';
+            html += '<button class="btn btn-sm" onclick="saveProfilePic()" style="width:100%;margin-top:8px;">💾 حفظ الصورة</button>';
+            html += '<p style="color:var(--text3);font-size:0.65rem;margin-top:6px;">💡 ارفع صورتك على <a href="https://imgbb.com" target="_blank" style="color:var(--gold);">imgbb.com</a> وانسخ الرابط المباشر</p>';
+            html += '</div>';
+            
+            // 🔥🔥🔥 إحصائيات سريعة
+            html += '<div style="background:var(--surface);border-radius:16px;padding:15px;margin-bottom:12px;">';
+            html += '<h4 style="color:var(--gold);margin-bottom:10px;">📊 إحصائياتي</h4>';
+            html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;">';
+            html += '<div style="background:var(--surface2);padding:12px;border-radius:12px;"><div style="font-size:1.5rem;color:var(--gold);font-weight:bold;">' + (u.totalMessages || 0) + '</div><div style="font-size:0.7rem;color:var(--text2);">💬 رسالة</div></div>';
+            html += '<div style="background:var(--surface2);padding:12px;border-radius:12px;"><div style="font-size:1.5rem;color:var(--gold);font-weight:bold;">' + (u.points || 0) + '</div><div style="font-size:0.7rem;color:var(--text2);">⭐ نقطة</div></div>';
+            html += '<div style="background:var(--surface2);padding:12px;border-radius:12px;"><div style="font-size:1.5rem;color:var(--gold);font-weight:bold;">' + level + '</div><div style="font-size:0.7rem;color:var(--text2);">🏆 مستوى</div></div>';
+            html += '</div></div>';
+            
+            html += '<button class="btn btn-outline btn-sm" onclick="switchTab(\'more\')" style="width:100%;">⬅️ رجوع</button>';
+            
+            c.innerHTML = html;
+        });
+    }
+    
+    // 🔥 تغيير صورة البروفايل
+    window.changeProfilePic = function() {
+        document.getElementById('profilePicUrl').focus();
+        document.getElementById('profilePicUrl').scrollIntoView({ behavior: 'smooth' });
+        showToast('📷 ضع رابط الصورة في الأسفل', 'info');
+    };
+    
+    // 🔥 حفظ صورة البروفايل
+    window.saveProfilePic = function() {
+        var url = document.getElementById('profilePicUrl').value.trim();
+        if (!url) return showToast('⚠️ ضع رابط الصورة', 'warning');
+        
+        db.collection('users').doc(currentUser.uid).update({
+            profilePic: url
+        }).then(function() {
+            document.getElementById('profileImage').src = url;
+            showToast('✅ تم تحديث الصورة', 'success');
+        }).catch(function() {
+            showToast('❌ فشل التحديث', 'error');
+        });
+    };
+    
+    // 🔥 تحديث الاسم
+    window.updateProfileName = function() {
+        var name = document.getElementById('profileName').value.trim();
+        if (!name) return showToast('⚠️ أدخل اسماً', 'warning');
+        if (name.length < 3) return showToast('⚠️ الاسم 3 أحرف على الأقل', 'warning');
+        
+        db.collection('users').doc(currentUser.uid).update({
+            name: name
+        }).then(function() {
+            currentUser.name = name;
+            showToast('✅ تم تحديث الاسم', 'success');
+        }).catch(function() {
+            showToast('❌ فشل التحديث', 'error');
+        });
+    };
 </script>
 </body>
 </html>
