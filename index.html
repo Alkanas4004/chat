@@ -3529,6 +3529,19 @@
     console.log('%c  🔔 Notifications | 🔊 Sound | 👻 Auto-login', 'color: #AAA;');
     console.log('%c  🔒 Anti-theft | 📱 PWA | ⚡ Real-time | 🎉 Confetti', 'color: #AAA;');
     console.log('%c🛡️ Protected by EduChat Pro  Security System', 'color: #FFA502;');
+        document.getElementById('loginBtn').addEventListener('click', function() {
+        studentLogin();
+    });
+        // 🔥🔥🔥 إصلاح زرار الدخول
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.querySelector('.login-box .btn');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                studentLogin();
+            });
+        }
+    });
 </script>
 </body>
 </html>
