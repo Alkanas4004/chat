@@ -2676,30 +2676,55 @@
         <button class="btn btn-outline btn-sm" onclick="switchTab('more')" style="width:100%; margin-top:10px;">⬅️ رجوع</button>`;
     }
     
-        window.changeAppTheme = function(theme) {
+          window.changeAppTheme = function(theme) {
         localStorage.setItem('edu_theme', theme);
         
-        // 🔥🔥🔥 تطبيق اللون فوراً
-        document.documentElement.removeAttribute('data-theme');
-        if (theme === 'blue') {
-            document.documentElement.setAttribute('data-theme', 'blue');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0055CC');
-        } else if (theme === 'green') {
-            document.documentElement.setAttribute('data-theme', 'green');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#00883A');
-        } else if (theme === 'purple') {
-            document.documentElement.setAttribute('data-theme', 'purple');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#6B21A8');
-        } else if (theme === 'pink') {
-            document.documentElement.setAttribute('data-theme', 'pink');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#CC1470');
-        } else {
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#FFC107');
-        }
+        // 🔥🔥🔥 الألوان الجديدة
+        var colors = {
+            'gold': { main: '#FFC107', dark: '#B8860B', light: '#FFD54F', bg: '#0A0A0F', surface: '#15151F', surface2: '#1E1E2A', gradient: 'linear-gradient(135deg, #FFC107, #B8860B, #FFD54F)' },
+            'blue': { main: '#1E90FF', dark: '#0055CC', light: '#70A1FF', bg: '#0A0A0F', surface: '#15151F', surface2: '#1E1E2A', gradient: 'linear-gradient(135deg, #1E90FF, #0055CC, #70A1FF)' },
+            'green': { main: '#2ED573', dark: '#00883A', light: '#7BED9F', bg: '#0A0A0F', surface: '#15151F', surface2: '#1E1E2A', gradient: 'linear-gradient(135deg, #2ED573, #00883A, #7BED9F)' },
+            'purple': { main: '#A855F7', dark: '#6B21A8', light: '#C084FC', bg: '#0A0A0F', surface: '#15151F', surface2: '#1E1E2A', gradient: 'linear-gradient(135deg, #A855F7, #6B21A8, #C084FC)' },
+            'pink': { main: '#FF69B4', dark: '#CC1470', light: '#FFB6D9', bg: '#0A0A0F', surface: '#15151F', surface2: '#1E1E2A', gradient: 'linear-gradient(135deg, #FF69B4, #CC1470, #FFB6D9)' }
+        };
+        
+        var c = colors[theme] || colors['gold'];
+        
+        // 🔥🔥🔥 تطبيق الألوان على الـ CSS Variables
+        var root = document.documentElement;
+        root.style.setProperty('--gold', c.main);
+        root.style.setProperty('--gold-dark', c.dark);
+        root.style.setProperty('--gold-light', c.light);
+        root.style.setProperty('--gold-gradient', c.gradient);
+        
+        // 🔥🔥🔥 تغيير لون الـ header
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', c.bg);
         
         showToast('✅ تم تغيير المظهر', 'success');
         setTimeout(function() { switchTab('more'); }, 300);
     };
+    
+    // 🔥 تحميل الثيم عند فتح التطبيق
+    (function() {
+        var savedTheme = localStorage.getItem('edu_theme') || 'gold';
+        if (savedTheme !== 'gold') {
+            var colors = {
+                'blue': { main: '#1E90FF', dark: '#0055CC', light: '#70A1FF', gradient: 'linear-gradient(135deg, #1E90FF, #0055CC, #70A1FF)' },
+                'green': { main: '#2ED573', dark: '#00883A', light: '#7BED9F', gradient: 'linear-gradient(135deg, #2ED573, #00883A, #7BED9F)' },
+                'purple': { main: '#A855F7', dark: '#6B21A8', light: '#C084FC', gradient: 'linear-gradient(135deg, #A855F7, #6B21A8, #C084FC)' },
+                'pink': { main: '#FF69B4', dark: '#CC1470', light: '#FFB6D9', gradient: 'linear-gradient(135deg, #FF69B4, #CC1470, #FFB6D9)' }
+            };
+            var c = colors[savedTheme];
+            if (c) {
+                var root = document.documentElement;
+                root.style.setProperty('--gold', c.main);
+                root.style.setProperty('--gold-dark', c.dark);
+                root.style.setProperty('--gold-light', c.light);
+                root.style.setProperty('--gold-gradient', c.gradient);
+            }
+        }
+    })();
 
     // ========== Support ==========
         function renderSupport() {
