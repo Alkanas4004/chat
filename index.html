@@ -1440,10 +1440,7 @@
             localStorage.setItem('webEgyptUserID', userId);
             localStorage.setItem('webEgyptUserCode', code);
             localStorage.setItem('webEgyptDeviceAuth', 'true');
-            localStorage.setItem('webEgyptAuthTime', Date.now());
-            localStorage.setItem('webEgyptDeviceAuth', 'true');  // تم التوثيق على الجهاز ده
-            localStorage.setItem('webEgyptAuthTime', Date.now()); // وقت التوثيق
-            
+            localStorage.setItem('webEgyptAuthTime', Date.now());            
             hideLoading();
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
