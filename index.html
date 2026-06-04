@@ -930,7 +930,7 @@
     let currentUser = null;
     let currentGroupId = null;
     let currentGroupData = null;
-    let chatUnsubscribe = null;  
+    let chatUnsubscribe = null;
     let groupLockListener = null;
     let typingUnsubscribe = null;
     let typingTimeout = null;
@@ -965,12 +965,12 @@
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
     }
 
-    function cleanListeners() {
+       function cleanListeners() {
         allListeners.forEach(fn => { try { fn(); } catch(e) {} });
         allListeners = [];
-        if (chatUnsubscribe)       
-      if (groupLockListener) { groupLockListener(); groupLockListener = null; }{ chatUnsubscribe(); chatUnsubscribe = null; }
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
+        if (groupLockListener) { groupLockListener(); groupLockListener = null; }
         clearTimeout(typingTimeout);
     }
 
@@ -1750,7 +1750,7 @@
         allListeners.push(unsub);
     }
 
-          function openGroupChat(groupId) {
+        function openGroupChat(groupId) {
         currentGroupId = groupId;
         setLastReadTimestamp(groupId, 'group');
         pushHistory('group-chat', groupId);
@@ -1779,7 +1779,6 @@
                         } else {
                             showToast('🔓 تم فتح المجموعة', 'success');
                         }
-                        // إعادة تحميل الشات
                         renderChat(groupId);
                     }
                 }
@@ -1796,7 +1795,6 @@
         
         const content = document.getElementById('contentArea');
         
-        // 🔥🔥🔥 الحل السحري لاختفاء الشات
         content.style.cssText = 'height:100%; overflow:hidden; display:flex; flex-direction:column;';
         document.getElementById('app').style.cssText = 'height:100dvh; overflow:hidden;';
         document.body.style.cssText = 'height:100dvh; overflow:hidden; position:fixed; width:100%;';
