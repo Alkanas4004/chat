@@ -930,7 +930,8 @@
     let currentUser = null;
     let currentGroupId = null;
     let currentGroupData = null;
-    let chatUnsubscribe = null;
+    let chatUnsubscribe = null;  
+    let groupLockListener = null;
     let typingUnsubscribe = null;
     let typingTimeout = null;
     let currentPrivateChatUser = null;
@@ -967,7 +968,8 @@
     function cleanListeners() {
         allListeners.forEach(fn => { try { fn(); } catch(e) {} });
         allListeners = [];
-        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        if (chatUnsubscribe)       
+      if (groupLockListener) { groupLockListener(); groupLockListener = null; }{ chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
         clearTimeout(typingTimeout);
     }
@@ -1748,11 +1750,43 @@
         allListeners.push(unsub);
     }
 
-        function openGroupChat(groupId) {
+          function openGroupChat(groupId) {
         currentGroupId = groupId;
         setLastReadTimestamp(groupId, 'group');
-        pushHistory('group-chat', groupId);  // 🔥 السطر ده مهم عشان زرار الرجوع
+        pushHistory('group-chat', groupId);
         navigate('chat', groupId);
+        
+        // 🔥🔥🔥 مراقبة قفل/فتح المجموعة في الوقت الحقيقي
+        if (groupLockListener) groupLockListener();
+        groupLockListener = db.collection('groups').doc(groupId)
+            .onSnapshot(function(doc) {
+                if (!doc.exists) {
+                    showToast('⚠️ تم حذف المجموعة', 'error');
+                    currentGroupId = null;
+                    switchTab('groups');
+                    return;
+                }
+                
+                var g = doc.data();
+                
+                if (currentGroupData) {
+                    var wasLocked = currentGroupData.isLocked;
+                    var isNowLocked = g.isLocked;
+                    
+                    if (wasLocked !== isNowLocked) {
+                        if (isNowLocked) {
+                            showToast('🔒 تم قفل المجموعة', 'warning');
+                        } else {
+                            showToast('🔓 تم فتح المجموعة', 'success');
+                        }
+                        // إعادة تحميل الشات
+                        renderChat(groupId);
+                    }
+                }
+                
+                currentGroupData = g;
+            });
+        allListeners.push(groupLockListener);
     }
 
     // ========== Chat System - Core ==========
