@@ -931,11 +931,6 @@
     let currentGroupId = null;
     let currentGroupData = null;
     let chatUnsubscribe = null;
-     let groupListener = null;
-     let groupsListener = null;
-    let privateChatsListener = null;
-    let storiesListener = null;
-    let statsListener = null;
     let typingUnsubscribe = null;
     let typingTimeout = null;
     let currentPrivateChatUser = null;
@@ -969,16 +964,11 @@
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
     }
 
-        function cleanListeners() {
+    function cleanListeners() {
         allListeners.forEach(fn => { try { fn(); } catch(e) {} });
         allListeners = [];
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
         if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
-        if (groupListener) { groupListener(); groupListener = null; }
-         if (groupsListener) { groupsListener(); groupsListener = null; }
-        if (privateChatsListener) { privateChatsListener(); privateChatsListener = null; }
-        if (storiesListener) { storiesListener(); storiesListener = null; }
-        if (statsListener) { statsListener(); statsListener = null; }
         clearTimeout(typingTimeout);
     }
 
@@ -1086,9 +1076,10 @@
         }, 100);
     };
 
-       // 🔥🔥🔥 التعامل مع زرار الرجوع في الموبايل
+    // 🔥🔥🔥 التعامل مع زرار الرجوع في الموبايل
     window.addEventListener('popstate', function(e) {
         if (e.state && e.state.view) {
+            // لو كان في شات وضغط رجوع
             if (e.state.view === 'group-chat') {
                 currentGroupId = null;
                 isInChat = false;
@@ -1103,12 +1094,13 @@
                        e.state.view === 'support' || e.state.view === 'stats' || 
                        e.state.view === 'settings' || e.state.view === 'notes' || 
                        e.state.view === 'leaderboard' || e.state.view === 'group-info' ||
-                       e.state.view === 'theme' || e.state.view === 'about' || e.state.view === 'stickers') {
+                       e.state.view === 'about') {
                 isInChat = false;
                 cleanListeners();
                 switchTab('more');
             }
         } else {
+            // لو مفيش state، يبقى راجع للصفحة الرئيسية
             if (currentGroupId) { 
                 currentGroupId = null; 
                 isInChat = false;
@@ -1122,40 +1114,12 @@
             }
         }
         
+        // إزالة آخر عنصر من الـ stack
         if (historyStack.length > 0) {
             historyStack.pop();
         }
     });
 
-    // 🔥🔥🔥 منع الخروج بالغلط من التطبيق (PWA)
-    document.addEventListener('backbutton', function(e) {
-        e.preventDefault();
-        
-        if (document.querySelector('.modal-overlay')) {
-            document.querySelectorAll('.modal-overlay').forEach(function(m) { m.remove(); });
-        } else if (document.getElementById('imageViewer') && !document.getElementById('imageViewer').classList.contains('hidden')) {
-            document.getElementById('imageViewer').classList.add('hidden');
-        } else if (isInChat && currentGroupId) {
-            currentGroupId = null;
-            isInChat = false;
-            cleanListeners();
-            switchTab('groups');
-        } else if (isInChat && currentPrivateChatUser) {
-            currentPrivateChatUser = null;
-            isInChat = false;
-            cleanListeners();
-            switchTab('chats');
-        } else if (currentTab === 'more' || currentTab === 'stats') {
-            cleanListeners();
-            switchTab('groups');
-        } else {
-            if (confirm('🚪 هل تريد الخروج من التطبيق؟')) {
-                if (navigator.app && navigator.app.exitApp) {
-                    navigator.app.exitApp();
-                }
-            }
-        }
-    }, false);
     // 🔥🔥🔥 منع الخروج بالغلط من التطبيق (للـ PWA)
     document.addEventListener('backbutton', function(e) {
         e.preventDefault();
@@ -1259,16 +1223,6 @@
         }
         updateUnreadBadges();
     }
-            if (page === 'stories') pushHistory('stories');
-        if (page === 'media') pushHistory('media');
-        if (page === 'support') pushHistory('support');
-        if (page === 'stats') pushHistory('stats');
-        if (page === 'settings') pushHistory('settings');
-        if (page === 'notes') pushHistory('notes');
-        if (page === 'leaderboard') pushHistory('leaderboard');
-        if (page === 'theme') pushHistory('theme');
-        if (page === 'stickers') pushHistory('stickers');
-        if (page === 'group-info') pushHistory('group-info');
 
     function navigate(page, data) {
         data = data || null;
@@ -1440,7 +1394,10 @@
             localStorage.setItem('webEgyptUserID', userId);
             localStorage.setItem('webEgyptUserCode', code);
             localStorage.setItem('webEgyptDeviceAuth', 'true');
-            localStorage.setItem('webEgyptAuthTime', Date.now());            
+            localStorage.setItem('webEgyptAuthTime', Date.now());
+            localStorage.setItem('webEgyptDeviceAuth', 'true');  // تم التوثيق على الجهاز ده
+            localStorage.setItem('webEgyptAuthTime', Date.now()); // وقت التوثيق
+            
             hideLoading();
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
@@ -1735,15 +1692,6 @@
     // ========== Groups ==========
     function renderGroups() {
         const content = document.getElementById('contentArea');
-                // 🔥🔥🔥 مستمع مباشر للمجموعات
-        if (groupsListener) groupsListener();
-        groupsListener = db.collection('groups')
-            .where('members', 'array-contains', currentUser.uid)
-            .onSnapshot(function(snap) {
-                // إعادة بناء القائمة كل ما يحصل تغيير
-                buildGroupsList(snap);
-            });
-        allListeners.push(groupsListener);
         content.innerHTML = `
         <h2 class="section-title">📚 مجموعاتي <span class="refresh-btn" onclick="renderGroups()">🔄</span></h2>
         <div id="groupsList" class="groups-grid">
@@ -1800,48 +1748,12 @@
         allListeners.push(unsub);
     }
 
-    function openGroupChat(groupId) {
+        function openGroupChat(groupId) {
         currentGroupId = groupId;
         setLastReadTimestamp(groupId, 'group');
-        pushHistory('group-chat', groupId);
+        pushHistory('group-chat', groupId);  // 🔥 السطر ده مهم عشان زرار الرجوع
         navigate('chat', groupId);
     }
-        
-        // 🔥🔥🔥 مراقبة تغييرات المجموعة في الوقت الحقيقي
-        if (groupListener) groupListener();
-        groupListener = db.collection('groups').doc(groupId)
-            .onSnapshot(function(doc) {
-                if (!doc.exists) {
-                    // المجموعة اتحذفت
-                    showToast('⚠️ تم حذف المجموعة', 'error');
-                    currentGroupId = null;
-                    switchTab('groups');
-                    return;
-                }
-                
-                var g = doc.data();
-                
-                // 🔥 تحديث القفل/الفتح فوراً
-                if (currentGroupData) {
-                    var wasLocked = currentGroupData.isLocked;
-                    var isNowLocked = g.isLocked;
-                    
-                    if (wasLocked !== isNowLocked) {
-                        // القفل اتغير - حدث الشات
-                        if (isNowLocked) {
-                            showToast('🔒 تم قفل المجموعة', 'warning');
-                        } else {
-                            showToast('🔓 تم فتح المجموعة', 'success');
-                        }
-                        // إعادة تحميل الشات عشان يطبق القفل
-                        renderChat(groupId);
-                    }
-                }
-                
-                currentGroupData = g;
-            });
-        allListeners.push(groupListener);
-    
 
     // ========== Chat System - Core ==========
         function renderChat(groupId) {
@@ -1881,8 +1793,7 @@
             if (!allowVideos) restrictions.push('🎥 الفيديو');
             if (!allowFiles) restrictions.push('📎 الملفات');
             if (!allowAudio) restrictions.push('🎤 الصوت');
-                        // 🔥🔥🔥 تحديث بيانات المجموعة
-            currentGroupData = g;
+            
             const canWrite = isAdmin || (!isLocked && (g.type === 'open' || g.type === undefined));
             const canWriteText = canWrite && allowText;
             const canUploadAnyMedia = canWrite && (allowImages || allowVideos || allowFiles || allowAudio);
@@ -2404,14 +2315,6 @@
     }
 
     // ========== Chats List ==========
-            // 🔥🔥🔥 مستمع مباشر للمحادثات الخاصة
-        if (privateChatsListener) privateChatsListener();
-        privateChatsListener = db.collection('private_chats')
-            .where('participants', 'array-contains', currentUser.uid)
-            .onSnapshot(function(snap) {
-                buildChatsList(snap);
-            });
-        allListeners.push(privateChatsListener);
     function renderChatsList() {
         const content = document.getElementById('contentArea');
         content.innerHTML = `
@@ -2472,9 +2375,9 @@
 
         function openPrivateChat(uid) {
         currentPrivateChatUser = uid;
-        var chatId = [currentUser.uid, uid].sort().join('_');
+        const chatId = [currentUser.uid, uid].sort().join('_');
         setLastReadTimestamp(chatId, 'private');
-        pushHistory('private-chat', uid);
+        pushHistory('private-chat', uid);  // 🔥 السطر ده هو اللي بيخلي زرار الرجوع يشتغل
         navigate('private-chat', uid);
     }
 
@@ -2611,15 +2514,6 @@
         });
     };
         // ========== Student Stats ==========
-                // 🔥🔥🔥 مستمع مباشر للإحصائيات
-        if (statsListener) statsListener();
-        statsListener = db.collection('users').doc(currentUser.uid)
-            .onSnapshot(function(doc) {
-                if (doc.exists) {
-                    buildStatsDisplay(doc.data());
-                }
-            });
-        allListeners.push(statsListener);
     function renderStudentStats() {
         const c = document.getElementById('contentArea');
         if (!currentUser) return;
@@ -2945,15 +2839,6 @@
     }
 
     // ========== Stories ==========
-            // 🔥🔥🔥 مستمع مباشر للقصص
-        if (storiesListener) storiesListener();
-        storiesListener = db.collection('stories')
-            .orderBy('createdAt', 'desc')
-            .limit(30)
-            .onSnapshot(function(snap) {
-                buildStoriesList(snap);
-            });
-        allListeners.push(storiesListener);
     function renderStories() {
         const c = document.getElementById('contentArea');
         c.innerHTML = '<h2 class="section-title">📖 القصص</h2><div id="storiesList"><p style="color:var(--text2); text-align:center;">⏳ جاري التحميل...</p></div>';
@@ -3529,19 +3414,6 @@
     console.log('%c  🔔 Notifications | 🔊 Sound | 👻 Auto-login', 'color: #AAA;');
     console.log('%c  🔒 Anti-theft | 📱 PWA | ⚡ Real-time | 🎉 Confetti', 'color: #AAA;');
     console.log('%c🛡️ Protected by EduChat Pro  Security System', 'color: #FFA502;');
-        document.getElementById('loginBtn').addEventListener('click', function() {
-        studentLogin();
-    });
-        // 🔥🔥🔥 إصلاح زرار الدخول
-    document.addEventListener('DOMContentLoaded', function() {
-        var btn = document.querySelector('.login-box .btn');
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                studentLogin();
-            });
-        }
-    });
 </script>
 </body>
 </html>
